@@ -21,6 +21,7 @@ starting_position_hi  .rs 1
 
 direction             .rs 1
 grounded              .rs 1
+speed                 .rs 1
 
 position_x            .rs 1
 position_y            .rs 1
@@ -44,8 +45,8 @@ check_y_offset        .rs 1
 ;;;;;;;;;;;;;;;
 
 
-	.bank 0
-	.org $C000
+    .bank 0
+    .org $C000
 Reset:
     SEI          ; disable IRQs
     CLD          ; disable decimal mode
@@ -205,11 +206,11 @@ DrawMode:
 
 
 InitializePosition:
-	LDY #$00
+    LDY #$00
     LDA [starting_position_lo], y
     STA position_x
 
-	INY
+    INY
     LDA [starting_position_lo], y
     STA position_y
 
@@ -370,9 +371,7 @@ GetPositionWithOffset:
     JSR _GetPositionWithOffset
 
 CollisionCheck:
-    TAY
-    LDA [level_lo], y
-
+    JSR _CheckCollision
     CMP #$00
     BNE GetPositionWithoutOffset
     JSR _Stop
@@ -381,8 +380,7 @@ GetPositionWithoutOffset:
     JSR _GetPositionWithoutOffset
 
 StopperCheck:
-    TAY
-    LDA [level_lo], y
+    JSR _CheckCollision
 
     CMP #$04
     BNE EndCheck
@@ -405,8 +403,8 @@ EndLevelVBlank:
     BPL StartNextLevel
 StartNextLevel:
     INC level_hi
-	INC starting_position_lo
-	INC starting_position_lo
+    INC starting_position_lo
+    INC starting_position_lo
     JMP VBlank
 
 UpdatePosition:
@@ -475,13 +473,31 @@ _Stop:
     STA direction
     RTS
 
+_CheckCollision:
+    TAY
+    LDA [level_lo], y
+    RTS
+
+_CheckMovement:
+    LDX grounded
+    CPX #$00
+    BEQ _CheckObstacle
+    RTS
+_CheckObstacle:
+    STY direction
+    JSR _GetPositionWithOffset
+    JSR _CheckCollision
+    CMP #$00
+    BNE _SetDirection
+    JMP _Stop
+
 _GetPositionWithOffset:
     LDX #$01
     STX check_x_offset
     LDX #$01
     STX check_y_offset
     JSR _GetPosition
-	RTS
+    RTS
 
 _GetPositionWithoutOffset:
     LDX #$00
@@ -489,13 +505,6 @@ _GetPositionWithoutOffset:
     LDX #$00
     STX check_y_offset
     JSR _GetPosition
-	RTS
-
-_CheckMovement:
-    LDX grounded
-    CPX #$00
-
-    BEQ _SetDirection
     RTS
 
 _GetPosition:
@@ -525,7 +534,6 @@ _AddOffsetY:
 _SaveY:
     JSR _Multiply
     STA py
-
 _LoadIndex:
     LDA py
     ADC px
@@ -534,7 +542,7 @@ _LoadIndex:
 
 ; Y as argument ;
 _SetDirection:
-    STY direction
+    ;STY direction
     LDY #$01
     STY grounded
     RTS
@@ -614,21 +622,21 @@ level_01_02:
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 level_01_03:
-	.db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $02, $00, $00
-	.db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $05, $01, $01, $01, $00, $00
-	.db $00, $00, $00, $01, $00, $01, $00, $01, $04, $01, $00, $01, $00, $01, $00, $00
-	.db $00, $01, $04, $01, $01, $01, $00, $00, $01, $00, $00, $01, $01, $01, $00, $00
-	.db $00, $01, $01, $00, $00, $05, $00, $00, $05, $00, $00, $00, $00, $00, $00, $00
-	.db $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00
-	.db $00, $01, $01, $04, $01, $01, $01, $01, $01, $01, $01, $01, $05, $01, $00, $00
-	.db $00, $01, $05, $01, $01, $00, $00, $00, $00, $01, $01, $04, $00, $01, $00, $00
-	.db $00, $00, $01, $01, $01, $01, $04, $01, $01, $01, $00, $01, $01, $01, $00, $00
-	.db $00, $01, $01, $00, $00, $01, $01, $01, $05, $01, $01, $04, $00, $01, $00, $00
-	.db $00, $01, $04, $01, $01, $05, $01, $05, $01, $05, $01, $01, $00, $01, $00, $00
-	.db $00, $01, $01, $01, $05, $05, $01, $01, $05, $01, $01, $01, $00, $01, $00, $00
-	.db $00, $00, $00, $01, $05, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
-	.db $00, $00, $00, $01, $01, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
-	.db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
+    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $02, $00, $00
+    .db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $05, $01, $01, $01, $00, $00
+    .db $00, $00, $00, $01, $00, $01, $00, $01, $04, $01, $00, $01, $00, $01, $00, $00
+    .db $00, $01, $04, $01, $01, $01, $00, $00, $01, $00, $00, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $05, $00, $00, $05, $00, $00, $00, $00, $00, $00, $00
+    .db $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $04, $01, $01, $01, $01, $01, $01, $01, $01, $05, $01, $00, $00
+    .db $00, $01, $05, $01, $01, $00, $00, $00, $00, $01, $01, $04, $00, $01, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $04, $01, $01, $01, $00, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $01, $01, $01, $05, $01, $01, $04, $00, $01, $00, $00
+    .db $00, $01, $04, $01, $01, $05, $01, $05, $01, $05, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $01, $05, $05, $01, $01, $05, $01, $01, $01, $00, $01, $00, $00
+    .db $00, $00, $00, $01, $05, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
+    .db $00, $00, $00, $01, $01, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
+    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 ;; starting positions ;;
