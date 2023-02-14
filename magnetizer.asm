@@ -12,7 +12,7 @@ level_hi              .rs 1
 
 tiles_lo              .rs 1
 tiles_hi              .rs 1
-    
+
 pointer_lo            .rs 1
 pointer_hi            .rs 1
 
@@ -77,7 +77,7 @@ ClearGraphics:
     STA $0200, x
     INX
     BNE ClearMemory
-    
+
 ;; setting pointers ;;
 SetTilesPointer:
     LDA #LOW(tiles)
@@ -90,13 +90,13 @@ SetLevelPointer:
     STA level_lo
     LDA #HIGH(levels)
     STA level_hi
-		
+
 SetStartingPositionPointer:
     LDA #LOW(starting_positions)
     STA starting_position_lo
     LDA #HIGH(starting_positions)
     STA starting_position_hi
-	
+
 InitializeSprite:
     LDA #$41
     STA flip
@@ -155,23 +155,23 @@ LoadBackground:
     LDX #$00            ; start at pointer + 0
     LDY #$00
 OutsideLoop:
-  
+
 InsideLoop:
     LDA [pointer_lo], y  ; copy one background byte from address in pointer plus Y
-    
+
 LoadTilePart:
     STY temp_y
-    TAY 
+    TAY
     LDA [tiles_lo], y
     STA current_tile
     LDY temp_y
 ProcessTile:
-    JSR ShiftVertically
+    JSR _ShiftVertically
     LDA current_tile
 
 DrawTile:
-    STA $2007       
-    ADC #$01    
+    STA $2007
+    ADC #$01
     STA $2007
 
     INY                 ; inside loop counter
@@ -188,7 +188,7 @@ IncrementPointer:
     ADC #$10
     STA pointer_lo
 
-    
+
 PostLoop:
     LDY #$00
     INX
@@ -196,7 +196,7 @@ PostLoop:
     BNE OutsideLoop     ; run the outside loop 256 times before continuing down
 
 
-DrawMode:           
+DrawMode:
     LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
     STA $2000
 
@@ -217,7 +217,7 @@ InitializePosition:
 Forever:
     JMP Forever     ;jump back to Forever, infinite loop
 
-    
+
 ;; NMI ;;
 NMI:
     LDA #$00
@@ -266,7 +266,7 @@ ReadUp:
     BEQ ReadUpDone   ; branch to ReadADone if button is NOT pressed (0)
                     ; add instructions here to do something when button IS pressed (1)
     LDY #$01
-    JSR CheckMovement
+    JSR _CheckMovement
 ReadUpDone:        ; handling this button is done
 
 
@@ -276,7 +276,7 @@ ReadDown:
     BEQ ReadDownDone   ; branch to ReadBDone if button is NOT pressed (0)
                     ; add instructions here to do something when button IS pressed (1)
     LDY #$02
-    JSR CheckMovement
+    JSR _CheckMovement
 ReadDownDone:        ; handling this button is done
 
 ReadLeft:
@@ -285,7 +285,7 @@ ReadLeft:
     BEQ ReadLeftDone   ; branch to ReadBDone if button is NOT pressed (0)
 
     LDY #$03
-    JSR CheckMovement
+    JSR _CheckMovement
 ReadLeftDone:        ; handling this button is done
 
 ReadRight:
@@ -294,7 +294,7 @@ ReadRight:
     BEQ ReadRightDone   ; branch to ReadBDone if button is NOT pressed (0)
                     ; add instructions here to do something when button IS pressed (1)
     LDY #$04
-    JSR CheckMovement
+    JSR _CheckMovement
 ReadRightDone:        ; handling this button is done
 
 
@@ -375,7 +375,7 @@ CollisionCheck:
 
     CMP #$00
     BNE GetPositionWithoutOffset
-    JSR Stop
+    JSR _Stop
 
 GetPositionWithoutOffset:
     JSR _GetPositionWithoutOffset
@@ -386,12 +386,12 @@ StopperCheck:
 
     CMP #$04
     BNE EndCheck
-    JSR Stop
+    JSR _Stop
 
 EndCheck:
     CMP #$03
     BNE UpdatePosition
-    JSR Stop
+    JSR _Stop
     JMP EndLevelReset
 
 EndLevelReset:
@@ -432,18 +432,18 @@ MainLoopEnd:
 
 
 ; u d l r
-GetOffset:
+_GetOffset:
     LDA direction
     CMP #$01
-    BEQ SetOffsetUp
+    BEQ _SetOffsetUp
     CMP #$02
-    BEQ SetOffsetDown
+    BEQ _SetOffsetDown
     CMP #$03
-    BEQ SetOffsetLeft
+    BEQ _SetOffsetLeft
     CMP #$04
-    BEQ SetOffsetRight
+    BEQ _SetOffsetRight
     RTS
-SetOffsetUp:
+_SetOffsetUp:
     LDA #$FF
     STA offset_y
     LDA #$00
@@ -480,96 +480,89 @@ _GetPositionWithOffset:
     STX check_x_offset
     LDX #$01
     STX check_y_offset
-    JSR GetPosition
+    JSR _GetPosition
 	RTS
-	
+
 _GetPositionWithoutOffset:
     LDX #$00
     STX check_x_offset
     LDX #$00
     STX check_y_offset
-    JSR GetPosition
+    JSR _GetPosition
 	RTS
 
-CheckMovement:
+_CheckMovement:
     LDX grounded
     CPX #$00
-	; check if movement is possible ;
-	TYA
-	STA direction
-	JSR GetPosition
-	LDA index
-	
-	
-	; lol ;
-    BEQ SetDirection
+
+    BEQ _SetDirection
     RTS
-	
-GetPosition:
-    JSR GetOffset
-GetX:
+
+_GetPosition:
+    JSR _GetOffset
+_GetX:
     LDA position_x
-    JSR Divide
+    JSR _Divide
     LDX check_x_offset
     CPX #$01
-    BNE SaveX
-AddOffsetX:
+    BNE _SaveX
+_AddOffsetX:
     CLC
     ADC offset_x
     AND #%00001111
-SaveX:
+_SaveX:
     STA px
-GetY:
+_GetY:
     LDA position_y
-    JSR Divide
+    JSR _Divide
     LDX check_y_offset
     CPX #$01
-    BNE SaveY
-AddOffsetY:
+    BNE _SaveY
+_AddOffsetY:
     CLC
     ADC offset_y
     AND #%00001111
-SaveY:
-    JSR Multiply
+_SaveY:
+    JSR _Multiply
     STA py
 
-LoadIndex:
+_LoadIndex:
     LDA py
     ADC px
     STA index
     RTS
 
 ; Y as argument ;
-SetDirection:
+_SetDirection:
     STY direction
     LDY #$01
     STY grounded
     RTS
 
-ShiftVertically:
+_ShiftVertically:
     TXA
     AND #%00000001
-    BEQ AfterShift
+    BEQ _AfterShift
 
     LDA current_tile
     ADC #$02
     STA current_tile
-AfterShift:
+_AfterShift:
     RTS
 
-Snap:
-    JSR Divide
-    JSR Multiply
+_Snap:
+    JSR _Divide
+    JSR _Multiply
     RTS
 
-Multiply:
+_Multiply:
     ASL a
     ASL a
     ASL a
     ASL a
     RTS
 
-Divide:
+_Divide:
     LSR a
     LSR a
     LSR a
@@ -619,7 +612,7 @@ level_01_02:
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-	
+
 level_01_03:
 	.db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $02, $00, $00
 	.db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $05, $01, $01, $01, $00, $00
@@ -637,13 +630,13 @@ level_01_03:
 	.db $00, $00, $00, $01, $01, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
 	.db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-    
+
 ;; starting positions ;;
 starting_positions:
     .db $68, $78
     .db $08, $68
     .db $D8, $08
-	
+
 
 attributes:
     .db %00000000, %00010000, %01010000, %00010000, %00000000, %00000000, %00000000, %00110000
@@ -656,13 +649,13 @@ attributes:
     .db %00000000, %00010000, %01010000, %00010000, %00000000, %00000000, %00000000, %00110000
 
 
-    .db $24,$24,$24,$24, $47,$47,$24,$24 
-    .db $47,$47,$47,$47, $47,$47,$24,$24 
+    .db $24,$24,$24,$24, $47,$47,$24,$24
+    .db $47,$47,$47,$47, $47,$47,$24,$24
     .db $24,$24,$24,$24 ,$24,$24,$24,$24
     .db $24,$24,$24,$24, $55,$56,$24,$24
-    .db $47,$47,$47,$47, $47,$47,$24,$24 
+    .db $47,$47,$47,$47, $47,$47,$24,$24
     .db $24,$24,$24,$24 ,$24,$24,$24,$24
-    .db $24,$24,$24,$24, $55,$56,$24,$24 
+    .db $24,$24,$24,$24, $55,$56,$24,$24
 
 
 
@@ -678,7 +671,7 @@ tiles:
     .db $30, $24, $34, $34, $38, $3C
 
 
-    
+
 
 
     .org $FFFA     ;first of the three vectors starts here
