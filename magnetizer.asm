@@ -22,6 +22,7 @@ starting_position_hi  .rs 1
 direction             .rs 1
 grounded              .rs 1
 speed                 .rs 1
+real_speed            .rs 1
 
 position_x            .rs 1
 position_y            .rs 1
@@ -42,7 +43,7 @@ temp_y                .rs 1
 check_x_offset        .rs 1
 check_y_offset        .rs 1
 
-;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
     .bank 0
@@ -298,7 +299,12 @@ ReadRight:
     JSR _CheckMovement
 ReadRightDone:        ; handling this button is done
 
-
+    LDA grounded
+    CMP #$01
+    BNE Move
+CalculateSpeed:
+    JSR _CalculateRealSpeed
+    JSR _IncreaseSpeed
 Move:
     LDX direction
     CPX #$01
@@ -309,103 +315,51 @@ Move:
     BEQ MoveLeft
     CPX #$04
     BEQ MoveRight
-    BNE CheckPosition
+    JMP UpdatePosition
 
 MoveUp:
-    DEC position_y
     LDA #$41
     STA flip
     LDA #$02
     STA sprite
-    JMP CheckPosition
+MoveUpStep:
+    DEC position_y
+    JSR _AfterStep
+    BNE MoveUpStep
+    JMP UpdatePosition
 
 MoveDown:
-    INC position_y
     LDA #$C1
     STA flip
     LDA #$02
     STA sprite
-    JMP CheckPosition
+MoveDownStep:
+    INC position_y
+    JSR _AfterStep
+    BNE MoveDownStep
+    JMP UpdatePosition
 
 MoveLeft:
-    DEC position_x
     LDA #$41
     STA flip
     LDA #$01
     STA sprite
-    JMP CheckPosition
+MoveLeftStep:
+    DEC position_x
+    JSR _AfterStep
+    BNE MoveLeftStep
+    JMP UpdatePosition
 
 MoveRight:
-    INC position_x
     LDA #$01
     STA flip
     LDA #$01
     STA sprite
-    JMP CheckPosition
-
-CheckPosition:
-; if direction = 1, 2, check y collision
-    LDA direction
-    CMP #$03
-    BCC CheckY
-
-    LDA direction
-    CMP #$03
-    BCS CheckX
+MoveRightStep:
+    INC position_x
+    JSR _AfterStep
+    BNE MoveRightStep
     JMP UpdatePosition
-
-CheckY:
-    LDA position_y
-    AND #%00001111
-    CMP #$08
-    BEQ GetPositionWithOffset
-    JMP UpdatePosition
-CheckX:
-    LDA position_x
-    AND #%00001111
-    CMP #$08
-    BEQ GetPositionWithOffset
-    JMP UpdatePosition
-
-GetPositionWithOffset:
-    JSR _GetPositionWithOffset
-
-CollisionCheck:
-    JSR _CheckCollision
-    CMP #$00
-    BNE GetPositionWithoutOffset
-    JSR _Stop
-
-GetPositionWithoutOffset:
-    JSR _GetPositionWithoutOffset
-
-StopperCheck:
-    JSR _CheckCollision
-
-    CMP #$04
-    BNE EndCheck
-    JSR _Stop
-
-EndCheck:
-    CMP #$03
-    BNE UpdatePosition
-    JSR _Stop
-    JMP EndLevelReset
-
-EndLevelReset:
-    TXS          ; Set up stack
-    INX          ; now X = 0
-    STX $2000    ; disable NMI
-    STX $2001    ; disable rendering
-    STX $4010    ; disable DMC IRQ
-EndLevelVBlank:
-    BIT $2002
-    BPL StartNextLevel
-StartNextLevel:
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    JMP VBlank
 
 UpdatePosition:
     LDA sprite
@@ -466,13 +420,108 @@ _SetOffsetRight:
     STA offset_y
     RTS
 
+;; movement ;;
+_AfterStep:
+    JSR _CheckPosition
+    DEC real_speed
+    LDA real_speed
+    CMP #$00
+    RTS
+
+;; speed subroutines ;;
+_CalculateRealSpeed:
+    LDA speed
+    JSR _Divide
+    ADC #$01
+    STA real_speed
+    RTS
+
+_IncreaseSpeed:
+    LDY speed
+    CPY #$FF
+    BNE _IncreaseSpeedStep
+    RTS
+_IncreaseSpeedStep:
+    INC speed
+    RTS
+
 _Stop:
     LDA #$00
     STA grounded
-    LDA #$00
     STA direction
+    STA speed
+    LDA #$01
+    STA real_speed
     RTS
 
+;; collision routine ;;
+
+_CheckPosition:
+; if direction = 1, 2, check y collision
+    LDA direction
+    CMP #$03
+    BCC _CheckY
+
+    LDA direction
+    CMP #$03
+    BCS _CheckX
+    RTS
+
+_CheckY:
+    LDA position_y
+    AND #%00001111
+    CMP #$08
+    BEQ __GetPositionWithOffset
+    RTS
+_CheckX:
+    LDA position_x
+    AND #%00001111
+    CMP #$08
+    BEQ __GetPositionWithOffset
+    RTS
+
+__GetPositionWithOffset:
+    JSR _GetPositionWithOffset
+
+__CollisionCheck:
+    JSR _CheckCollision
+    CMP #$00
+    BNE __GetPositionWithoutOffset
+    JSR _Stop
+
+__GetPositionWithoutOffset:
+    JSR _GetPositionWithoutOffset
+
+_StopperCheck:
+    JSR _CheckCollision
+
+    CMP #$04
+    BNE _EndCheck
+    JSR _Stop
+
+_EndCheck:
+    CMP #$03
+    BNE __UpdatePosition
+    JSR _Stop
+
+_EndLevelReset:
+    TXS          ; Set up stack
+    INX          ; now X = 0
+    STX $2000    ; disable NMI
+    STX $2001    ; disable rendering
+    STX $4010    ; disable DMC IRQ
+_EndLevelVBlank:
+    BIT $2002
+    BPL _StartNextLevel
+_StartNextLevel:
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    JMP VBlank
+__UpdatePosition:
+    RTS
+
+;;;;;;;;;;;;;;;;
 _CheckCollision:
     TAY
     LDA [level_lo], y
@@ -610,39 +659,58 @@ level_01_02:
     .db $00, $01, $01, $01, $00, $01, $00, $00, $01, $01, $00, $04, $01, $01, $00, $00
     .db $00, $01, $00, $01, $01, $01, $01, $00, $01, $00, $00, $01, $00, $01, $00, $00
     .db $00, $01, $01, $00, $01, $04, $01, $01, $01, $01, $00, $01, $00, $01, $00, $00
-    .db $02, $01, $01, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $01, $00, $00, $00, $00, $01, $00, $01, $00, $00
+    .db $02, $01, $01, $01, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $00, $00
     .db $00, $00, $01, $01, $01, $00, $01, $00, $04, $00, $00, $01, $00, $01, $00, $00
-    .db $00, $01, $01, $00, $04, $01, $00, $01, $01, $01, $01, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $04, $01, $00, $01, $01, $01, $01, $01, $00, $01, $00, $00
     .db $00, $01, $00, $01, $01, $01, $00, $00, $00, $01, $00, $01, $00, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $01, $04, $01, $01, $01, $00, $01, $04, $00, $00
     .db $00, $00, $00, $01, $01, $00, $01, $01, $00, $01, $00, $00, $00, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $00, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 level_01_03:
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $02, $00, $00
-    .db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $05, $01, $01, $01, $00, $00
-    .db $00, $00, $00, $01, $00, $01, $00, $01, $04, $01, $00, $01, $00, $01, $00, $00
-    .db $00, $01, $04, $01, $01, $01, $00, $00, $01, $00, $00, $01, $01, $01, $00, $00
-    .db $00, $01, $01, $00, $00, $05, $00, $00, $05, $00, $00, $00, $00, $00, $00, $00
+    .db $00, $00, $00, $01, $01, $01, $01, $01, $01, $01, $04, $01, $01, $01, $00, $00
+    .db $00, $00, $00, $01, $00, $01, $00, $01, $05, $01, $00, $01, $00, $01, $00, $00
+    .db $00, $01, $05, $01, $01, $01, $00, $00, $01, $00, $00, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $04, $00, $00, $04, $00, $00, $00, $00, $00, $00, $00
     .db $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00
-    .db $00, $01, $01, $04, $01, $01, $01, $01, $01, $01, $01, $01, $05, $01, $00, $00
-    .db $00, $01, $05, $01, $01, $00, $00, $00, $00, $01, $01, $04, $00, $01, $00, $00
-    .db $00, $00, $01, $01, $01, $01, $04, $01, $01, $01, $00, $01, $01, $01, $00, $00
-    .db $00, $01, $01, $00, $00, $01, $01, $01, $05, $01, $01, $04, $00, $01, $00, $00
-    .db $00, $01, $04, $01, $01, $05, $01, $05, $01, $05, $01, $01, $00, $01, $00, $00
-    .db $00, $01, $01, $01, $05, $05, $01, $01, $05, $01, $01, $01, $00, $01, $00, $00
-    .db $00, $00, $00, $01, $05, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
+    .db $00, $01, $01, $05, $01, $01, $01, $01, $01, $01, $01, $01, $04, $01, $00, $00
+    .db $00, $01, $04, $01, $01, $00, $00, $00, $00, $01, $01, $05, $00, $01, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $05, $01, $01, $01, $00, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $01, $01, $01, $04, $01, $01, $05, $00, $01, $00, $00
+    .db $00, $01, $05, $01, $01, $04, $01, $04, $01, $04, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $01, $04, $04, $01, $01, $04, $01, $01, $01, $00, $01, $00, $00
+    .db $00, $00, $00, $01, $04, $01, $01, $00, $01, $01, $00, $00, $00, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $00, $00, $01, $01, $00, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00
+    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+
+level_01_04:
+    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $02, $00, $00
+    .db $00, $00, $00, $01, $01, $01, $01, $01, $04, $01, $00, $01, $01, $01, $00, $00
+    .db $00, $00, $00, $01, $00, $01, $04, $01, $01, $01, $01, $01, $05, $01, $00, $00
+    .db $00, $01, $01, $01, $05, $01, $01, $05, $01, $00, $00, $01, $04, $01, $00, $00
+    .db $00, $01, $00, $01, $01, $05, $05, $01, $01, $01, $01, $05, $05, $00, $00, $00
+    .db $00, $05, $00, $01, $01, $01, $01, $01, $00, $01, $00, $01, $05, $01, $00, $00
+    .db $00, $01, $01, $01, $01, $05, $05, $01, $04, $01, $01, $00, $00, $01, $00, $00
+    .db $00, $00, $01, $01, $05, $01, $01, $01, $01, $05, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $01, $01, $01, $00, $05, $00, $01, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $04, $01, $04, $01, $01, $00, $00, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $01, $01, $01, $01, $01, $01, $01, $05, $04, $00, $01, $00, $00
+    .db $00, $01, $00, $01, $01, $01, $00, $01, $05, $01, $01, $01, $00, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $00, $01, $01, $05, $01, $00, $01, $05, $01, $00, $00
+    .db $00, $01, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $01, $00, $00, $00
+    .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $03, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 ;; starting positions ;;
 starting_positions:
     .db $68, $78
-    .db $08, $68
+    .db $08, $78
+    .db $D8, $08
     .db $D8, $08
 
 
@@ -666,7 +734,6 @@ attributes:
     .db $24,$24,$24,$24, $55,$56,$24,$24
 
 
-
 palette:
     .db $19,$02,$04,$1D,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F ; background
     .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C ; sprites
@@ -678,9 +745,7 @@ sprites:
 tiles:
     .db $30, $24, $34, $34, $38, $3C
 
-
-
-
+;;;;;;;;;;;;;;
 
     .org $FFFA     ;first of the three vectors starts here
     .dw NMI        ;when an NMI happens (once per frame if enabled) the
@@ -691,7 +756,6 @@ tiles:
 
 
 ;;;;;;;;;;;;;;
-
 
   .bank 2
   .org $0000
