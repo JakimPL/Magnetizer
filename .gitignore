@@ -1,6 +1,9 @@
+.idea/
+
 *.bat
 *.sh
 
+*.deb
 *.nes
 *.fns
 
