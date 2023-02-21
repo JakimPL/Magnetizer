@@ -35,13 +35,14 @@ index                 .rs 1
 offset_x              .rs 1
 offset_y              .rs 1
 
-sprite                .rs 1
-flip                  .rs 1
-
 temp_y                .rs 1
 
 check_x_offset        .rs 1
 check_y_offset        .rs 1
+
+metasprite_low        .rs 1
+metasprite_high       .rs 1
+metasprite_offset     .rs 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -61,7 +62,7 @@ Reset:
     STX $4010    ; disable DMC IRQs
 
 
-InitialVBlank:       ; First wait for vblank to make sure PPU is ready
+InitialVBlank:
     BIT $2002
     BPL InitialVBlank
 
@@ -99,12 +100,14 @@ SetStartingPositionPointer:
     LDA #HIGH(starting_positions)
     STA starting_position_hi
 
-InitializeSprite:
-    LDA #$41
-    STA flip
-
-    LDA #$01
-    STA sprite
+LoadSprites:
+    LDX #$00
+LoadSpritesLoop:
+    LDA sprites, x
+    STA $0200, x
+    INX
+    CPX #$14
+    BNE LoadSpritesLoop
 
 VBlank:
     BIT $2002
@@ -124,15 +127,6 @@ LoadPalettesLoop:
     INX
     CPX #$20
     BNE LoadPalettesLoop
-
-LoadSprites:
-    LDX #$00
-LoadSpritesLoop:
-    LDA sprites, x
-    STA $0200, x
-    INX
-    CPX #$10
-    BNE LoadSpritesLoop
 
 LoadBackground:
     LDA $2002
@@ -310,64 +304,93 @@ Move:
     JMP UpdatePosition
 
 MoveUp:
-    LDA #$41
-    STA flip
-    LDA #$02
-    STA sprite
-MoveUpStep:
     DEC position_y
     JSR _AfterStep
-    BNE MoveUpStep
+    BNE MoveUp
     JMP UpdatePosition
 
 MoveDown:
-    LDA #$C1
-    STA flip
-    LDA #$02
-    STA sprite
-MoveDownStep:
     INC position_y
     JSR _AfterStep
-    BNE MoveDownStep
+    BNE MoveDown
     JMP UpdatePosition
 
 MoveLeft:
-    LDA #$41
-    STA flip
-    LDA #$01
-    STA sprite
-MoveLeftStep:
     DEC position_x
     JSR _AfterStep
-    BNE MoveLeftStep
+    BNE MoveLeft
     JMP UpdatePosition
 
 MoveRight:
-    LDA #$01
-    STA flip
-    LDA #$01
-    STA sprite
-MoveRightStep:
     INC position_x
     JSR _AfterStep
-    BNE MoveRightStep
+    BNE MoveRight
     JMP UpdatePosition
 
 UpdatePosition:
-    LDA sprite
-    STA $0201
-    LDA flip
-    STA $0202
-
     LDA position_x
     SEC
-    SBC #$04
+    SBC #$07
     STA $0203
+    STA $020B
+
+    CLC
+    ADC #$08
+    STA $0207
+    STA $020F
 
     LDA position_y
     SEC
-    SBC #$07
+    SBC #$0A
     STA $0200
+    STA $0204
+
+    CLC
+    ADC #$08
+    STA $0208
+    STA $020C
+
+;; change sprite ;;
+    LDA direction
+    CMP #$00
+    BNE UpdateSprite
+    JMP MainLoopEnd
+
+UpdateSprite:
+    LDA direction
+    SBC #$01
+    ASL a
+    ASL a
+    STA metasprite_offset
+
+    LDA #LOW(magnetizer_metasprite)
+    CLC
+    ADC metasprite_offset
+    STA metasprite_low
+    LDA #HIGH(magnetizer_metasprite)
+    STA metasprite_high
+
+    LDX #$00
+    LDY #$00
+UpdateSpriteStep:
+    LDA [metasprite_low], y
+    AND #%00000011
+    STA $0201, x
+
+    LDA [metasprite_low], y
+    AND #%11000000
+    CLC
+    ADC #$01
+    STA $0202, x
+
+    INX
+    INX
+    INX
+    INX
+
+    INY
+    CPY #$04
+    BNE UpdateSpriteStep
 
 MainLoopEnd:
     RTI
@@ -732,13 +755,19 @@ palette:
 
 
 sprites:
-    .db $80, $00, $00, $80
-    .db $80, $01, $01, $88
-    .db $88, $00, $02, $80
-    .db $88, $01, $03, $88
+    .db $70, $00, $01, $70
+    .db $70, $01, $01, $78
+    .db $78, $00, $81, $70
+    .db $78, $01, $81, $78
 
 tiles:
     .db $30, $24, $24, $24, $38, $24
+
+magnetizer_metasprite:
+    .db $C2, $82, $80, $C0
+    .db $00, $40, $42, $02
+    .db $41, $40, $C1, $C0
+    .db $00, $01, $80, $81
 
 ;;;;;;;;;;;;;;
 
