@@ -112,54 +112,46 @@ VBlank:
 
 ;; load graphics ;;
 LoadPalettes:
-    LDA $2002             ; read PPU status to reset the high/low latch
+    LDA $2002
     LDA #$3F
-    STA $2006             ; write the high byte of $3F00 address
+    STA $2006
     LDA #$00
-    STA $2006             ; write the low byte of $3F00 address
-    LDX #$00              ; start out at 0
+    STA $2006
+    LDX #$00
 LoadPalettesLoop:
-    LDA palette, x        ; load data from address (palette + the value in x)
-                            ; 1st time through loop it will load palette+0
-                            ; 2nd time through loop it will load palette+1
-                            ; 3rd time through loop it will load palette+2
-                            ; etc
-    STA $2007             ; write to PPU
-    INX                   ; X = X + 1
-    CPX #$20              ; Compare X to hex $10, decimal 16 - copying 16 bytes = 4 sprites
-    BNE LoadPalettesLoop  ; Branch to LoadPalettesLoop if compare was Not Equal to zero
-                          ; if compare was equal to 32, keep going down
+    LDA palette, x
+    STA $2007
+    INX
+    CPX #$20
+    BNE LoadPalettesLoop
 
 LoadSprites:
-    LDX #$00              ; start at 0
+    LDX #$00
 LoadSpritesLoop:
-    LDA sprites, x        ; load data from address (sprites +  x)
-    STA $0200, x          ; store into RAM address ($0200 + x)
-    INX                   ; X = X + 1
-    CPX #$04              ; Compare X to hex $20, decimal 32
-    BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
-                          ; if compare was equal to 32, keep going down
-
+    LDA sprites, x
+    STA $0200, x
+    INX
+    CPX #$10
+    BNE LoadSpritesLoop
 
 LoadBackground:
-    LDA $2002             ; read PPU status to reset the high/low latch
+    LDA $2002
     LDA #$20
-    STA $2006             ; write the high byte of $2000 address
+    STA $2006
     LDA #$00
-    STA $2006             ; write the low byte of $2000 address
-
+    STA $2006
     LDA #$00
-    STA pointer_lo       ; put the low byte of the address of background into pointer
+    STA pointer_lo
 
     LDA level_hi
-    STA pointer_hi       ; put the high byte of the address into pointer
+    STA pointer_hi
 
-    LDX #$00            ; start at pointer + 0
+    LDX #$00
     LDY #$00
 OutsideLoop:
 
 InsideLoop:
-    LDA [pointer_lo], y  ; copy one background byte from address in pointer plus Y
+    LDA [pointer_lo], y
 
 LoadTilePart:
     STY temp_y
@@ -176,9 +168,9 @@ DrawTile:
     ADC #$01
     STA $2007
 
-    INY                 ; inside loop counter
+    INY
     CPY #$10
-    BNE InsideLoop      ; run the inside loop 256 times before continuing down
+    BNE InsideLoop
 
     TXA
     AND #%00000001
@@ -195,7 +187,7 @@ PostLoop:
     LDY #$00
     INX
     CPX #$1E
-    BNE OutsideLoop     ; run the outside loop 256 times before continuing down
+    BNE OutsideLoop
 
 
 DrawMode:
@@ -217,87 +209,87 @@ InitializePosition:
 
 
 Forever:
-    JMP Forever     ;jump back to Forever, infinite loop
+    JMP Forever
 
 
 ;; NMI ;;
 NMI:
     LDA #$00
-    STA $2003       ; set the low byte (00) of the RAM address
+    STA $2003
     LDA #$02
-    STA $4014       ; set the high byte (02) of the RAM address, start the transfer
+    STA $4014
 
 
 LatchController:
     LDA #$01
     STA $4016
     LDA #$00
-    STA $4016       ; tell both the controllers to latch buttons
+    STA $4016
 
 PreRead:
     LDY #$00
 
 ReadA:
-    LDA $4016       ; player 1 - A
-    AND #%10000000  ; only look at bit 0
-    BEQ ReadADone   ; branch to ReadADone if button is NOT pressed (0)
-ReadADone:        ; handling this button is done
+    LDA $4016
+    AND #%10000000
+    BEQ ReadADone
+ReadADone:
 
 
 ReadB:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadBDone   ; branch to ReadBDone if button is NOT pressed (0)
-ReadBDone:        ; handling this button is done
+    LDA $4016
+    AND #%00000001
+    BEQ ReadBDone
+ReadBDone:
 
 
 ReadSelect:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-ReadSelectDone:        ; handling this button is done
+    LDA $4016
+    AND #%00000001
+ReadSelectDone:
 
 ReadStart:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadStartDone   ; branch to ReadBDone if button is NOT pressed (0)
-ReadStartDone:        ; handling this button is done
+    LDA $4016
+    AND #%00000001
+    BEQ ReadStartDone
+ReadStartDone:
 
 ReadUp:
-    LDA $4016       ; player 1 - A
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadUpDone   ; branch to ReadADone if button is NOT pressed (0)
-                    ; add instructions here to do something when button IS pressed (1)
+    LDA $4016
+    AND #%00000001
+    BEQ ReadUpDone
+
     LDY #$01
     JSR _CheckMovement
-ReadUpDone:        ; handling this button is done
+ReadUpDone:
 
 
 ReadDown:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadDownDone   ; branch to ReadBDone if button is NOT pressed (0)
-                    ; add instructions here to do something when button IS pressed (1)
+    LDA $4016
+    AND #%00000001
+    BEQ ReadDownDone
+
     LDY #$02
     JSR _CheckMovement
-ReadDownDone:        ; handling this button is done
+ReadDownDone:
 
 ReadLeft:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadLeftDone   ; branch to ReadBDone if button is NOT pressed (0)
+    LDA $4016
+    AND #%00000001
+    BEQ ReadLeftDone
 
     LDY #$03
     JSR _CheckMovement
-ReadLeftDone:        ; handling this button is done
+ReadLeftDone:
 
 ReadRight:
-    LDA $4016       ; player 1 - B
-    AND #%00000001  ; only look at bit 0
-    BEQ ReadRightDone   ; branch to ReadBDone if button is NOT pressed (0)
-                    ; add instructions here to do something when button IS pressed (1)
+    LDA $4016
+    AND #%00000001
+    BEQ ReadRightDone
+
     LDY #$04
     JSR _CheckMovement
-ReadRightDone:        ; handling this button is done
+ReadRightDone:
 
     LDA grounded
     CMP #$01
@@ -378,7 +370,7 @@ UpdatePosition:
     STA $0200
 
 MainLoopEnd:
-    RTI             ; return from interrupt
+    RTI
 
 ;;;;;;;;;;;;;;
 
@@ -740,10 +732,13 @@ palette:
 
 
 sprites:
-    .db $80, $01, $00, $80
+    .db $80, $00, $00, $80
+    .db $80, $01, $01, $88
+    .db $88, $00, $02, $80
+    .db $88, $01, $03, $88
 
 tiles:
-    .db $30, $24, $34, $34, $38, $3C
+    .db $30, $24, $24, $24, $38, $24
 
 ;;;;;;;;;;;;;;
 
