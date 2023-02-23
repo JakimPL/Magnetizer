@@ -643,7 +643,7 @@ __BoxCheck:
 __CollisionCheck:
     LDA index
     JSR _CheckCollision
-    CMP #$00
+    CMP #$01
     BNE __GetPositionWithoutOffset
     JSR _Stop
 
@@ -651,8 +651,7 @@ __GetPositionWithoutOffset:
     JSR _GetPositionWithoutOffset
 
 _StopperCheck:
-    JSR _CheckCollision
-
+    JSR _GetTile
     CMP #$04
     BNE _EndCheck
     JSR _Stop
@@ -702,11 +701,8 @@ _BoxAction:
     CLC
     ADC offset
     STA target
-    TAY
 
-    LDA [level_lo], y
-    TAY
-    LDA solid, y
+    JSR _CheckCollision
     CMP #$01
     BNE _MoveBox
     RTS
@@ -725,9 +721,15 @@ _BoxCheckEnd:
     RTS
 
 ;; collision logic ;;
-_CheckCollision:
+_GetTile:
     TAY
     LDA [level_lo], y
+    RTS
+
+_CheckCollision:
+    JSR _GetTile
+    TAY
+    LDA solid, y
     RTS
 
 _CheckMovement:
@@ -738,7 +740,7 @@ _CheckMovement:
 _CheckObstacle:
     STY direction
     JSR _GetPositionWithOffset
-    JSR _CheckCollision
+    JSR _GetTile
     CMP #$00
     BNE _SetDirection
     JMP _Stop
