@@ -568,38 +568,11 @@ _SetNegativeAnimationDirection:
 
 ; u d l r
 _GetOffset:
-    LDA direction
-    CMP #$01
-    BEQ _SetOffsetUp
-    CMP #$02
-    BEQ _SetOffsetDown
-    CMP #$03
-    BEQ _SetOffsetLeft
-    CMP #$04
-    BEQ _SetOffsetRight
-    RTS
-_SetOffsetUp:
-    LDA #$FF
-    STA offset_y
-    LDA #$00
+    LDX direction
+    LDA movement_x, x
     STA offset_x
-    RTS
-_SetOffsetDown:
-    LDA #$01
-    STA offset_y
-    LDA #$00
-    STA offset_x
-    RTS
-_SetOffsetLeft:
-    LDA #$FF
-    STA offset_x
-    LDA #$00
-    STA offset_y
-    RTS
-_SetOffsetRight:
-    LDA #$01
-    STA offset_x
-    LDA #$00
+
+    LDA movement_y, x
     STA offset_y
     RTS
 
@@ -1004,6 +977,12 @@ solid
 
 movement:
     .db $00, $F0, $10, $FF, $01
+
+movement_x:
+    .db $00, $00, $00, $FF, $01
+
+movement_y:
+    .db $00, $FF, $01, $00, $00
 
 magnetizer_metasprite:
     .db $C2, $82, $80, $C0
