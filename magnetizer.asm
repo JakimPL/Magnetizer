@@ -690,8 +690,6 @@ _BoxCheck:
     CMP box_y
     BNE _BoxCheckEnd
 _BoxAction:
-    ; move box if possible
-    ; check if
     LDX direction
     LDA movement, x
     STA offset
@@ -702,7 +700,7 @@ _BoxAction:
     ADC offset
     STA target
 
-    JSR _CheckCollision
+    JSR _CheckBoxCollision
     CMP #$01
     BNE _MoveBox
     RTS
@@ -732,6 +730,12 @@ _CheckCollision:
     LDA solid, y
     RTS
 
+_CheckBoxCollision:
+    JSR _GetTile
+    TAY
+    LDA box_solid, y
+    RTS
+
 _CheckMovement:
     LDX grounded
     CPX #$00
@@ -740,10 +744,17 @@ _CheckMovement:
 _CheckObstacle:
     STY direction
     JSR _GetPositionWithOffset
-    JSR _GetTile
-    CMP #$00
-    BNE _SetDirection
-    JMP _Stop
+    JSR _CheckCollision
+    CMP #$01
+    BEQ _Ground
+_CheckBoxObstacle:
+    TYA
+    JSR _SetDirection
+    JSR _BoxCheck
+    RTS
+_Ground:
+    JSR _Stop
+    RTS
 
 _GetPositionWithOffset:
     LDX #$01
@@ -860,7 +871,7 @@ level_01_01:
     .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $01, $00, $00, $00
     .db $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $01, $01, $05, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -976,6 +987,9 @@ tiles:
 
 solid
     .db $01, $00, $00, $00, $00, $00
+
+box_solid
+    .db $01, $00, $00, $00, $01, $00
 
 movement:
     .db $00, $F0, $10, $FF, $01
