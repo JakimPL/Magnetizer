@@ -7,6 +7,11 @@
 ;;;;;;;;;;;;;;;
     .rsset $0000
 
+draw_boxes            .rs 1
+boxes                 .rs 1
+box_x                 .rs 1
+box_y                 .rs 1
+
 level_lo              .rs 1
 level_hi              .rs 1
 
@@ -43,6 +48,14 @@ check_y_offset        .rs 1
 metasprite_low        .rs 1
 metasprite_high       .rs 1
 metasprite_offset     .rs 1
+
+starting_point_x      .rs 1
+starting_point_y      .rs 1
+animation_cycle       .rs 1
+animation_direction   .rs 1
+
+ending_point_real_x   .rs 1
+ending_point_real_y   .rs 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -106,7 +119,7 @@ LoadSpritesLoop:
     LDA sprites, x
     STA $0200, x
     INX
-    CPX #$14
+    CPX #$30
     BNE LoadSpritesLoop
 
 VBlank:
@@ -128,6 +141,11 @@ LoadPalettesLoop:
     CPX #$20
     BNE LoadPalettesLoop
 
+InitializeBoxes:
+    LDA #$00
+    STA boxes
+    LDA #$01
+    STA draw_boxes
 LoadBackground:
     LDA $2002
     LDA #$20
@@ -146,18 +164,42 @@ OutsideLoop:
 
 InsideLoop:
     LDA [pointer_lo], y
+CheckIfEndingPoint:
+    CMP #$03
+    BEQ SaveEndingPointPosition
+CheckIfBox:
+    CMP #$05
+    BEQ AddBox
+    JMP LoadTilePart
+SaveEndingPointPosition:
+    JSR _GetYPosition
+    STA ending_point_real_y
+
+    JSR _GetXPosition
+    STA ending_point_real_x
+    JMP LoadTilePart
+AddBox:
+    INC boxes
+    TXA
+    LSR a
+    STA box_y
+    TYA
+    STY box_x
 
 LoadTilePart:
+    CLC
+    LDA [pointer_lo], y
     STY temp_y
     TAY
     LDA [tiles_lo], y
     STA current_tile
     LDY temp_y
+
 ProcessTile:
     JSR _ShiftVertically
-    LDA current_tile
 
 DrawTile:
+    LDA current_tile
     STA $2007
     ADC #$01
     STA $2007
@@ -197,10 +239,31 @@ InitializePosition:
     LDA [starting_position_lo], y
     STA position_x
 
+    SBC #$08
+    STA $0213
+    STA $021B
+    CLC
+    ADC #$08
+    STA $0217
+    STA $021F
+
     INY
     LDA [starting_position_lo], y
     STA position_y
 
+    SBC #$0A
+    STA $0210
+    STA $0214
+    CLC
+    ADC #$08
+    STA $0218
+    STA $021C
+
+InitializeAnimation:
+    LDA #$01
+    STA animation_direction
+    LDA #$00
+    STA animation_cycle
 
 Forever:
     JMP Forever
@@ -354,7 +417,7 @@ UpdatePosition:
     LDA direction
     CMP #$00
     BNE UpdateSprite
-    JMP MainLoopEnd
+    JMP UpdateAnimation
 
 UpdateSprite:
     LDA direction
@@ -392,11 +455,111 @@ UpdateSpriteStep:
     CPY #$04
     BNE UpdateSpriteStep
 
+UpdateAnimation:
+    LDA animation_cycle
+    CLC
+    ADC animation_direction
+    STA animation_cycle
+
+    CMP #$30
+    BEQ ReverseAnimationDirection
+
+    CMP #$00
+    BEQ ReverseAnimationDirection
+    JMP DrawAnimation
+
+ReverseAnimationDirection:
+    JSR _ReverseAnimationDirection
+
+DrawAnimation:
+    LDA ending_point_real_x
+    STA $0223
+    STA $022B
+    CLC
+    ADC #$08
+    STA $0227
+    STA $022F
+
+    LDA ending_point_real_y
+    SBC #$02
+    STA $0220
+    STA $0224
+    CLC
+    ADC #$08
+    STA $0228
+    STA $022C
+
+    LDA animation_cycle
+    CLC
+    JSR _Divide
+    ADC #$03
+    STA $0211
+    STA $0215
+    STA $0219
+    STA $021D
+    STA $0221
+    STA $0225
+    STA $0229
+    STA $022D
+
+    LDA draw_boxes
+    CMP #$01
+    BEQ DrawBoxes
+    JMP MainLoopEnd
+
+DrawBoxes:
+    LDX #$00
+DrawBox:
+    LDA #$08
+    STA $0231, x
+    STA $0235, x
+    STA $0239, x
+    STA $023D, x
+
+    LDA #$17
+    STA $0232, x
+    LDA #$57
+    STA $0236, x
+    LDA #$97
+    STA $023A, x
+    LDA #$D7
+    STA $023E, x
+
+    LDA box_x
+    JSR _Multiply
+    STA $0233, x
+    STA $023B, x
+    CLC
+    ADC #$08
+    STA $0237, x
+    STA $023F, x
+
+    LDA box_y
+    JSR _Multiply
+    SBC #$02
+    STA $0230, x
+    STA $0234, x
+    CLC
+    ADC #$08
+    STA $0238, x
+    STA $023C, x
+
 MainLoopEnd:
     RTI
 
 ;;;;;;;;;;;;;;
+_ReverseAnimationDirection:
+    LDA animation_direction
+    CMP #$01
+    BEQ _SetNegativeAnimationDirection
+    LDA #$01
+    STA animation_direction
+    RTS
 
+_SetNegativeAnimationDirection:
+    LDA #$FF
+    STA animation_direction
+    RTS
 
 ; u d l r
 _GetOffset:
@@ -623,8 +786,7 @@ _AfterShift:
     RTS
 
 _Snap:
-    JSR _Divide
-    JSR _Multiply
+    AND #%11110000
     RTS
 
 _Multiply:
@@ -641,6 +803,16 @@ _Divide:
     LSR a
     RTS
 
+_GetXPosition:
+    TYA
+    JSR _Multiply
+    RTS
+
+_GetYPosition:
+    TXA
+    LSR a
+    JSR _Multiply
+    RTS
 
 ;;;;;;;;;;;;;;
 
@@ -750,15 +922,28 @@ attributes:
 
 
 palette:
-    .db $19,$02,$04,$1D,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F ; background
-    .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C ; sprites
+    .db $19,$02,$05,$1D,  $22,$36,$17,$0F,  $22,$10,$11,$0F,  $22,$27,$17,$0F ; background
+    .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
 
 
 sprites:
+    ;; magnetizer ;;
     .db $70, $00, $01, $70
     .db $70, $01, $01, $78
     .db $78, $00, $81, $70
     .db $78, $01, $81, $78
+
+    ;; start ;;
+    .db $40, $04, $03, $40
+    .db $40, $04, $43, $48
+    .db $48, $04, $83, $40
+    .db $48, $04, $C3, $48
+
+    ;; end ;;
+    .db $00, $04, $02, $00
+    .db $00, $04, $42, $08
+    .db $08, $04, $82, $00
+    .db $08, $04, $C2, $08
 
 tiles:
     .db $30, $24, $24, $24, $38, $24
