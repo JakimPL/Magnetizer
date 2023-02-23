@@ -29,6 +29,7 @@ grounded              .rs 1
 speed                 .rs 1
 real_speed            .rs 1
 
+position              .rs 1
 position_x            .rs 1
 position_y            .rs 1
 px                    .rs 1
@@ -37,6 +38,8 @@ py                    .rs 1
 current_tile          .rs 1
 index                 .rs 1
 
+target                .rs 1
+offset                .rs 1
 offset_x              .rs 1
 offset_y              .rs 1
 
@@ -191,7 +194,7 @@ LoadTilePart:
     LDA [pointer_lo], y
     STY temp_y
     TAY
-    LDA [tiles_lo], y
+    LDA tiles, y
     STA current_tile
     LDY temp_y
 
@@ -544,6 +547,8 @@ DrawBox:
     STA $0238, x
     STA $023C, x
 
+    LDA #$00
+    STA draw_boxes
 MainLoopEnd:
     RTI
 
@@ -633,9 +638,7 @@ _Stop:
     RTS
 
 ;; collision routine ;;
-
 _CheckPosition:
-; if direction = 1, 2, check y collision
     LDA direction
     CMP #$03
     BCC _CheckY
@@ -661,7 +664,11 @@ _CheckX:
 __GetPositionWithOffset:
     JSR _GetPositionWithOffset
 
+__BoxCheck:
+    JSR _BoxCheck
+
 __CollisionCheck:
+    LDA index
     JSR _CheckCollision
     CMP #$00
     BNE __GetPositionWithoutOffset
@@ -699,7 +706,52 @@ _StartNextLevel:
 __UpdatePosition:
     RTS
 
-;;;;;;;;;;;;;;;;
+;; box logic ;;
+_BoxCheck:
+    LDA index
+    AND #%00001111
+    CMP box_x
+    BNE _BoxCheckEnd
+
+    LDA index
+    JSR _Divide
+    CMP box_y
+    BNE _BoxCheckEnd
+_BoxAction:
+    ; move box if possible
+    ; check if
+    LDX direction
+    LDA movement, x
+    STA offset
+    JSR _Stop
+
+    LDA index
+    CLC
+    ADC offset
+    STA target
+    TAY
+
+    LDA [level_lo], y
+    TAY
+    LDA solid, y
+    CMP #$01
+    BNE _MoveBox
+    RTS
+_MoveBox:
+    LDA target
+    AND #%00001111
+    STA box_x
+
+    LDA target
+    JSR _Divide
+    STA box_y
+
+    LDA #$01
+    STA draw_boxes
+_BoxCheckEnd:
+    RTS
+
+;; collision logic ;;
 _CheckCollision:
     TAY
     LDA [level_lo], y
@@ -769,7 +821,6 @@ _LoadIndex:
 
 ; Y as argument ;
 _SetDirection:
-    ;STY direction
     LDY #$01
     STY grounded
     RTS
@@ -834,7 +885,7 @@ level_01_01:
     .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $01, $00, $00, $00
     .db $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
+    .db $00, $00, $01, $01, $05, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
@@ -947,6 +998,12 @@ sprites:
 
 tiles:
     .db $30, $24, $24, $24, $38, $24
+
+solid
+    .db $01, $00, $00, $00, $00, $00
+
+movement:
+    .db $00, $F0, $10, $FF, $01
 
 magnetizer_metasprite:
     .db $C2, $82, $80, $C0
