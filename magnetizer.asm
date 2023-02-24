@@ -686,8 +686,15 @@ _CheckX:
 __GetPositionWithOffset:
     JSR _GetPositionWithOffset
 
+    LDY boxes
+    CPY #$00
+    BEQ __CollisionCheck
 __BoxCheck:
+    DEY
     JSR _BoxCheck
+
+    CPY #$00
+    BNE __BoxCheck
 
 __CollisionCheck:
     LDA index
@@ -727,16 +734,17 @@ _StartNextLevel:
 __UpdatePosition:
     RTS
 
-;; box logic ;;
+;; box logic, y - index ;;
 _BoxCheck:
+    STY temp_y
     LDA index
     AND #%00001111
-    CMP box_x
+    CMP box_x, y
     BNE _BoxCheckEnd
 
     LDA index
     JSR _Divide
-    CMP box_y
+    CMP box_y, y
     BNE _BoxCheckEnd
 _BoxAction:
     LDX direction
@@ -754,13 +762,14 @@ _BoxAction:
     BNE _MoveBox
     RTS
 _MoveBox:
+    LDY temp_y
     LDA target
     AND #%00001111
-    STA box_x
+    STA box_x, y
 
     LDA target
     JSR _Divide
-    STA box_y
+    STA box_y, y
 
     LDA #$01
     STA draw_boxes
@@ -912,7 +921,7 @@ level_01_01:
     .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $01, $01, $00, $00, $00, $01, $01, $00, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
+    .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $05, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $00, $00, $00, $01, $00, $00, $01, $01, $00, $00
     .db $00, $00, $00, $00, $01, $01, $02, $00, $00, $01, $00, $01, $01, $01, $03, $00
     .db $00, $00, $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $00, $00
