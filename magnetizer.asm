@@ -695,15 +695,8 @@ _CheckX:
 __GetPositionWithOffset:
     JSR _GetPositionWithOffset
 
-    LDY boxes
-    CPY #$00
-    BEQ __CollisionCheck
 __BoxCheck:
-    DEY
-    JSR _BoxCheck
-
-    CPY #$00
-    BNE __BoxCheck
+    JSR _BoxCheckLoop
 
 __CollisionCheck:
     LDA index
@@ -744,16 +737,23 @@ __UpdatePosition:
     RTS
 
 ;; box logic, y - index ;;
+_BoxCheckLoop:
+    LDY boxes
+    CPY #$00
+    BNE _BoxCheckLoopStep
+    RTS
+_BoxCheckLoopStep:
+    DEY
+    JSR _BoxCheck
+
+    CPY #$00
+    BNE _BoxCheckLoopStep
+    RTS
+
 _BoxCheck:
     STY temp_y
-    LDA index
-    AND #%00001111
-    CMP box_x, y
-    BNE _BoxCheckEnd
-
-    LDA index
-    JSR _Divide
-    CMP box_y, y
+    JSR _IsBoxOnIndex
+    CMP #$01
     BNE _BoxCheckEnd
 _BoxAction:
     LDX direction
@@ -785,6 +785,26 @@ _MoveBox:
 _BoxCheckEnd:
     RTS
 
+;; y as argument ;;
+_IsBoxOnIndex:
+    LDA index
+    AND #%00001111
+    CMP box_x, y
+    BEQ _IsBoxOnYIndex
+    JMP _IsBoxOnIndexReturnFalse
+_IsBoxOnYIndex:
+    LDA index
+    JSR _Divide
+    CMP box_y, y
+    BEQ _IsBoxOnIndexReturnTrue
+    JMP _IsBoxOnIndexReturnFalse
+_IsBoxOnIndexReturnTrue:
+    LDA #$01
+    RTS
+_IsBoxOnIndexReturnFalse:
+    LDA #$00
+    RTS
+
 ;; collision logic ;;
 _GetTile:
     TAY
@@ -801,6 +821,11 @@ _CheckBoxCollision:
     JSR _GetTile
     TAY
     LDA box_solid, y
+    CMP #$01
+    BNE _CheckIfBoxIsBlocking
+    RTS
+_CheckIfBoxIsBlocking
+    LDA #$00
     RTS
 
 _CheckMovement:
@@ -817,7 +842,7 @@ _CheckObstacle:
 _CheckBoxObstacle:
     TYA
     JSR _SetDirection
-    JSR _BoxCheck
+    JSR _BoxCheckLoop
     RTS
 _Ground:
     JSR _Stop
@@ -936,8 +961,8 @@ level_01_01:
     .db $00, $00, $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $00, $00
     .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $01, $00, $00, $00
-    .db $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $00, $01, $05, $01, $01, $01, $01, $00, $00, $00, $00
+    .db $00, $00, $01, $01, $05, $01, $05, $01, $01, $00, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
