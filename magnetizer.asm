@@ -7,11 +7,6 @@
 ;;;;;;;;;;;;;;;
     .rsset $0000
 
-draw_boxes            .rs 1
-boxes                 .rs 1
-box_x                 .rs 1
-box_y                 .rs 1
-
 level_lo              .rs 1
 level_hi              .rs 1
 
@@ -43,6 +38,7 @@ offset                .rs 1
 offset_x              .rs 1
 offset_y              .rs 1
 
+temp_x                .rs 1
 temp_y                .rs 1
 
 check_x_offset        .rs 1
@@ -54,12 +50,16 @@ metasprite_offset     .rs 1
 
 starting_point_x      .rs 1
 starting_point_y      .rs 1
-animation_cycle       .rs 1
-animation_direction   .rs 1
-
 ending_point_real_x   .rs 1
 ending_point_real_y   .rs 1
 
+animation_cycle       .rs 1
+animation_direction   .rs 1
+
+boxes                 .rs 1
+draw_boxes            .rs 1
+box_x                 .rs 64
+box_y                 .rs 64
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -149,6 +149,61 @@ InitializeBoxes:
     STA boxes
     LDA #$01
     STA draw_boxes
+
+LoadLevel:
+    LDA level_lo
+    STA pointer_lo
+
+    LDA level_hi
+    STA pointer_hi
+
+    LDX #$00
+    LDY #$00
+LoadLevelInsideLoop:
+    LDA [pointer_lo], y
+CheckIfEndingPoint:
+    CMP #$03
+    BEQ SaveEndingPointPosition
+CheckIfBox:
+    CMP #$05
+    BEQ AddBox
+    JMP LoadLevelIncrement
+
+SaveEndingPointPosition:
+    JSR _GetRealYPosition
+    STA ending_point_real_y
+
+    JSR _GetRealXPosition
+    STA ending_point_real_x
+    JMP LoadLevelIncrement
+AddBox:
+    STX temp_x
+    LDX boxes
+    INC boxes
+    TXA
+    LSR a
+    STA box_y, x
+    TYA
+    STA box_x, x
+    LDX temp_x
+
+LoadLevelIncrement:
+    INY
+    CPY #$10
+    BNE LoadLevelInsideLoop
+
+LoadLevelIncrementPointer:
+    LDA pointer_lo
+    CLC
+    ADC #$10
+    STA pointer_lo
+
+LoadLevelPostLoop:
+    LDY #$00
+    INX
+    CPX #$10
+    BNE LoadLevelInsideLoop
+
 LoadBackground:
     LDA $2002
     LDA #$20
@@ -163,31 +218,8 @@ LoadBackground:
 
     LDX #$00
     LDY #$00
-OutsideLoop:
-
-InsideLoop:
+LoadBackgroundInsideLoop:
     LDA [pointer_lo], y
-CheckIfEndingPoint:
-    CMP #$03
-    BEQ SaveEndingPointPosition
-CheckIfBox:
-    CMP #$05
-    BEQ AddBox
-    JMP LoadTilePart
-SaveEndingPointPosition:
-    JSR _GetYPosition
-    STA ending_point_real_y
-
-    JSR _GetXPosition
-    STA ending_point_real_x
-    JMP LoadTilePart
-AddBox:
-    INC boxes
-    TXA
-    LSR a
-    STA box_y
-    TYA
-    STY box_x
 
 LoadTilePart:
     CLC
@@ -209,24 +241,23 @@ DrawTile:
 
     INY
     CPY #$10
-    BNE InsideLoop
+    BNE LoadBackgroundInsideLoop
 
     TXA
     AND #%00000001
-    BEQ PostLoop
+    BEQ LoadBackgroundPostLoop
 
-IncrementPointer:
+LoadBackgroundIncrementPointer:
     LDA pointer_lo
     CLC
     ADC #$10
     STA pointer_lo
 
-
-PostLoop:
+LoadBackgroundPostLoop:
     LDY #$00
     INX
     CPX #$1E
-    BNE OutsideLoop
+    BNE LoadBackgroundInsideLoop
 
 
 DrawMode:
@@ -511,41 +542,71 @@ DrawAnimation:
     JMP MainLoopEnd
 
 DrawBoxes:
-    LDX #$00
+    LDA boxes
+    TAX
+    ASL a
+    ASL a
+    TAY
+    CPY #$00
+    BEQ MainLoopEnd
 DrawBox:
+    DEX
     LDA #$08
-    STA $0231, x
-    STA $0235, x
-    STA $0239, x
-    STA $023D, x
+    STA $0231, y
+    STA $0235, y
+    STA $0239, y
+    STA $023D, y
 
     LDA #$17
-    STA $0232, x
+    STA $0232, y
     LDA #$57
-    STA $0236, x
+    STA $0236, y
     LDA #$97
-    STA $023A, x
+    STA $023A, y
     LDA #$D7
-    STA $023E, x
+    STA $023E, y
 
-    LDA box_x
+    LDA box_x, x
     JSR _Multiply
-    STA $0233, x
-    STA $023B, x
+    STA $0233, y
+    STA $023B, y
     CLC
     ADC #$08
-    STA $0237, x
-    STA $023F, x
+    STA $0237, y
+    STA $023F, y
 
-    LDA box_y
+    LDA box_y, x
     JSR _Multiply
     SBC #$02
-    STA $0230, x
-    STA $0234, x
+    STA $0230, y
+    STA $0234, y
     CLC
     ADC #$08
-    STA $0238, x
-    STA $023C, x
+    STA $0238, y
+    STA $023C, y
+
+    DEY
+    DEY
+    DEY
+    DEY
+
+    DEY
+    DEY
+    DEY
+    DEY
+
+    DEY
+    DEY
+    DEY
+    DEY
+
+    DEY
+    DEY
+    DEY
+    DEY
+
+    CPY #$00
+    BNE DrawBox
 
     LDA #$00
     STA draw_boxes
@@ -840,14 +901,13 @@ _Divide:
     LSR a
     RTS
 
-_GetXPosition:
+_GetRealXPosition:
     TYA
     JSR _Multiply
     RTS
 
-_GetYPosition:
+_GetRealYPosition:
     TXA
-    LSR a
     JSR _Multiply
     RTS
 
@@ -870,8 +930,8 @@ level_01_01:
     .db $00, $00, $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $00, $00
     .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $01, $00, $00, $00
-    .db $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $00, $01, $01, $05, $01, $01, $01, $00, $00, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $01, $05, $01, $00, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
