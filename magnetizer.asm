@@ -46,6 +46,7 @@ py                    .rs 1
 
 current_tile          .rs 1
 index                 .rs 1
+index_temp            .rs 1
 
 target                .rs 1
 offset                .rs 1
@@ -767,8 +768,8 @@ _BoxAction:
     STA target
 
     JSR _CheckBoxCollision
-    CMP #FREE
-    BNE _MoveBox
+    CMP #$00
+    BEQ _MoveBox
     RTS
 _MoveBox:
     LDY temp_y
@@ -818,6 +819,10 @@ _CheckCollision:
     RTS
 
 _CheckBoxCollision:
+    JSR _SaveIndex
+    LDA target
+    STA index
+
     JSR _GetTile
     TAY
     LDA box_solid, y
@@ -825,7 +830,32 @@ _CheckBoxCollision:
     BNE _CheckIfBoxIsBlocking
     RTS
 _CheckIfBoxIsBlocking
+    LDY boxes
     LDA #$00
+_CheckIfBoxIsBlockingStep:
+    DEY
+    JSR _IsBoxOnIndex
+    CMP #$01
+    BEQ _CheckIfBoxIsBlockingTrue
+
+    CPY #$00
+    BNE _CheckIfBoxIsBlockingStep
+_CheckIfBoxIsBlockingFalse:
+    JSR _RestoreIndex
+    LDA #$00
+    RTS
+_CheckIfBoxIsBlockingTrue:
+    JSR _RestoreIndex
+    LDA #$01
+    RTS
+
+_SaveIndex:
+    LDA index
+    STA index_temp
+    RTS
+_RestoreIndex:
+    LDA index_temp
+    STA index
     RTS
 
 _CheckMovement:
