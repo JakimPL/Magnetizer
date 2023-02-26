@@ -16,10 +16,6 @@ BOX                   = $05
 
 ANIMATION_LENGTH      = $30
 
-boxes                 .rs 1
-draw_boxes            .rs 1
-box_x                 .rs 64
-box_y                 .rs 64
 
 level_lo              .rs 1
 level_hi              .rs 1
@@ -71,6 +67,13 @@ ending_point_real_y   .rs 1
 animation_cycle       .rs 1
 animation_direction   .rs 1
 
+boxes                 .rs 1
+draw_boxes            .rs 1
+box_x                 .rs 64
+box_y                 .rs 64
+
+move_counter          .rs 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -87,7 +90,6 @@ Reset:
     STX $2000    ; disable NMI
     STX $2001    ; disable rendering
     STX $4010    ; disable DMC IRQs
-
 
 InitialVBlank:
     BIT $2002
@@ -220,68 +222,14 @@ LoadLevelPostLoop:
     BNE LoadLevelInsideLoop
 
 LoadBackground:
-    LDA $2002
-    LDA #$20
-    STA $2006
-    LDA #$00
-    STA $2006
-    LDA #$00
-    STA pointer_lo
-
-    LDA level_hi
-    STA pointer_hi
-
-    LDX #$00
-    LDY #$00
-LoadBackgroundInsideLoop:
-    LDA [pointer_lo], y
-
-LoadTilePart:
-    CLC
-    LDA [pointer_lo], y
-    STY temp_y
-    TAY
-    LDA tiles, y
-    STA current_tile
-    LDY temp_y
-
-ProcessTile:
-    JSR _ShiftVertically
-
-DrawTile:
-    LDA current_tile
-    STA $2007
-    ADC #$01
-    STA $2007
-
-    INY
-    CPY #$10
-    BNE LoadBackgroundInsideLoop
-
-    TXA
-    AND #%00000001
-    BEQ LoadBackgroundPostLoop
-
-LoadBackgroundIncrementPointer:
-    LDA pointer_lo
-    CLC
-    ADC #$10
-    STA pointer_lo
-
-LoadBackgroundPostLoop:
-    LDY #$00
-    INX
-    CPX #$1E
-    BNE LoadBackgroundInsideLoop
-
+    JSR _LoadBackground
 
 DrawMode:
-    LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
+    LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
     STA $2000
 
     LDA #%00011110   ; enable sprites
     STA $2001
-
 
 InitializePosition:
     LDY #$00
@@ -325,6 +273,12 @@ NMI:
     LDA #$02
     STA $4014
 
+    LDA $2002
+    LDA #$23
+    STA $2006
+    LDA #$00
+    STA $2006
+    STA $2006
 
 LatchController:
     LDA #$01
@@ -611,7 +565,67 @@ DrawBox:
 MainLoopEnd:
     RTI
 
-;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;
+;; subroutines ;;
+;;;;;;;;;;;;;;;;;
+
+_LoadBackground:
+    LDA $2002
+    LDA #$20
+    STA $2006
+    LDA #$00
+    STA $2006
+    LDA #$00
+    STA pointer_lo
+
+    LDA level_hi
+    STA pointer_hi
+
+    LDX #$00
+    LDY #$00
+_LoadBackgroundInsideLoop:
+    LDA [pointer_lo], y
+
+_LoadTilePart:
+    CLC
+    LDA [pointer_lo], y
+    STY temp_y
+    TAY
+    LDA tiles, y
+    STA current_tile
+    LDY temp_y
+
+_ProcessTile:
+    JSR _ShiftVertically
+
+_DrawTile:
+    LDA current_tile
+    STA $2007
+    ADC #$01
+    STA $2007
+
+    INY
+    CPY #$10
+    BNE _LoadBackgroundInsideLoop
+
+    TXA
+    AND #%00000001
+    BEQ _LoadBackgroundPostLoop
+
+_LoadBackgroundIncPointer:
+    LDA pointer_lo
+    CLC
+    ADC #$10
+    STA pointer_lo
+
+_LoadBackgroundPostLoop:
+    LDY #$00
+    INX
+    CPX #$1E
+    BNE _LoadBackgroundInsideLoop
+    RTS
+
+;; animation ;;
 _ReverseAnimationDirection:
     LDA animation_direction
     CMP #$01
@@ -721,14 +735,12 @@ _EndCheck:
     JSR _Stop
 
 _EndLevelReset:
+    LDX #$FF
     TXS          ; Set up stack
     INX          ; now X = 0
     STX $2000    ; disable NMI
     STX $2001    ; disable rendering
     STX $4010    ; disable DMC IRQ
-_EndLevelVBlank:
-    BIT $2002
-    BPL _StartNextLevel
 _StartNextLevel:
     INC level_hi
     INC starting_position_lo
@@ -931,6 +943,7 @@ _LoadIndex:
 _SetDirection:
     LDY #$01
     STY grounded
+    INC move_counter
     RTS
 
 _ShiftVertically:
@@ -991,8 +1004,8 @@ level_01_01:
     .db $00, $00, $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $00, $00
     .db $00, $00, $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00
     .db $00, $01, $01, $01, $00, $00, $00, $01, $01, $01, $00, $01, $01, $00, $00, $00
-    .db $00, $01, $01, $00, $00, $00, $01, $05, $01, $01, $01, $01, $00, $00, $00, $00
-    .db $00, $00, $01, $01, $05, $01, $05, $01, $01, $00, $01, $01, $01, $01, $00, $00
+    .db $00, $01, $01, $00, $00, $00, $01, $01, $01, $01, $01, $01, $00, $00, $00, $00
+    .db $00, $00, $01, $01, $01, $01, $01, $01, $01, $00, $01, $01, $01, $01, $00, $00
     .db $00, $00, $00, $01, $01, $01, $01, $00, $01, $01, $01, $00, $00, $01, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
