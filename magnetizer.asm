@@ -7,6 +7,22 @@
 ;;;;;;;;;;;;;;;
     .rsset $0000
 
+PPUCTRL               = $2000
+PPUMASK               = $2001
+PPUSTATUS             = $2002
+OAMADDR               = $2003
+OAMDATA               = $2004
+PPUSCROLL             = $2005
+PPUADDR               = $2006
+PPUDATA               = $2007
+DMC_FREQ              = $4010
+DMC_RAW               = $4011
+DMC_START             = $4012
+DMC_LEN               = $4013
+OAMDMA                = $4014
+SND_CHN               = $4015
+JOY1                  = $4016
+
 BLOCK                 = $00
 FREE                  = $01
 START                 = $02
@@ -87,12 +103,12 @@ Reset:
     LDX #$FF
     TXS          ; Set up stack
     INX          ; now X = 0
-    STX $2000    ; disable NMI
-    STX $2001    ; disable rendering
-    STX $4010    ; disable DMC IRQs
+    STX PPUCTRL    ; disable NMI
+    STX PPUMASK    ; disable rendering
+    STX DMC_FREQ    ; disable DMC IRQs
 
 InitialVBlank:
-    BIT $2002
+    BIT PPUSTATUS
     BPL InitialVBlank
 
 ClearMemory:
@@ -139,20 +155,20 @@ LoadSpritesLoop:
     BNE LoadSpritesLoop
 
 VBlank:
-    BIT $2002
+    BIT PPUSTATUS
     BPL VBlank
 
 ;; load graphics ;;
 LoadPalettes:
-    LDA $2002
+    LDA PPUSTATUS
     LDA #$3F
-    STA $2006
+    STA PPUADDR
     LDA #$00
-    STA $2006
+    STA PPUADDR
     LDX #$00
 LoadPalettesLoop:
     LDA palette, x
-    STA $2007
+    STA PPUDATA
     INX
     CPX #$20
     BNE LoadPalettesLoop
@@ -226,10 +242,10 @@ LoadBackground:
 
 DrawMode:
     LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
-    STA $2000
+    STA PPUCTRL
 
     LDA #%00011110   ; enable sprites
-    STA $2001
+    STA PPUMASK
 
 InitializePosition:
     LDY #$00
@@ -269,53 +285,53 @@ Forever:
 ;; NMI ;;
 NMI:
     LDA #$00
-    STA $2003
+    STA OAMADDR
     LDA #$02
-    STA $4014
+    STA OAMDMA
 
-    LDA $2002
+    LDA PPUSTATUS
     LDA #$23
-    STA $2006
+    STA PPUADDR
     LDA #$00
-    STA $2006
-    STA $2006
+    STA PPUADDR
+    STA PPUADDR
 
 LatchController:
     LDA #$01
-    STA $4016
+    STA JOY1
     LDA #$00
-    STA $4016
+    STA JOY1
 
 PreRead:
     LDY #$00
 
 ReadA:
-    LDA $4016
+    LDA JOY1
     AND #%10000000
     BEQ ReadADone
 ReadADone:
 
 
 ReadB:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadBDone
 ReadBDone:
 
 
 ReadSelect:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
 ReadSelectDone:
 
 ReadStart:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadStartDone
 ReadStartDone:
 
 ReadUp:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadUpDone
 
@@ -325,7 +341,7 @@ ReadUpDone:
 
 
 ReadDown:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadDownDone
 
@@ -334,7 +350,7 @@ ReadDown:
 ReadDownDone:
 
 ReadLeft:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadLeftDone
 
@@ -343,7 +359,7 @@ ReadLeft:
 ReadLeftDone:
 
 ReadRight:
-    LDA $4016
+    LDA JOY1
     AND #%00000001
     BEQ ReadRightDone
 
@@ -570,11 +586,11 @@ MainLoopEnd:
 ;;;;;;;;;;;;;;;;;
 
 _LoadBackground:
-    LDA $2002
+    LDA PPUSTATUS
     LDA #$20
-    STA $2006
+    STA PPUADDR
     LDA #$00
-    STA $2006
+    STA PPUADDR
     LDA #$00
     STA pointer_lo
 
@@ -600,9 +616,9 @@ _ProcessTile:
 
 _DrawTile:
     LDA current_tile
-    STA $2007
+    STA PPUDATA
     ADC #$01
-    STA $2007
+    STA PPUDATA
 
     INY
     CPY #$10
@@ -738,9 +754,9 @@ _EndLevelReset:
     LDX #$FF
     TXS          ; Set up stack
     INX          ; now X = 0
-    STX $2000    ; disable NMI
-    STX $2001    ; disable rendering
-    STX $4010    ; disable DMC IRQ
+    STX PPUCTRL    ; disable NMI
+    STX PPUMASK    ; disable rendering
+    STX DMC_FREQ    ; disable DMC IRQ
 _StartNextLevel:
     INC level_hi
     INC starting_position_lo
@@ -1142,16 +1158,13 @@ magnetizer_metasprite:
 
 ;;;;;;;;;;;;;;
 
-    .org $FFFA     ;first of the three vectors starts here
-    .dw NMI        ;when an NMI happens (once per frame if enabled) the
-                     ;processor will jump to the label NMI:
-    .dw Reset      ;when the processor first turns on or is reset, it will jump
-                     ;to the label RESET:
-    .dw 0          ;external interrupt IRQ is not used in this tutorial
-
+    .org $FFFA
+    .dw NMI
+    .dw Reset
+    .dw 0
 
 ;;;;;;;;;;;;;;
 
   .bank 2
   .org $0000
-  .incbin "magnetizer.chr"   ;includes 8KB graphics file from SMB1
+  .incbin "magnetizer.chr"
