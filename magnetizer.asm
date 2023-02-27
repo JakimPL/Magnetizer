@@ -32,7 +32,11 @@ BOX                   = $05
 
 ANIMATION_LENGTH      = $30
 
-
+UP                    = $01
+DOWN                  = $02
+LEFT                  = $03
+RIGHT                 = $04
+button .rs 1
 level_lo              .rs 1
 level_hi              .rs 1
 
@@ -305,68 +309,25 @@ LatchController:
 PreRead:
     LDY #$00
 
-ReadA:
-    LDA JOY1
-    AND #%10000000
-    BEQ ReadADone
-ReadADone:
-
-
-ReadB:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadBDone
-ReadBDone:
-
-
-ReadSelect:
+ReadController:
+    LDA #$01
+    STA JOY1
+    LDA #$00
+    STA JOY1
+    LDY #$08
+ReadControllerLoop:
     LDA JOY1
     AND #%00000001
-ReadSelectDone:
+    BNE CheckButton
 
-ReadStart:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadStartDone
-ReadStartDone:
-
-ReadUp:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadUpDone
-
-    LDY #$01
+    DEY
+    BNE ReadControllerLoop
+    JMP Movement
+CheckButton:
+    JSR _AssignDirection
     JSR _CheckMovement
-ReadUpDone:
 
-
-ReadDown:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadDownDone
-
-    LDY #$02
-    JSR _CheckMovement
-ReadDownDone:
-
-ReadLeft:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadLeftDone
-
-    LDY #$03
-    JSR _CheckMovement
-ReadLeftDone:
-
-ReadRight:
-    LDA JOY1
-    AND #%00000001
-    BEQ ReadRightDone
-
-    LDY #$04
-    JSR _CheckMovement
-ReadRightDone:
-
+Movement:
     LDA grounded
     CMP #$01
     BNE Move
@@ -375,13 +336,13 @@ CalculateSpeed:
     JSR _IncreaseSpeed
 Move:
     LDX direction
-    CPX #$01
+    CPX #UP
     BEQ MoveUp
-    CPX #$02
+    CPX #DOWN
     BEQ MoveDown
-    CPX #$03
+    CPX #LEFT
     BEQ MoveLeft
-    CPX #$04
+    CPX #RIGHT
     BEQ MoveRight
     JMP UpdatePosition
 
@@ -956,6 +917,16 @@ _LoadIndex:
     RTS
 
 ; Y as argument ;
+_AssignDirection:
+    TYA
+    STA button
+    LDA #$05
+    SEC
+    SBC button
+    STA button
+    TAY
+    RTS
+
 _SetDirection:
     LDY #$01
     STY grounded
