@@ -43,7 +43,7 @@ POINT_Y_OFFSET        = $08
 
 TEN                   = $0A
 LAST_DIGIT            = TEN - 1
-COUNTER_DIGITS        = $03
+COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 button                .rs 1
@@ -105,6 +105,8 @@ boxes                 .rs 1
 draw_boxes            .rs 1
 box_x                 .rs 64
 box_y                 .rs 64
+
+ppu_shift             .rs 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -316,16 +318,31 @@ DrawMoveCounterOffset:
     LDA #%10010100
     STA PPUCTRL
 
-    LDA PPUDATA
-    LDA PPUDATA
-    LDA PPUDATA
-    LDA PPUDATA
+    LDX #$04
+    JSR _ShiftPPU
 
     LDA #%10010000
     STA PPUCTRL
 
+    LDA #$18
+    STA ppu_shift
 DrawMoveCounter:
     JSR _DrawMoveCounter
+
+    LDA #%10010100
+    STA PPUCTRL
+
+    LDX #$03
+    JSR _ShiftPPU
+
+    LDA #%10010000
+    STA PPUCTRL
+
+    LDX ppu_shift
+    JSR _ShiftPPU
+
+    LDA #$0F
+    STA PPUDATA
 
 LatchController:
     LDA #$01

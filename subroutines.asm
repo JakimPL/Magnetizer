@@ -2,6 +2,13 @@
 ;; subroutines ;;
 ;;;;;;;;;;;;;;;;;
 
+;; x as argument ;;
+_ShiftPPU:
+    LDA PPUDATA
+    DEX
+    BNE _ShiftPPU
+    RTS
+
 _LoadBackground:
     LDA PPUSTATUS
     LDA #$20
@@ -446,6 +453,7 @@ _SetMoveCounterMaxValue
 _DrawMoveCounter:
     LDX #$00
 _DrawMoveCounterStep:
+    DEC ppu_shift
     LDA move_counter, x
     STA PPUDATA
     INX
