@@ -36,7 +36,12 @@ UP                    = $01
 DOWN                  = $02
 LEFT                  = $03
 RIGHT                 = $04
-button .rs 1
+
+POINT_X_OFFSET        = $08
+POINT_Y_OFFSET        = $08
+
+button                .rs 1
+
 level_lo              .rs 1
 level_hi              .rs 1
 
@@ -256,7 +261,7 @@ InitializePosition:
     LDA [starting_position_lo], y
     STA position_x
 
-    SBC #$08
+    SBC #POINT_X_OFFSET
     STA $0213
     STA $021B
     CLC
@@ -268,7 +273,7 @@ InitializePosition:
     LDA [starting_position_lo], y
     STA position_y
 
-    SBC #$0A
+    SBC #POINT_Y_OFFSET
     STA $0210
     STA $0214
     CLC
@@ -373,7 +378,7 @@ MoveRight:
 UpdatePosition:
     LDA position_x
     SEC
-    SBC #$07
+    SBC #POINT_X_OFFSET
     STA $0203
     STA $020B
 
@@ -384,7 +389,7 @@ UpdatePosition:
 
     LDA position_y
     SEC
-    SBC #$0A
+    SBC #POINT_Y_OFFSET
     STA $0200
     STA $0204
 
@@ -461,7 +466,7 @@ DrawAnimation:
     STA $022F
 
     LDA ending_point_real_y
-    SBC #$02
+    SBC #$00
     STA $0220
     STA $0224
     CLC
@@ -527,8 +532,7 @@ DrawBox:
 
     LDA box_y, y
     JSR _Multiply
-    SEC
-    SBC #$02
+    SBC #$00
     STA $0230, x
     STA $0234, x
     CLC
