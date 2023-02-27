@@ -15,6 +15,7 @@ OAMDATA               = $2004
 PPUSCROLL             = $2005
 PPUADDR               = $2006
 PPUDATA               = $2007
+
 DMC_FREQ              = $4010
 DMC_RAW               = $4011
 DMC_START             = $4012
@@ -40,7 +41,15 @@ RIGHT                 = $04
 POINT_X_OFFSET        = $08
 POINT_Y_OFFSET        = $08
 
+TEN                   = $0A
+LAST_DIGIT            = TEN - 1
+COUNTER_DIGITS        = $03
+COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
+
 button                .rs 1
+
+move_counter          .rs 4
+move_counter_limit    .rs 1
 
 level_lo              .rs 1
 level_hi              .rs 1
@@ -96,8 +105,6 @@ boxes                 .rs 1
 draw_boxes            .rs 1
 box_x                 .rs 64
 box_y                 .rs 64
-
-move_counter          .rs 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -297,12 +304,28 @@ NMI:
     LDA #$02
     STA OAMDMA
 
+PrepareMoveCounter:
     LDA PPUSTATUS
     LDA #$23
     STA PPUADDR
     LDA #$00
     STA PPUADDR
     STA PPUADDR
+
+DrawMoveCounterOffset:
+    LDA #%10010100
+    STA PPUCTRL
+
+    LDA PPUDATA
+    LDA PPUDATA
+    LDA PPUDATA
+    LDA PPUDATA
+
+    LDA #%10010000
+    STA PPUCTRL
+
+DrawMoveCounter:
+    JSR _DrawMoveCounter
 
 LatchController:
     LDA #$01

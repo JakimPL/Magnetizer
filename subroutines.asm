@@ -175,6 +175,7 @@ _EndLevelReset:
     STX PPUMASK    ; disable rendering
     STX DMC_FREQ    ; disable DMC IRQ
 _StartNextLevel:
+    JSR _ResetMoveCounter
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
@@ -386,7 +387,70 @@ _AssignDirection:
 _SetDirection:
     LDY #$01
     STY grounded
-    INC move_counter
+    JSR _IncreaseMoveCounter
+    RTS
+
+;; move counter ;;
+_ResetMoveCounter:
+    LDA #$00
+    STA move_counter_limit
+    LDX #$00
+_ResetMoveCounterStep:
+    STA move_counter, x
+    INX
+    CPX #COUNTER_DIGITS
+    BNE _ResetMoveCounterStep
+    RTS
+
+_IncreaseMoveCounter:
+    LDX #COUNTER_LAST_DIGIT
+_IncreaseMoveCounterCheck:
+    LDA move_counter_limit
+    CMP #$00
+    BEQ _IncreaseMoveCounterStep
+    RTS
+_IncreaseMoveCounterStep:
+    INC move_counter, x
+    LDA move_counter, x
+    CMP #TEN
+    BEQ _IncreaseMoveCounterCarry
+    RTS
+_IncreaseMoveCounterCarry:
+    LDA #$00
+    STA move_counter, x
+    DEX
+    JSR _CheckMoveCounterLimit
+    JMP _IncreaseMoveCounterCheck
+
+_CheckMoveCounterLimit:
+    CPX #$00
+    BEQ _CheckMoveCounterFirstDigit
+    RTS
+_CheckMoveCounterFirstDigit:
+    LDA move_counter
+    CMP #LAST_DIGIT
+    BEQ _CheckMoveCounterLimitTrue
+    RTS
+_CheckMoveCounterLimitTrue
+    LDA #$01
+    STA move_counter_limit
+
+    LDA #LAST_DIGIT
+    LDY #COUNTER_LAST_DIGIT
+_SetMoveCounterMaxValue
+    STA move_counter, y
+    DEY
+    BNE _SetMoveCounterMaxValue
+    RTS
+
+_DrawMoveCounter:
+    LDX #$00
+_DrawMoveCounterStep:
+    LDA move_counter, x
+    STA PPUDATA
+    INX
+    CPX #COUNTER_DIGITS
+    BNE _DrawMoveCounterStep
     RTS
 
 _ShiftVertically:
