@@ -1,0 +1,429 @@
+;;;;;;;;;;;;;;;;;
+;; subroutines ;;
+;;;;;;;;;;;;;;;;;
+
+_LoadBackground:
+    LDA PPUSTATUS
+    LDA #$20
+    STA PPUADDR
+    LDA #$00
+    STA PPUADDR
+    LDA #$00
+    STA pointer_lo
+
+    LDA level_hi
+    STA pointer_hi
+
+    LDX #$00
+    LDY #$00
+_LoadBackgroundInsideLoop:
+    LDA [pointer_lo], y
+
+_LoadTilePart:
+    CLC
+    LDA [pointer_lo], y
+    STY temp_y
+    TAY
+    LDA tiles, y
+    STA current_tile
+    LDY temp_y
+
+_ProcessTile:
+    JSR _ShiftVertically
+
+_DrawTile:
+    LDA current_tile
+    STA PPUDATA
+    ADC #$01
+    STA PPUDATA
+
+    INY
+    CPY #$10
+    BNE _LoadBackgroundInsideLoop
+
+    TXA
+    AND #%00000001
+    BEQ _LoadBackgroundPostLoop
+
+_LoadBackgroundIncPointer:
+    LDA pointer_lo
+    CLC
+    ADC #$10
+    STA pointer_lo
+
+_LoadBackgroundPostLoop:
+    LDY #$00
+    INX
+    CPX #$1E
+    BNE _LoadBackgroundInsideLoop
+    RTS
+
+;; animation ;;
+_ReverseAnimationDirection:
+    LDA animation_direction
+    CMP #$01
+    BEQ _SetNegativeAnimationDirection
+    LDA #$01
+    STA animation_direction
+    RTS
+
+_SetNegativeAnimationDirection:
+    LDA #$FF
+    STA animation_direction
+    RTS
+
+; u d l r
+_GetOffset:
+    LDX direction
+    LDA movement_x, x
+    STA offset_x
+
+    LDA movement_y, x
+    STA offset_y
+    RTS
+
+;; movement ;;
+_AfterStep:
+    JSR _CheckPosition
+    DEC real_speed
+    LDA real_speed
+    CMP #$00
+    RTS
+
+;; speed subroutines ;;
+_CalculateRealSpeed:
+    LDA speed
+    JSR _Divide
+    ADC #$01
+    STA real_speed
+    RTS
+
+_IncreaseSpeed:
+    LDY speed
+    CPY #$FF
+    BNE _IncreaseSpeedStep
+    RTS
+_IncreaseSpeedStep:
+    INC speed
+    RTS
+
+_Stop:
+    LDA #$00
+    STA grounded
+    STA direction
+    STA speed
+    LDA #$01
+    STA real_speed
+    RTS
+
+;; collision routine ;;
+_CheckPosition:
+    LDA direction
+    CMP #$03
+    BCC _CheckY
+
+    LDA direction
+    CMP #$03
+    BCS _CheckX
+    RTS
+
+_CheckY:
+    LDA position_y
+    AND #%00001111
+    CMP #$08
+    BEQ __GetPositionWithOffset
+    RTS
+_CheckX:
+    LDA position_x
+    AND #%00001111
+    CMP #$08
+    BEQ __GetPositionWithOffset
+    RTS
+
+__GetPositionWithOffset:
+    JSR _GetPositionWithOffset
+
+__BoxCheck:
+    JSR _BoxCheckLoop
+
+__CollisionCheck:
+    LDA index
+    JSR _CheckCollision
+    CMP #$01
+    BNE __GetPositionWithoutOffset
+    JSR _Stop
+
+__GetPositionWithoutOffset:
+    JSR _GetPositionWithoutOffset
+
+_StopperCheck:
+    JSR _GetTile
+    CMP #STOPPER
+    BNE _EndCheck
+    JSR _Stop
+
+_EndCheck:
+    CMP #END
+    BNE __UpdatePosition
+    JSR _Stop
+
+_EndLevelReset:
+    LDX #$FF
+    TXS          ; Set up stack
+    INX          ; now X = 0
+    STX PPUCTRL    ; disable NMI
+    STX PPUMASK    ; disable rendering
+    STX DMC_FREQ    ; disable DMC IRQ
+_StartNextLevel:
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    JMP VBlank
+__UpdatePosition:
+    RTS
+
+;; box logic, y - index ;;
+_BoxCheckLoop:
+    LDY boxes
+    CPY #$00
+    BNE _BoxCheckLoopStep
+    RTS
+_BoxCheckLoopStep:
+    DEY
+    JSR _BoxCheck
+
+    CPY #$00
+    BNE _BoxCheckLoopStep
+    RTS
+
+_BoxCheck:
+    STY temp_y
+    JSR _IsBoxOnIndex
+    CMP #$01
+    BNE _BoxCheckEnd
+_BoxAction:
+    LDX direction
+    LDA movement, x
+    STA offset
+    JSR _Stop
+
+    LDA index
+    CLC
+    ADC offset
+    STA target
+
+    JSR _CheckBoxCollision
+    CMP #$00
+    BEQ _MoveBox
+    RTS
+_MoveBox:
+    LDY temp_y
+    LDA target
+    AND #%00001111
+    STA box_x, y
+
+    LDA target
+    JSR _Divide
+    STA box_y, y
+
+    LDA #$01
+    STA draw_boxes
+_BoxCheckEnd:
+    RTS
+
+;; y as argument ;;
+_IsBoxOnIndex:
+    LDA index
+    AND #%00001111
+    CMP box_x, y
+    BEQ _IsBoxOnYIndex
+    JMP _IsBoxOnIndexReturnFalse
+_IsBoxOnYIndex:
+    LDA index
+    JSR _Divide
+    CMP box_y, y
+    BEQ _IsBoxOnIndexReturnTrue
+    JMP _IsBoxOnIndexReturnFalse
+_IsBoxOnIndexReturnTrue:
+    LDA #$01
+    RTS
+_IsBoxOnIndexReturnFalse:
+    LDA #$00
+    RTS
+
+;; collision logic ;;
+_GetTile:
+    TAY
+    LDA [level_lo], y
+    RTS
+
+_CheckCollision:
+    JSR _GetTile
+    TAY
+    LDA solid, y
+    RTS
+
+_CheckBoxCollision:
+    JSR _SaveIndex
+    LDA target
+    STA index
+
+    JSR _GetTile
+    TAY
+    LDA box_solid, y
+    CMP #$01
+    BNE _CheckIfBoxIsBlocking
+    RTS
+_CheckIfBoxIsBlocking
+    LDY boxes
+    LDA #$00
+_CheckIfBoxIsBlockingStep:
+    DEY
+    JSR _IsBoxOnIndex
+    CMP #$01
+    BEQ _CheckIfBoxIsBlockingTrue
+
+    CPY #$00
+    BNE _CheckIfBoxIsBlockingStep
+_CheckIfBoxIsBlockingFalse:
+    JSR _RestoreIndex
+    LDA #$00
+    RTS
+_CheckIfBoxIsBlockingTrue:
+    JSR _RestoreIndex
+    LDA #$01
+    RTS
+
+_SaveIndex:
+    LDA index
+    STA index_temp
+    RTS
+_RestoreIndex:
+    LDA index_temp
+    STA index
+    RTS
+
+_CheckMovement:
+    LDX grounded
+    CPX #$00
+    BEQ _CheckObstacle
+    RTS
+_CheckObstacle:
+    STY direction
+    JSR _GetPositionWithOffset
+    JSR _CheckCollision
+    CMP #$01
+    BEQ _Ground
+_CheckBoxObstacle:
+    TYA
+    JSR _SetDirection
+    JSR _BoxCheckLoop
+    RTS
+_Ground:
+    JSR _Stop
+    RTS
+
+_GetPositionWithOffset:
+    LDX #$01
+    STX check_x_offset
+    LDX #$01
+    STX check_y_offset
+    JSR _GetPosition
+    RTS
+
+_GetPositionWithoutOffset:
+    LDX #$00
+    STX check_x_offset
+    LDX #$00
+    STX check_y_offset
+    JSR _GetPosition
+    RTS
+
+_GetPosition:
+    JSR _GetOffset
+_GetX:
+    LDA position_x
+    JSR _Divide
+    LDX check_x_offset
+    CPX #$01
+    BNE _SaveX
+_AddOffsetX:
+    CLC
+    ADC offset_x
+    AND #%00001111
+_SaveX:
+    STA px
+_GetY:
+    LDA position_y
+    JSR _Divide
+    LDX check_y_offset
+    CPX #$01
+    BNE _SaveY
+_AddOffsetY:
+    CLC
+    ADC offset_y
+    AND #%00001111
+_SaveY:
+    JSR _Multiply
+    STA py
+_LoadIndex:
+    LDA py
+    ADC px
+    STA index
+    RTS
+
+; Y as argument ;
+_AssignDirection:
+    TYA
+    STA button
+    LDA #$05
+    SEC
+    SBC button
+    STA button
+    TAY
+    RTS
+
+_SetDirection:
+    LDY #$01
+    STY grounded
+    INC move_counter
+    RTS
+
+_ShiftVertically:
+    TXA
+    AND #%00000001
+    BEQ _AfterShift
+
+    LDA current_tile
+    ADC #$02
+    STA current_tile
+_AfterShift:
+    RTS
+
+_Snap:
+    AND #%11110000
+    RTS
+
+_Multiply:
+    ASL a
+    ASL a
+    ASL a
+    ASL a
+    RTS
+
+_Divide:
+    LSR a
+    LSR a
+    LSR a
+    LSR a
+    RTS
+
+_GetRealXPosition:
+    TYA
+    JSR _Multiply
+    RTS
+
+_GetRealYPosition:
+    TXA
+    JSR _Multiply
+    RTS
