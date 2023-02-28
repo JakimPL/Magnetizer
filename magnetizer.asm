@@ -7,6 +7,7 @@
 ;;;;;;;;;;;;;;;
     .rsset $0000
 
+;; constants ;;
 PPUCTRL               = $2000
 PPUMASK               = $2001
 PPUSTATUS             = $2002
@@ -45,6 +46,14 @@ TEN                   = $0A
 LAST_DIGIT            = TEN - 1
 COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
+
+;; variables ;;
+source_box            .rs 1
+source_box_x          .rs 1
+source_box_y          .rs 1
+target_box            .rs 1
+target_box_x          .rs 1
+target_box_y          .rs 1
 
 attribute             .rs 1
 tile_attribute        .rs 1
@@ -164,6 +173,9 @@ SetStartingPositionPointer:
     STA starting_position_lo
     LDA #HIGH(starting_positions)
     STA starting_position_hi
+
+SetBoxSwap:
+    JSR _ResetBoxSwap
 
 LoadSprites:
     LDX #$00
@@ -312,13 +324,37 @@ NMI:
     LDA #$02
     STA OAMDMA
 
+    LDA source_box
+    CMP #$FF
+    BEQ PrepareMoveCounter
+SwapBoxes:
+    LDA #$20
+    STA ppu_shift
+    JSR _PreparePPU
+
+    LDX source_box_x
+    LDY source_box_y
+
+    JSR _MovePPU
+    LDA #$24
+    STA PPUDATA
+    LDA #$25
+    STA PPUDATA
+
+    LDX #$1E
+    JSR _ShiftPPU
+
+    LDA #$26
+    STA PPUDATA
+    LDA #$27
+    STA PPUDATA
+
+    JSR _ResetBoxSwap
+
 PrepareMoveCounter:
-    LDA PPUSTATUS
     LDA #$23
-    STA PPUADDR
-    LDA #$00
-    STA PPUADDR
-    STA PPUADDR
+    STA ppu_shift
+    JSR _PreparePPU
 
 DrawMoveCounterOffset:
     LDA #%10010100

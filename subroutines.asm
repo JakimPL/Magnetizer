@@ -2,11 +2,43 @@
 ;; subroutines ;;
 ;;;;;;;;;;;;;;;;;
 
+_PreparePPU:
+    LDA PPUSTATUS
+    LDA ppu_shift
+    STA PPUADDR
+    LDA #$00
+    STA PPUADDR
+    STA PPUADDR
+    RTS
+
 ;; x as argument ;;
 _ShiftPPU:
     LDA PPUDATA
     DEX
     BNE _ShiftPPU
+    RTS
+
+;; x, y as arguments ;;
+_MovePPU:
+    LDA #%10010100
+    STA PPUCTRL
+
+    CPX #$00
+    BEQ _MovePPUChangeFlag
+_MovePPUX:
+    JSR _ShiftPPU
+
+_MovePPUChangeFlag:
+    LDA #%10010000
+    STA PPUCTRL
+
+    TYA
+    TAX
+    CPX #$00
+    BNE _MovePPUY
+    RTS
+_MovePPUY:
+    JSR _ShiftPPU
     RTS
 
 _SetLevelPointer:
@@ -310,9 +342,29 @@ _MoveBox:
     JSR _Divide
     STA box_y, y
 
-    LDA #$01
-    STA draw_boxes
+_MarkBoxesForSwap:
+    LDA index
+    JSR _Divide
+    ASL a
+    STA source_box_x
+
+    LDA index
+    AND #%00001111
+    ASL a
+    STA source_box_y
+
+    STA source_box
+    LDA target
+    STA target_box
+    STA ppu_shift
+
 _BoxCheckEnd:
+    RTS
+
+_ResetBoxSwap:
+    LDA #$FF
+    STA source_box
+    STA target_box
     RTS
 
 ;; y as argument ;;
