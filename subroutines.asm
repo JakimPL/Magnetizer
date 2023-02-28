@@ -41,6 +41,27 @@ _MovePPUY:
     JSR _ShiftPPU
     RTS
 
+_DrawSingleTilePart:
+    LDA target_tile
+    STA PPUDATA
+    INC target_tile
+    RTS
+
+_DrawSingleTile
+    LDX target_y
+    LDY target_x
+
+    JSR _MovePPU
+    JSR _DrawSingleTilePart
+    JSR _DrawSingleTilePart
+
+    LDX #$1E
+    JSR _ShiftPPU
+
+    JSR _DrawSingleTilePart
+    JSR _DrawSingleTilePart
+    RTS
+
 _SetLevelPointer:
     LDA level_lo
     STA pointer_lo
@@ -98,14 +119,16 @@ _LoadBackgroundPostLoop:
     BNE _LoadBackgroundInsideLoop
     RTS
 
-_LoadAttributes:
+_PrepareAttributePPU:
     LDA PPUSTATUS
     LDA #$23
     STA PPUADDR
     LDA #$C0
     STA PPUADDR
-    LDA #$00
+    RTS
 
+_LoadAttributes:
+    JSR _PrepareAttributePPU
     JSR _SetLevelPointer
 
     LDX #$00
@@ -343,20 +366,52 @@ _MoveBox:
     STA box_y, y
 
 _MarkBoxesForSwap:
+    ; subject for optimization (stack) ;
     LDA index
+    STA source_box
     JSR _Divide
     ASL a
-    STA source_box_x
+    STA source_box_y
 
     LDA index
     AND #%00001111
     ASL a
-    STA source_box_y
+    STA source_box_x
 
-    STA source_box
     LDA target
     STA target_box
-    STA ppu_shift
+    JSR _Divide
+    ASL a
+    STA target_box_y
+
+    LDA target
+    AND #%00001111
+    ASL a
+    STA target_box_x
+_CalculateAttributeOffset:
+    LDA target_box_y
+    AND #%11111100
+    ASL a
+    TAX
+    STA target_offset
+
+    LDA target_box_x
+    LSR a
+    LSR a
+    ADC target_offset
+    STA target_offset
+
+    ;LDA source_box_y
+    ;AND #%11111100
+    ;ASL a
+    ;TAX
+    ;STA source_offset
+
+    ;LDA source_box_x
+    ;LSR a
+    ;LSR a
+    ;ADC source_offset
+    ;STA source_offset
 
 _BoxCheckEnd:
     RTS
