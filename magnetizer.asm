@@ -50,6 +50,7 @@ attribute             .rs 1
 tile_attribute        .rs 1
 button                .rs 1
 
+increase_counter      .rs 1
 move_counter          .rs 4
 move_counter_limit    .rs 1
 
@@ -357,6 +358,7 @@ LatchController:
 
 PreRead:
     LDY #$00
+    STA increase_counter
 
 ReadController:
     LDA #$01
@@ -531,64 +533,12 @@ DrawAnimation:
     STA $0229
     STA $022D
 
-    LDA draw_boxes
+IncrementCounterCheck:
+    LDA increase_counter
     CMP #$01
-    JMP MainLoopEnd ; <- to delete
+    BNE MainLoopEnd
+    JSR _IncreaseMoveCounter
 
-    BEQ DrawBoxes
-    JMP MainLoopEnd
-
-DrawBoxes:
-    LDA #$00
-    STA draw_boxes
-
-    LDA boxes
-    CMP #$00
-    BEQ MainLoopEnd
-
-    LDY #$00
-DrawBox:
-    TYA
-    JSR _Multiply
-    TAX
-
-    LDA #$08
-    STA $0231, x
-    STA $0235, x
-    STA $0239, x
-    STA $023D, x
-
-    LDA #$17
-    STA $0232, x
-    LDA #$57
-    STA $0236, x
-    LDA #$97
-    STA $023A, x
-    LDA #$D7
-    STA $023E, x
-
-    LDA box_x, y
-    JSR _Multiply
-    STA $0233, x
-    STA $023B, x
-    CLC
-    ADC #$08
-    STA $0237, x
-    STA $023F, x
-
-    LDA box_y, y
-    JSR _Multiply
-    SBC #$00
-    STA $0230, x
-    STA $0234, x
-    CLC
-    ADC #$08
-    STA $0238, x
-    STA $023C, x
-
-    INY
-    CPY boxes
-    BNE DrawBox
 MainLoopEnd:
     RTI
 

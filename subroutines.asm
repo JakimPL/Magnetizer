@@ -192,6 +192,7 @@ _IncreaseSpeedStep:
 _Stop:
     LDA #$00
     STA grounded
+    STA increase_counter
     STA direction
     STA speed
     LDA #$01
@@ -469,7 +470,7 @@ _AssignDirection:
 _SetDirection:
     LDY #$01
     STY grounded
-    JSR _IncreaseMoveCounter
+    STY increase_counter
     RTS
 
 ;; move counter ;;
