@@ -54,13 +54,9 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 source_box            .rs 1
 source_box_x          .rs 1
 source_box_y          .rs 1
-source_offset         .rs 1
 target_box            .rs 1
 target_box_x          .rs 1
 target_box_y          .rs 1
-target_offset         .rs 1
-target_x              .rs 1
-target_y              .rs 1
 target_tile           .rs 1
 
 attribute             .rs 1
@@ -342,55 +338,31 @@ NMI:
     JMP DrawTargetBox
 RemoveSourceBox:
     LDA source_box_x
-    STA target_x
-    LDA source_box_y
-    STA target_y
+    STA ppu_shift
+    LDX source_box_y
+    JSR _PreparePPU
+
     LDA #TILE_EMPTY
     STA target_tile
+    JSR _DrawSingleTile
+
     LDA #$FF
     STA source_box
 
-    LDA #$20
-    STA ppu_shift
-    JSR _PreparePPU
-    JSR _DrawSingleTile
-
-    JSR _PrepareAttributePPU
-    ; get attribute index by X, Y ;
-    LDA source_box_y
-    AND #%11111100
-
-ChangeSourceAttribute:
-    ;LDX source_offset
-    ;JSR _ShiftPPU
-    ;LDA #%00000000
-    ;STA PPUDATA
-    JMP PrepareMoveCounter
-
 DrawTargetBox:
     LDA target_box_x
-    STA target_x
-    LDA target_box_y
-    STA target_y
+    STA ppu_shift
+    LDX target_box_y
+    JSR _PreparePPU
+
     LDA #TILE_BOX
     STA target_tile
-
-    LDA #$20
-    STA ppu_shift
-    JSR _PreparePPU
     JSR _DrawSingleTile
-    JSR _ResetBoxSwap
-
-ChangeTargetAttribute:
-    JSR _PrepareAttributePPU
-    LDX target_offset
-    JSR _ShiftPPU
-    LDA #%00000000
-    STA PPUDATA
-    JMP PrepareMoveCounter
 
 PrepareMoveCounter:
     LDA #$23
+    LDX #$00
+    LDY #$00
     STA ppu_shift
     JSR _PreparePPU
 

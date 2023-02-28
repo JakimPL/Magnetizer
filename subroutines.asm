@@ -2,12 +2,13 @@
 ;; subroutines ;;
 ;;;;;;;;;;;;;;;;;
 
+;; x as arguments ;;
 _PreparePPU:
     LDA PPUSTATUS
     LDA ppu_shift
     STA PPUADDR
+    STX PPUADDR
     LDA #$00
-    STA PPUADDR
     STA PPUADDR
     RTS
 
@@ -48,10 +49,6 @@ _DrawSingleTilePart:
     RTS
 
 _DrawSingleTile
-    LDX target_y
-    LDY target_x
-
-    JSR _MovePPU
     JSR _DrawSingleTilePart
     JSR _DrawSingleTilePart
 
@@ -339,7 +336,8 @@ _BoxCheck:
     STY temp_y
     JSR _IsBoxOnIndex
     CMP #$01
-    BNE _BoxCheckEnd
+    BEQ _BoxAction
+    RTS
 _BoxAction:
     LDX direction
     LDA movement, x
@@ -370,48 +368,46 @@ _MarkBoxesForSwap:
     LDA index
     STA source_box
     JSR _Divide
-    ASL a
-    STA source_box_y
+    LSR a
+    LSR a
+    CLC
+    ADC #$20
+    STA source_box_x
 
     LDA index
     AND #%00001111
     ASL a
-    STA source_box_x
+    STA source_box_y
+
+    LDA index
+    AND #%00110000
+    ASL a
+    ASL a
+    CLC
+    ADC source_box_y
+    STA source_box_y
 
     LDA target
     STA target_box
     JSR _Divide
-    ASL a
-    STA target_box_y
+    LSR a
+    LSR a
+    CLC
+    ADC #$20
+    STA target_box_x
 
     LDA target
     AND #%00001111
     ASL a
-    STA target_box_x
-_CalculateAttributeOffset:
-    LDA target_box_y
-    AND #%11111100
+    STA target_box_y
+
+    LDA target
+    AND #%00110000
     ASL a
-    TAX
-    STA target_offset
-
-    LDA target_box_x
-    LSR a
-    LSR a
-    ADC target_offset
-    STA target_offset
-
-    ;LDA source_box_y
-    ;AND #%11111100
-    ;ASL a
-    ;TAX
-    ;STA source_offset
-
-    ;LDA source_box_x
-    ;LSR a
-    ;LSR a
-    ;ADC source_offset
-    ;STA source_offset
+    ASL a
+    CLC
+    ADC target_box_y
+    STA target_box_y
 
 _BoxCheckEnd:
     RTS
