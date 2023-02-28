@@ -9,25 +9,26 @@ _ShiftPPU:
     BNE _ShiftPPU
     RTS
 
+_SetLevelPointer:
+    LDA level_lo
+    STA pointer_lo
+
+    LDA level_hi
+    STA pointer_hi
+    RTS
+
 _LoadBackground:
     LDA PPUSTATUS
     LDA #$20
     STA PPUADDR
     LDA #$00
     STA PPUADDR
-    LDA #$00
-    STA pointer_lo
 
-    LDA level_hi
-    STA pointer_hi
+    JSR _SetLevelPointer
 
     LDX #$00
     LDY #$00
 _LoadBackgroundInsideLoop:
-    LDA [pointer_lo], y
-
-_LoadTilePart:
-    CLC
     LDA [pointer_lo], y
     STY temp_y
     TAY
@@ -63,6 +64,80 @@ _LoadBackgroundPostLoop:
     INX
     CPX #$1E
     BNE _LoadBackgroundInsideLoop
+    RTS
+
+_LoadAttributes:
+    LDA PPUSTATUS
+    LDA #$23
+    STA PPUADDR
+    LDA #$C0
+    STA PPUADDR
+    LDA #$00
+
+    JSR _SetLevelPointer
+
+    LDX #$00
+    LDY #$00
+_LoadAttributeLoop:
+    JSR _LoadTileAttribute
+    STA PPUDATA
+
+    INY
+    INY
+    TYA
+    AND #%00001111
+    BNE _LoadAttributeLoopNextStep
+_LoadAttributeLoopNextLine:
+    TYA
+    ADC #$10
+    TAY
+_LoadAttributeLoopNextStep:
+    INX
+    CPX #$40
+    BNE _LoadAttributeLoop
+    RTS
+
+;; y as argument ;;
+_LoadSingleTileAttribute:
+    LDA [pointer_lo], y
+    TAY
+    LDA attributes, y
+    STA tile_attribute
+
+    LDA attribute
+    ASL a
+    ASL a
+    ADC tile_attribute
+    STA attribute
+    RTS
+
+_LoadTileAttribute:
+    STX temp_x
+    STY temp_y
+
+    LDA #$00
+    STA attribute
+    STA tile_attribute
+
+    LDA temp_y
+    ADC #$11
+    TAY
+    JSR _LoadSingleTileAttribute
+
+    LDA temp_y
+    ADC #$10
+    TAY
+    JSR _LoadSingleTileAttribute
+
+    LDY temp_y
+    INY
+    JSR _LoadSingleTileAttribute
+
+    LDY temp_y
+    JSR _LoadSingleTileAttribute
+
+    LDX temp_x
+    LDY temp_y
     RTS
 
 ;; animation ;;

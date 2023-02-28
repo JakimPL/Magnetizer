@@ -46,6 +46,8 @@ LAST_DIGIT            = TEN - 1
 COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
+attribute             .rs 1
+tile_attribute        .rs 1
 button                .rs 1
 
 move_counter          .rs 4
@@ -256,6 +258,9 @@ LoadLevelPostLoop:
 
 LoadBackground:
     JSR _LoadBackground
+
+LoadAttributes:
+    JSR _LoadAttributes
 
 DrawMode:
     LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
@@ -528,6 +533,8 @@ DrawAnimation:
 
     LDA draw_boxes
     CMP #$01
+    JMP MainLoopEnd ; <- to delete
+
     BEQ DrawBoxes
     JMP MainLoopEnd
 
@@ -598,7 +605,6 @@ palette:
     .db $19,$02,$05,$1D,  $22,$36,$17,$0F,  $22,$10,$11,$0F,  $22,$27,$17,$0F ; background
     .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
 
-
 sprites:
     ;; magnetizer ;;
     .db $70, $00, $01, $70
@@ -619,7 +625,13 @@ sprites:
     .db $08, $04, $C2, $08
 
 tiles:
-    .db $30, $24, $24, $24, $38, $24
+    .db $30, $24, $24, $24, $38, $3C
+
+attributes:
+    .db $00, $00, $00, $00, $00, $03
+
+attribute_offsets:
+    .db $11, $10, $01, $00
 
 solid
     .db $01, $00, $00, $00, $00, $00
