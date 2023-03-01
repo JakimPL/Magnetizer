@@ -313,6 +313,15 @@ _StartNextLevel:
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
     JMP VBlank
 __UpdatePosition:
     RTS
