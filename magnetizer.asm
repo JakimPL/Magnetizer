@@ -51,13 +51,22 @@ COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;; variables ;;
+
 source_box            .rs 1
 source_box_x          .rs 1
 source_box_y          .rs 1
+source_box_z          .rs 1
+source_box_offset     .rs 1
+
 target_box            .rs 1
 target_box_x          .rs 1
 target_box_y          .rs 1
+target_box_z          .rs 1
+target_box_offset     .rs 1
+
 target_tile           .rs 1
+target_temp           .rs 1
+
 
 attribute             .rs 1
 tile_attribute        .rs 1
@@ -346,8 +355,25 @@ RemoveSourceBox:
     STA target_tile
     JSR _DrawSingleTile
 
+GetSourceBoxAttribute:
+    LDA #$23
+    STA ppu_shift
+    LDX source_box_offset
+    JSR _PreparePPU
+    LDA PPUDATA
+    LDA PPUDATA
+    STA target_tile
+
+DrawSourceBoxAttribute:
+    JSR _PreparePPU
+    LDA target_tile
+    AND source_box_z
+    STA PPUDATA
+
+ResetSourceBox:
     LDA #$FF
     STA source_box
+    JMP PrepareMoveCounter
 
 DrawTargetBox:
     LDA target_box_x
@@ -358,6 +384,25 @@ DrawTargetBox:
     LDA #TILE_BOX
     STA target_tile
     JSR _DrawSingleTile
+
+GetTargetBoxAttribute:
+    LDA #$23
+    STA ppu_shift
+    LDX target_box_offset
+    JSR _PreparePPU
+    LDA PPUDATA
+    LDA PPUDATA
+    STA target_tile
+
+DrawTargetBoxAttribute:
+    JSR _PreparePPU
+    LDA target_tile
+    AND target_box_z
+    STA PPUDATA
+
+ResetTargetBox:
+    LDA #$FF
+    STA target_box
 
 PrepareMoveCounter:
     LDA #$23

@@ -68,15 +68,13 @@ _SetLevelPointer:
     RTS
 
 _LoadBackground:
-    LDA PPUSTATUS
     LDA #$20
-    STA PPUADDR
-    LDA #$00
-    STA PPUADDR
+    STA ppu_shift
+    LDX #$00
+    JSR _PreparePPU
 
     JSR _SetLevelPointer
 
-    LDX #$00
     LDY #$00
 _LoadBackgroundInsideLoop:
     LDA [pointer_lo], y
@@ -116,15 +114,16 @@ _LoadBackgroundPostLoop:
     BNE _LoadBackgroundInsideLoop
     RTS
 
+;; x as argument ;;
 _PrepareAttributePPU:
     LDA PPUSTATUS
     LDA #$23
     STA PPUADDR
-    LDA #$C0
-    STA PPUADDR
+    LDX PPUADDR
     RTS
 
 _LoadAttributes:
+    LDX #$C0
     JSR _PrepareAttributePPU
     JSR _SetLevelPointer
 
@@ -365,52 +364,102 @@ _MoveBox:
 
 _MarkBoxesForSwap:
     ; subject for optimization (stack) ;
-    LDA index
-    STA source_box
-    JSR _Divide
-    LSR a
-    LSR a
-    CLC
-    ADC #$20
+    LDX index
+    STX source_box
+    JSR _CalculateBoxX
     STA source_box_x
 
-    LDA index
-    AND #%00001111
-    ASL a
+    JSR _CalculateBoxY
     STA source_box_y
 
-    LDA index
-    AND #%00110000
-    ASL a
-    ASL a
-    CLC
-    ADC source_box_y
-    STA source_box_y
+    JSR _CalculateBoxOffset
+    STA source_box_offset
 
-    LDA target
-    STA target_box
-    JSR _Divide
-    LSR a
-    LSR a
-    CLC
-    ADC #$20
+    JSR _CalculateBoxZ
+    STA source_box_z
+
+    LDX target
+    STX target_box
+    JSR _CalculateBoxX
     STA target_box_x
 
-    LDA target
-    AND #%00001111
-    ASL a
+    JSR _CalculateBoxY
     STA target_box_y
 
-    LDA target
-    AND #%00110000
-    ASL a
-    ASL a
-    CLC
-    ADC target_box_y
-    STA target_box_y
+    JSR _CalculateBoxOffset
+    STA target_box_offset
+
+    JSR _CalculateBoxZ
+    STA target_box_z
 
 _BoxCheckEnd:
     RTS
+
+_CalculateBoxX:
+    TXA
+    STA target_temp
+    JSR _Divide
+    LSR a
+    LSR a
+    CLC
+    ADC #$20
+    STA target_temp
+    RTS
+
+_CalculateBoxY:
+    TXA
+    AND #%00001111
+    ASL a
+    STA target_temp
+
+    TXA
+    AND #%00110000
+    ASL a
+    ASL a
+    CLC
+    ADC target_temp
+    STA target_temp
+    RTS
+
+_CalculateBoxOffset:
+    TXA
+    AND #%00001110
+    LSR a
+    CLC
+    ADC #$C0
+    STA target_temp
+
+    TXA
+    AND #%11100000
+    LSR a
+    LSR a
+    CLC
+    ADC target_temp
+    STA target_temp
+    RTS
+
+_CalculateBoxZ:
+    TXA
+    AND #%00000001
+    STA target_temp
+
+    TXA
+    AND #%00010000
+    JSR _Divide
+    CLC
+    ADC target_temp
+    STA target_temp
+
+    TAY
+    LDA #%11111100
+_PrepareTileAttribute:
+    ROR a
+    ROR a
+    DEY
+    BNE _PrepareTileAttribute
+    STA target_temp
+    RTS
+
 
 _ResetBoxSwap:
     LDA #$FF
