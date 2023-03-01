@@ -375,6 +375,7 @@ _MarkBoxesForSwap:
     JSR _CalculateBoxOffset
     STA source_box_offset
 
+    LDY #%11111100
     JSR _CalculateBoxZ
     STA source_box_z
 
@@ -389,6 +390,7 @@ _MarkBoxesForSwap:
     JSR _CalculateBoxOffset
     STA target_box_offset
 
+    LDY #%00000011
     JSR _CalculateBoxZ
     STA target_box_z
 
@@ -445,18 +447,29 @@ _CalculateBoxZ:
 
     TXA
     AND #%00010000
-    JSR _Divide
+    LSR a
+    LSR a
+    LSR a
     CLC
     ADC target_temp
     STA target_temp
 
-    TAY
-    LDA #%11111100
-_PrepareTileAttribute:
-    ROR a
-    ROR a
-    DEY
+    TAX
+    CPX #$00
     BNE _PrepareTileAttribute
+    STY target_temp
+    LDA target_temp
+    RTS
+
+_PrepareTileAttribute:
+    TYA
+_PrepareTileAttributeStep:
+    ASL a
+    ADC #$00
+    ASL a
+    ADC #$00
+    DEX
+    BNE _PrepareTileAttributeStep
     STA target_temp
     RTS
 

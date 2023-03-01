@@ -397,7 +397,7 @@ GetTargetBoxAttribute:
 DrawTargetBoxAttribute:
     JSR _PreparePPU
     LDA target_tile
-    AND target_box_z
+    ORA target_box_z
     STA PPUDATA
 
 ResetTargetBox:
