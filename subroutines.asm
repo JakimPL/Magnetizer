@@ -265,29 +265,16 @@ _CheckY:
     LDA position_y
     AND #%00001111
     CMP #$08
-    BEQ __GetPositionWithOffset
+    BEQ _CheckIfPositionIsFree
     RTS
 _CheckX:
     LDA position_x
     AND #%00001111
     CMP #$08
-    BEQ __GetPositionWithOffset
+    BEQ _CheckIfPositionIsFree
     RTS
 
-__GetPositionWithOffset:
-    JSR _GetPositionWithOffset
-
-__BoxCheck:
-    JSR _BoxCheckLoop
-
-__CollisionCheck:
-    LDA index
-    JSR _CheckCollision
-    CMP #$01
-    BNE __GetPositionWithoutOffset
-    JSR _Stop
-
-__GetPositionWithoutOffset:
+_CheckIfPositionIsFree:
     JSR _GetPositionWithoutOffset
 
 _StopperCheck:
@@ -298,7 +285,7 @@ _StopperCheck:
 
 _EndCheck:
     CMP #END
-    BNE __UpdatePosition
+    BNE _CheckIfNextPositionIsFree
     JSR _Stop
 
 _EndLevelReset:
@@ -313,16 +300,21 @@ _StartNextLevel:
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
     JMP VBlank
+
+_CheckIfNextPositionIsFree:
+    JSR _GetPositionWithOffset
+
+__BoxCheck:
+    JSR _BoxCheckLoop
+
+__CollisionCheck:
+    LDA index
+    JSR _CheckCollision
+    CMP #$01
+    BNE __UpdatePosition
+    JSR _Stop
+
 __UpdatePosition:
     RTS
 

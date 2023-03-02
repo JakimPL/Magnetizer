@@ -52,22 +52,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;; variables ;;
 
-source_box            .rs 1
-source_box_x          .rs 1
-source_box_y          .rs 1
-source_box_z          .rs 1
-source_box_offset     .rs 1
-
-target_box            .rs 1
-target_box_x          .rs 1
-target_box_y          .rs 1
-target_box_z          .rs 1
-target_box_offset     .rs 1
-
-target_tile           .rs 1
-target_temp           .rs 1
-
-
 attribute             .rs 1
 tile_attribute        .rs 1
 button                .rs 1
@@ -130,6 +114,21 @@ boxes                 .rs 1
 draw_boxes            .rs 1
 box_x                 .rs 64
 box_y                 .rs 64
+
+source_box            .rs 1
+source_box_x          .rs 1
+source_box_y          .rs 1
+source_box_z          .rs 1
+source_box_offset     .rs 1
+
+target_box            .rs 1
+target_box_x          .rs 1
+target_box_y          .rs 1
+target_box_z          .rs 1
+target_box_offset     .rs 1
+
+target_tile           .rs 1
+target_temp           .rs 1
 
 ppu_shift             .rs 1
 
@@ -643,7 +642,7 @@ MainLoopEnd:
 
 
 palette:
-    .db $19,$02,$18,$1D,  $22,$36,$17,$0F,  $22,$10,$11,$0F,  $22,$27,$17,$0F ; background
+    .db $19,$02,$17,$1D,  $22,$36,$17,$0F,  $22,$10,$11,$0F,  $22,$27,$17,$0F ; background
     .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
 
 sprites:
