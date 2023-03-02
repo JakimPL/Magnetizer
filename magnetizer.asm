@@ -31,6 +31,10 @@ START                 = $02
 END                   = $03
 STOPPER               = $04
 BOX                   = $05
+ARROW_UP              = $06
+ARROW_DOWN            = $07
+ARROW_LEFT            = $08
+ARROW_RIGHT           = $09
 
 TILE_EMPTY            = $24
 TILE_BOX              = $3C

@@ -277,6 +277,38 @@ _CheckX:
 _CheckIfPositionIsFree:
     JSR _GetPositionWithoutOffset
 
+_ArrowUpCheck:
+    JSR _GetTile
+    CMP #ARROW_UP
+    BNE _ArrowDownCheck
+    LDX #UP
+    STX direction
+    JMP _CheckIfNextPositionIsFree
+
+_ArrowDownCheck:
+    JSR _GetTile
+    CMP #ARROW_DOWN
+    BNE _ArrowLeftCheck
+    LDX #DOWN
+    STX direction
+    JMP _CheckIfNextPositionIsFree
+
+_ArrowLeftCheck:
+    JSR _GetTile
+    CMP #ARROW_LEFT
+    BNE _ArrowRightCheck
+    LDX #LEFT
+    STX direction
+    JMP _CheckIfNextPositionIsFree
+
+_ArrowRightCheck:
+    JSR _GetTile
+    CMP #ARROW_RIGHT
+    BNE _StopperCheck
+    LDX #RIGHT
+    STX direction
+    JMP _CheckIfNextPositionIsFree
+
 _StopperCheck:
     JSR _GetTile
     CMP #STOPPER
@@ -284,6 +316,7 @@ _StopperCheck:
     JSR _Stop
 
 _EndCheck:
+    JSR _GetTile
     CMP #END
     BNE _CheckIfNextPositionIsFree
     JSR _Stop
@@ -297,6 +330,15 @@ _EndLevelReset:
     STX DMC_FREQ    ; disable DMC IRQ
 _StartNextLevel:
     JSR _ResetMoveCounter
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
@@ -503,7 +545,7 @@ _IsBoxOnIndexReturnFalse:
 
 ;; collision logic ;;
 _GetTile:
-    TAY
+    LDY index
     LDA [level_lo], y
     RTS
 
