@@ -59,10 +59,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;; variables ;;
 
-box_animation_x       .rs 1
-box_animation_y       .rs 1
-box_direction         .rs 1
-
 attribute             .rs 1
 tile_attribute        .rs 1
 button                .rs 1
@@ -120,6 +116,11 @@ ending_point_real_y   .rs 1
 
 animation_cycle       .rs 1
 animation_direction   .rs 1
+
+box_animation         .rs 1
+box_animation_x       .rs 1
+box_animation_y       .rs 1
+box_direction         .rs 1
 
 boxes                 .rs 1
 draw_boxes            .rs 1
@@ -363,7 +364,9 @@ NMI:
     LDA #$02
     STA OAMDMA
 
-
+    LDA box_animation
+    CMP #$00
+    BNE RemoveSourceBox
 
     LDA box_direction
     CMP #$00
@@ -376,17 +379,15 @@ NMI:
 JumpToDrawTargetBox:
     JMP DrawTargetBox
 
-BoxAnimationMovement:
-    JSR _BoxAnimationMovement
-DrawBox:
-    JSR _DrawBox
-
-    LDA source_box
-    CMP #$FF
-    BNE RemoveSourceBox
-    JMP CheckIfBoxAnimationEnds
 RemoveSourceBox:
     JSR _RemoveSourceBox
+
+BoxAnimationMovement:
+    JSR _BoxAnimationMovement
+    LDA #$01
+    STA box_animation
+DrawBox:
+    JSR _DrawBox
 
 CheckIfBoxAnimationEnds:
     LDA box_animation_x
@@ -397,6 +398,7 @@ CheckIfBoxAnimationEnds:
     BNE PrepareMoveCounter
     LDA #$00
     STA box_direction
+    STA box_animation
 
 HideBoxSprite:
     JSR _HideBoxSprite
