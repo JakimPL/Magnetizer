@@ -2,9 +2,11 @@ import numpy as np
 import argparse
 
 OFFSET = 16
+BYTE_WIDTH = 8
+BYTE_HEIGHT = 10
 
-COLUMNS = 18
-ROWS = 18
+COLUMNS = 23
+ROWS = 23
 
 TARGET_ROWS = 15
 TARGET_COLUMNS = 15
@@ -17,13 +19,19 @@ DICTIONARY = {
     1: 0,
     2: 4,
     3: 5,
+    6: 6,
+    7: 7,
+    4: 8,
+    5: 9,
+    8: 10,
+    9: 11,
     98: 3,
     99: 2
 }
 
 
 def to_hex(integer: int):
-    return f'{integer:#02}'
+    return "{0:#0{1}x}".format(integer, 4)[2:].upper()
 
 
 parser = argparse.ArgumentParser()
@@ -37,6 +45,10 @@ with open(filename, 'rb') as file:
     array = np.zeros((ROWS, COLUMNS), dtype=int)
     while byte := file.read(2):
         index += 1
+        if index == BYTE_WIDTH:
+            COLUMNS = int.from_bytes(byte, byteorder='little')
+        if index == BYTE_HEIGHT:
+            ROWS = int.from_bytes(byte, byteorder='little')
         if index >= OFFSET and not index % 2:
             real_index = (index - OFFSET) // 2
             column = real_index % ROWS
