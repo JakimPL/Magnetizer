@@ -444,6 +444,60 @@ _MarkBoxesForSwap:
 _BoxCheckEnd:
     RTS
 
+_RemoveSourceBox:
+    LDA source_box_x
+    STA ppu_shift
+    LDX source_box_y
+    JSR _PreparePPU
+
+    LDA #TILE_EMPTY
+    STA target_tile
+    JSR _DrawSingleTile
+_GetSourceBoxAttribute:
+    LDA #$23
+    STA ppu_shift
+    LDX source_box_offset
+    JSR _PreparePPU
+    LDA PPUDATA
+    LDA PPUDATA
+    STA target_tile
+_DrawSourceBoxAttribute:
+    JSR _PreparePPU
+    LDA target_tile
+    AND source_box_z
+    STA PPUDATA
+_ResetSourceBox:
+    LDA #$FF
+    STA source_box
+    RTS
+
+_DrawTargetBox:
+    LDA target_box_x
+    STA ppu_shift
+    LDX target_box_y
+    JSR _PreparePPU
+
+    LDA #TILE_BOX
+    STA target_tile
+    JSR _DrawSingleTile
+_GetTargetBoxAttribute:
+    LDA #$23
+    STA ppu_shift
+    LDX target_box_offset
+    JSR _PreparePPU
+    LDA PPUDATA
+    LDA PPUDATA
+    STA target_tile
+_DrawTargetBoxAttribute:
+    JSR _PreparePPU
+    LDA target_tile
+    ORA target_box_z
+    STA PPUDATA
+_ResetTargetBox:
+    LDA #$FF
+    STA target_box
+    RTS
+
 _CalculateBoxX:
     TXA
     STA target_temp
@@ -506,6 +560,71 @@ _CalculateBoxZ:
     BNE _PrepareTileAttribute
     STY target_temp
     LDA target_temp
+    RTS
+
+_BoxAnimationMovement:
+_BoxAnimationCheckUp:
+    LDA box_direction
+    CMP #$F0
+    BNE _BoxAnimationCheckDown
+_BoxAnimationMoveUp:
+    LDA box_animation_y
+    SEC
+    SBC #BOX_SPEED
+    STA box_animation_y
+    RTS
+_BoxAnimationCheckDown:
+    LDA box_direction
+    CMP #$10
+    BNE _BoxAnimationCheckLeft
+_BoxAnimationMoveDown:
+    LDA box_animation_y
+    CLC
+    ADC #BOX_SPEED
+    STA box_animation_y
+    RTS
+_BoxAnimationCheckLeft:
+    LDA box_direction
+    CMP #$FF
+    BNE _BoxAnimationMoveRight
+_BoxAnimationMoveLeft:
+    LDA box_animation_x
+    SEC
+    SBC #BOX_SPEED
+    STA box_animation_x
+    RTS
+_BoxAnimationMoveRight:
+    LDA box_animation_x
+    CLC
+    ADC #BOX_SPEED
+    STA box_animation_x
+    RTS
+
+_DrawBox:
+    LDA box_animation_x
+    STA $0233
+    STA $023B
+    CLC
+    ADC #$08
+    STA $0237
+    STA $023F
+
+    LDA box_animation_y
+    SBC #$00
+    STA $0230
+    STA $0234
+    CLC
+    ADC #$08
+    STA $0238
+    STA $023C
+    RTS
+
+_HideBoxSprite:
+    LDA #$F0
+    STA $0230
+    STA $0234
+    STA $0238
+    STA $023C
     RTS
 
 _PrepareTileAttribute:

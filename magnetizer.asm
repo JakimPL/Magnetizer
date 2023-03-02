@@ -209,6 +209,22 @@ LoadSpritesLoop:
     CPX #$30
     BNE LoadSpritesLoop
 
+LoadBoxSprites:
+    LDA #$08
+    STA $0231
+    STA $0235
+    STA $0239
+    STA $023D
+
+    LDA #$17
+    STA $0232
+    LDA #$57
+    STA $0236
+    LDA #$97
+    STA $023A
+    LDA #$D7
+    STA $023E
+
 VBlank:
     BIT PPUSTATUS
     BPL VBlank
@@ -347,13 +363,11 @@ NMI:
     LDA #$02
     STA OAMDMA
 
-    LDA source_box
-    CMP #$FF
-    BNE RemoveSourceBox
+
 
     LDA box_direction
     CMP #$00
-    BNE BoxAnimationCheckUp
+    BNE BoxAnimationMovement
 
     LDA target_box
     CMP #$FF
@@ -362,103 +376,17 @@ NMI:
 JumpToDrawTargetBox:
     JMP DrawTargetBox
 
-RemoveSourceBox:
-    LDA source_box_x
-    STA ppu_shift
-    LDX source_box_y
-    JSR _PreparePPU
-
-    LDA #TILE_EMPTY
-    STA target_tile
-    JSR _DrawSingleTile
-
-GetSourceBoxAttribute:
-    LDA #$23
-    STA ppu_shift
-    LDX source_box_offset
-    JSR _PreparePPU
-    LDA PPUDATA
-    LDA PPUDATA
-    STA target_tile
-
-DrawSourceBoxAttribute:
-    JSR _PreparePPU
-    LDA target_tile
-    AND source_box_z
-    STA PPUDATA
-
-ResetSourceBox:
-    LDA #$FF
-    STA source_box
-
-BoxAnimationCheckUp:
-    LDA box_direction
-    CMP #$F0
-    BNE BoxAnimationCheckDown
-BoxAnimationMoveUp:
-    LDA box_animation_y
-    SEC
-    SBC #BOX_SPEED
-    STA box_animation_y
-    JMP DrawBox
-BoxAnimationCheckDown:
-    LDA box_direction
-    CMP #$10
-    BNE BoxAnimationCheckLeft
-BoxAnimationMoveDown:
-    LDA box_animation_y
-    CLC
-    ADC #BOX_SPEED
-    STA box_animation_y
-    JMP DrawBox
-BoxAnimationCheckLeft:
-    LDA box_direction
-    CMP #$FF
-    BNE BoxAnimationMoveRight
-BoxAnimationMoveLeft:
-    LDA box_animation_x
-    SEC
-    SBC #BOX_SPEED
-    STA box_animation_x
-    JMP DrawBox
-BoxAnimationMoveRight:
-    LDA box_animation_x
-    CLC
-    ADC #BOX_SPEED
-    STA box_animation_x
-
+BoxAnimationMovement:
+    JSR _BoxAnimationMovement
 DrawBox:
-    LDA #$08
-    STA $0231
-    STA $0235
-    STA $0239
-    STA $023D
+    JSR _DrawBox
 
-    LDA #$17
-    STA $0232
-    LDA #$57
-    STA $0236
-    LDA #$97
-    STA $023A
-    LDA #$D7
-    STA $023E
-
-    LDA box_animation_x
-    STA $0233
-    STA $023B
-    CLC
-    ADC #$08
-    STA $0237
-    STA $023F
-
-    LDA box_animation_y
-    SBC #$00
-    STA $0230
-    STA $0234
-    CLC
-    ADC #$08
-    STA $0238
-    STA $023C
+    LDA source_box
+    CMP #$FF
+    BNE RemoveSourceBox
+    JMP CheckIfBoxAnimationEnds
+RemoveSourceBox:
+    JSR _RemoveSourceBox
 
 CheckIfBoxAnimationEnds:
     LDA box_animation_x
@@ -471,40 +399,10 @@ CheckIfBoxAnimationEnds:
     STA box_direction
 
 HideBoxSprite:
-    LDA #$F0
-    STA $0230
-    STA $0234
-    STA $0238
-    STA $023C
+    JSR _HideBoxSprite
 
-DrawTargetBox:
-    LDA target_box_x
-    STA ppu_shift
-    LDX target_box_y
-    JSR _PreparePPU
-
-    LDA #TILE_BOX
-    STA target_tile
-    JSR _DrawSingleTile
-
-GetTargetBoxAttribute:
-    LDA #$23
-    STA ppu_shift
-    LDX target_box_offset
-    JSR _PreparePPU
-    LDA PPUDATA
-    LDA PPUDATA
-    STA target_tile
-
-DrawTargetBoxAttribute:
-    JSR _PreparePPU
-    LDA target_tile
-    ORA target_box_z
-    STA PPUDATA
-
-ResetTargetBox:
-    LDA #$FF
-    STA target_box
+DrawTargetBox
+    JSR _DrawTargetBox
 
 PrepareMoveCounter:
     LDA #$23
