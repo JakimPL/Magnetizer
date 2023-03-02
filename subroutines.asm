@@ -333,15 +333,6 @@ _StartNextLevel:
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
     JMP VBlank
 
 _CheckIfNextPositionIsFree:
@@ -406,7 +397,6 @@ _MoveBox:
     STA box_y, y
 
 _MarkBoxesForSwap:
-    ; subject for optimization (stack) ;
     LDX index
     STX source_box
     JSR _CalculateBoxX
@@ -436,6 +426,20 @@ _MarkBoxesForSwap:
     LDY #%00000011
     JSR _CalculateBoxZ
     STA target_box_z
+
+    LDA target
+    SEC
+    SBC index
+    STA box_direction
+
+    LDA index
+    AND #%00001111
+    JSR _Multiply
+    STA box_animation_x
+
+    LDA index
+    AND #%11110000
+    STA box_animation_y
 
 _BoxCheckEnd:
     RTS

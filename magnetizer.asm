@@ -42,6 +42,7 @@ TILE_EMPTY            = $24
 TILE_BOX              = $3C
 
 ANIMATION_LENGTH      = $30
+BOX_SPEED             = $02
 
 UP                    = $01
 DOWN                  = $02
@@ -57,6 +58,10 @@ COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;; variables ;;
+
+box_animation_x       .rs 1
+box_animation_y       .rs 1
+box_direction         .rs 1
 
 attribute             .rs 1
 tile_attribute        .rs 1
@@ -346,10 +351,17 @@ NMI:
     CMP #$FF
     BNE RemoveSourceBox
 
+    LDA box_direction
+    CMP #$00
+    BNE BoxAnimationCheckUp
+
     LDA target_box
     CMP #$FF
-    BEQ PrepareMoveCounter
+    BNE JumpToDrawTargetBox
+    JMP PrepareMoveCounter
+JumpToDrawTargetBox:
     JMP DrawTargetBox
+
 RemoveSourceBox:
     LDA source_box_x
     STA ppu_shift
@@ -378,7 +390,92 @@ DrawSourceBoxAttribute:
 ResetSourceBox:
     LDA #$FF
     STA source_box
-    JMP PrepareMoveCounter
+
+BoxAnimationCheckUp:
+    LDA box_direction
+    CMP #$F0
+    BNE BoxAnimationCheckDown
+BoxAnimationMoveUp:
+    LDA box_animation_y
+    SEC
+    SBC #BOX_SPEED
+    STA box_animation_y
+    JMP DrawBox
+BoxAnimationCheckDown:
+    LDA box_direction
+    CMP #$10
+    BNE BoxAnimationCheckLeft
+BoxAnimationMoveDown:
+    LDA box_animation_y
+    CLC
+    ADC #BOX_SPEED
+    STA box_animation_y
+    JMP DrawBox
+BoxAnimationCheckLeft:
+    LDA box_direction
+    CMP #$FF
+    BNE BoxAnimationMoveRight
+BoxAnimationMoveLeft:
+    LDA box_animation_x
+    SEC
+    SBC #BOX_SPEED
+    STA box_animation_x
+    JMP DrawBox
+BoxAnimationMoveRight:
+    LDA box_animation_x
+    CLC
+    ADC #BOX_SPEED
+    STA box_animation_x
+
+DrawBox:
+    LDA #$08
+    STA $0231
+    STA $0235
+    STA $0239
+    STA $023D
+
+    LDA #$17
+    STA $0232
+    LDA #$57
+    STA $0236
+    LDA #$97
+    STA $023A
+    LDA #$D7
+    STA $023E
+
+    LDA box_animation_x
+    STA $0233
+    STA $023B
+    CLC
+    ADC #$08
+    STA $0237
+    STA $023F
+
+    LDA box_animation_y
+    SBC #$00
+    STA $0230
+    STA $0234
+    CLC
+    ADC #$08
+    STA $0238
+    STA $023C
+
+CheckIfBoxAnimationEnds:
+    LDA box_animation_x
+    AND #%00001111
+    BNE PrepareMoveCounter
+    LDA box_animation_y
+    AND #%00001111
+    BNE PrepareMoveCounter
+    LDA #$00
+    STA box_direction
+
+HideBoxSprite:
+    LDA #$F0
+    STA $0230
+    STA $0234
+    STA $0238
+    STA $023C
 
 DrawTargetBox:
     LDA target_box_x
@@ -455,6 +552,10 @@ LatchController:
 PreRead:
     LDY #$00
     STA increase_counter
+    LDA box_direction
+    CMP #$00
+    BEQ ReadController
+    JMP UpdatePosition
 
 ReadController:
     LDA #$01
