@@ -472,8 +472,17 @@ ReadControllerLoop:
     BNE ReadControllerLoop
     JMP Movement
 CheckButton:
+    CPY #$06
+    BPL RestartLevel
     JSR _AssignDirection
     JSR _CheckMovement
+    JMP Movement
+
+RestartLevel:
+    DEC level_hi
+    DEC starting_position_lo
+    DEC starting_position_lo
+    JMP _EndLevelReset
 
 Movement:
     LDA grounded

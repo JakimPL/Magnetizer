@@ -322,6 +322,7 @@ _EndCheck:
     JSR _Stop
 
 _EndLevelReset:
+    JSR _Stop
     LDX #$FF
     TXS          ; Set up stack
     INX          ; now X = 0
