@@ -68,11 +68,8 @@ _SetLevelPointer:
     RTS
 
 _LoadLevel:
-    LDA level_lo
-    STA pointer_lo
-
-    LDA level_hi
-    STA pointer_hi
+    JSR _SetLevelPointer
+    JSR _InitializeVariables
 
     LDX #$00
     LDY #$00
@@ -251,6 +248,15 @@ _LoadTileAttribute:
     RTS
 
 ;; level loading ;;
+_InitializeVariables:
+    LDA #$00
+    STA boxes
+    STA portals_a
+    STA portals_b
+    LDA #$01
+    STA draw_boxes
+    RTS
+
 _SaveEndingPointPosition:
     JSR _GetRealYPosition
     STA ending_point_real_y
@@ -312,20 +318,36 @@ _AddPortalB:
     RTS
 
 ;; portals ;;
-_FindPortalID:
+_FindPortalAID:
     LDX #$00
-_FindPortalIDStep:
+_FindPortalAIDStep:
     LDA portals_a_x, x
     CMP position_x
-    BNE _FindPortalIDIncrement
+    BNE _FindPortalAIDIncrement
     LDA portals_a_y, x
     CMP position_y
-    BNE _FindPortalIDIncrement
+    BNE _FindPortalAIDIncrement
     RTS
-_FindPortalIDIncrement
+_FindPortalAIDIncrement
     INX
     CPX portals_a
-    BNE _FindPortalIDStep
+    BNE _FindPortalAIDStep
+    RTS
+
+_FindPortalBID:
+    LDX #$00
+_FindPortalBIDStep:
+    LDA portals_b_x, x
+    CMP position_x
+    BNE _FindPortalBIDIncrement
+    LDA portals_b_y, x
+    CMP position_y
+    BNE _FindPortalBIDIncrement
+    RTS
+_FindPortalBIDIncrement
+    INX
+    CPX portals_b
+    BNE _FindPortalBIDStep
     RTS
 
 ;; animation ;;
@@ -417,13 +439,25 @@ _CheckIfPositionIsFree:
 _PortalACheck:
     JSR _GetTile
     CMP #PORTAL_A
-    BNE _ArrowUpCheck
+    BNE _PortalBCheck
 _PortalATeleport:
-    JSR _FindPortalID
+    JSR _FindPortalAID
     JSR _Stop
     LDA portals_b_x, x
     STA position_x
     LDA portals_b_y, x
+    STA position_y
+    JMP _CheckIfNextPositionIsFree
+_PortalBCheck:
+    JSR _GetTile
+    CMP #PORTAL_B
+    BNE _ArrowUpCheck
+_PortalBTeleport:
+    JSR _FindPortalBID
+    JSR _Stop
+    LDA portals_a_x, x
+    STA position_x
+    LDA portals_a_y, x
     STA position_y
     JMP _CheckIfNextPositionIsFree
 
@@ -484,34 +518,19 @@ _StartNextLevel:
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
-    INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
+    JSR _LoadLevel
     JMP VBlank
 
 _CheckIfNextPositionIsFree:
     JSR _GetPositionWithOffset
-
-__BoxCheck:
     JSR _BoxCheckLoop
-
-__CollisionCheck:
     LDA index
     JSR _CheckCollision
     CMP #$01
-    BNE __UpdatePosition
+    BNE _CheckIfPositionIsFreeEnd
     JSR _Stop
 
-__UpdatePosition:
+_CheckIfPositionIsFreeEnd:
     RTS
 
 ;; box logic, y - index ;;

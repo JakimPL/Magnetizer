@@ -8,6 +8,7 @@
     .rsset $0000
 
 ;;;;;;;   constants   ;;;;;;;
+
 PPUCTRL               = $2000
 PPUMASK               = $2001
 PPUSTATUS             = $2002
@@ -233,6 +234,9 @@ LoadBoxSprites:
     LDA #$D7
     STA $023E
 
+LoadLevel:
+    JSR _LoadLevel
+
 VBlank:
     BIT PPUSTATUS
     BPL VBlank
@@ -251,15 +255,6 @@ LoadPalettesLoop:
     INX
     CPX #$20
     BNE LoadPalettesLoop
-
-InitializeBoxes:
-    LDA #$00
-    STA boxes
-    LDA #$01
-    STA draw_boxes
-
-LoadLevel:
-    JSR _LoadLevel
 
 LoadBackground:
     JSR _LoadBackground
