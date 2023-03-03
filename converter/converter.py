@@ -5,8 +5,8 @@ OFFSET = 16
 BYTE_WIDTH = 8
 BYTE_HEIGHT = 10
 
-COLUMNS = 23
-ROWS = 23
+COLUMNS = -1
+ROWS = -1
 
 TARGET_ROWS = 15
 TARGET_COLUMNS = 15
@@ -27,13 +27,15 @@ DICTIONARY = {
     9: 11,
     12: 12,
     13: 13,
+    10: 14,
+    11: 15,
     98: 3,
     99: 2
 }
 
 
 def to_hex(integer: int):
-    return "{0:#0{1}x}".format(integer, 4)[2:].upper()
+    return "{0:#0{1}X}".format(integer, 4)[2:]
 
 
 parser = argparse.ArgumentParser()
@@ -44,22 +46,21 @@ filename = args.input
 
 with open(filename, 'rb') as file:
     index = 0
-    array = np.zeros((ROWS, COLUMNS), dtype=int)
     while byte := file.read(2):
         index += 1
         if index == BYTE_WIDTH:
-            COLUMNS = int.from_bytes(byte, byteorder='little')
-        if index == BYTE_HEIGHT:
             ROWS = int.from_bytes(byte, byteorder='little')
-        if index >= OFFSET and not index % 2:
+        elif index == BYTE_HEIGHT:
+            COLUMNS = int.from_bytes(byte, byteorder='little')
+            array = np.zeros((ROWS, COLUMNS), dtype=int)
+        elif index >= OFFSET and not index % 2:
             real_index = (index - OFFSET) // 2
             column = real_index % ROWS
             row = real_index // ROWS
             value = int.from_bytes(byte, byteorder='little')
-            array[row, column] = DICTIONARY.get(value, -1)
+            if row < ROWS and column < COLUMNS:
+                array[row, column] = DICTIONARY.get(value, -1)
 
-            if column >= COLUMNS or row >= ROWS:
-                break
 
 target_array = np.zeros((PADDED_TARGET_ROWS, PADDED_TARGET_COLUMNS), dtype=int)
 target_array[:TARGET_ROWS, :TARGET_COLUMNS] = array[:TARGET_ROWS, :TARGET_COLUMNS]
