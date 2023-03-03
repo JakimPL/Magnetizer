@@ -7,7 +7,7 @@
 ;;;;;;;;;;;;;;;
     .rsset $0000
 
-;; constants ;;
+;;;;;;;   constants   ;;;;;;;
 PPUCTRL               = $2000
 PPUMASK               = $2001
 PPUSTATUS             = $2002
@@ -57,90 +57,96 @@ LAST_DIGIT            = TEN - 1
 COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
-;; variables ;;
+;;;;;;;   variables   ;;;;;;;
+attribute              .rs  1
+tile_attribute         .rs  1
+button                 .rs  1
 
-attribute             .rs 1
-tile_attribute        .rs 1
-button                .rs 1
+increase_counter       .rs  1
+move_counter           .rs  4
+move_counter_limit     .rs  1
 
-increase_counter      .rs 1
-move_counter          .rs 4
-move_counter_limit    .rs 1
+level_lo               .rs  1
+level_hi               .rs  1
 
-level_lo              .rs 1
-level_hi              .rs 1
+tiles_lo               .rs  1
+tiles_hi               .rs  1
 
-tiles_lo              .rs 1
-tiles_hi              .rs 1
+pointer_lo             .rs  1
+pointer_hi             .rs  1
 
-pointer_lo            .rs 1
-pointer_hi            .rs 1
+starting_position_lo   .rs  1
+starting_position_hi   .rs  1
 
-starting_position_lo  .rs 1
-starting_position_hi  .rs 1
+direction              .rs  1
+grounded               .rs  1
+speed                  .rs  1
+real_speed             .rs  1
 
-direction             .rs 1
-grounded              .rs 1
-speed                 .rs 1
-real_speed            .rs 1
+position               .rs  1
+position_x             .rs  1
+position_y             .rs  1
+px                     .rs  1
+py                     .rs  1
 
-position              .rs 1
-position_x            .rs 1
-position_y            .rs 1
-px                    .rs 1
-py                    .rs 1
+current_tile           .rs  1
+index                  .rs  1
+index_temp             .rs  1
 
-current_tile          .rs 1
-index                 .rs 1
-index_temp            .rs 1
+target                 .rs  1
+offset                 .rs  1
+offset_x               .rs  1
+offset_y               .rs  1
 
-target                .rs 1
-offset                .rs 1
-offset_x              .rs 1
-offset_y              .rs 1
+temp_x                 .rs  1
+temp_y                 .rs  1
 
-temp_x                .rs 1
-temp_y                .rs 1
+check_x_offset         .rs  1
+check_y_offset         .rs  1
 
-check_x_offset        .rs 1
-check_y_offset        .rs 1
+metasprite_low         .rs  1
+metasprite_high        .rs  1
+metasprite_offset      .rs  1
 
-metasprite_low        .rs 1
-metasprite_high       .rs 1
-metasprite_offset     .rs 1
+starting_point_x       .rs  1
+starting_point_y       .rs  1
+ending_point_real_x    .rs  1
+ending_point_real_y    .rs  1
 
-starting_point_x      .rs 1
-starting_point_y      .rs 1
-ending_point_real_x   .rs 1
-ending_point_real_y   .rs 1
+animation_cycle        .rs  1
+animation_direction    .rs  1
 
-animation_cycle       .rs 1
-animation_direction   .rs 1
+box_animation          .rs  1
+box_animation_x        .rs  1
+box_animation_y        .rs  1
+box_direction          .rs  1
 
-box_animation         .rs 1
-box_animation_x       .rs 1
-box_animation_y       .rs 1
-box_direction         .rs 1
+boxes                  .rs  1
+draw_boxes             .rs  1
+box_x                  .rs 64
+box_y                  .rs 64
 
-boxes                 .rs 1
-draw_boxes            .rs 1
-box_x                 .rs 64
-box_y                 .rs 64
+source_box             .rs  1
+source_box_x           .rs  1
+source_box_y           .rs  1
+source_box_z           .rs  1
+source_box_offset      .rs  1
 
-source_box            .rs 1
-source_box_x          .rs 1
-source_box_y          .rs 1
-source_box_z          .rs 1
-source_box_offset     .rs 1
+target_box             .rs  1
+target_box_x           .rs  1
+target_box_y           .rs  1
+target_box_z           .rs  1
+target_box_offset      .rs  1
 
-target_box            .rs 1
-target_box_x          .rs 1
-target_box_y          .rs 1
-target_box_z          .rs 1
-target_box_offset     .rs 1
+target_tile            .rs  1
+target_temp            .rs  1
 
-target_tile           .rs 1
-target_temp           .rs 1
+portals_a              .rs  1
+portals_a_x            .rs 16
+portals_a_y            .rs 16
+portals_b              .rs  1
+portals_b_x            .rs 16
+portals_b_y            .rs 16
 
 ppu_shift             .rs 1
 
@@ -268,6 +274,9 @@ CheckIfEndingPoint:
 CheckIfBox:
     CMP #BOX
     BEQ AddBox
+CheckIfPortalA:
+    CMP #PORTAL_A
+    BEQ AddPortalA
     JMP LoadLevelIncrement
 
 SaveEndingPointPosition:
@@ -277,20 +286,19 @@ SaveEndingPointPosition:
     JSR _GetRealXPosition
     STA ending_point_real_x
     JMP LoadLevelIncrement
+
 AddBox:
-    STY temp_x
-    STX temp_y
+    JSR _AddBox
 
-    LDX boxes
-    LDA temp_y
-    STA box_y, x
+    JMP LoadLevelIncrement
 
-    LDA temp_x
-    STA box_x, x
+AddPortalA:
+    JSR _AddPortalA
+    JMP LoadLevelIncrement
 
-    INC boxes
-    LDY temp_x
-    LDX temp_y
+AddPortalB:
+    JSR _AddPortalB
+    JMP LoadLevelIncrement
 
 LoadLevelIncrement:
     INY
