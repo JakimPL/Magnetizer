@@ -58,6 +58,14 @@ COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
+
+portals_a              .rs  1
+portals_a_x            .rs 16
+portals_a_y            .rs 16
+portals_b              .rs  1
+portals_b_x            .rs 16
+portals_b_y            .rs 16
+
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -141,14 +149,7 @@ target_box_offset      .rs  1
 target_tile            .rs  1
 target_temp            .rs  1
 
-portals_a              .rs  1
-portals_a_x            .rs 16
-portals_a_y            .rs 16
-portals_b              .rs  1
-portals_b_x            .rs 16
-portals_b_y            .rs 16
-
-ppu_shift             .rs 1
+ppu_shift              .rs  1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -258,64 +259,7 @@ InitializeBoxes:
     STA draw_boxes
 
 LoadLevel:
-    LDA level_lo
-    STA pointer_lo
-
-    LDA level_hi
-    STA pointer_hi
-
-    LDX #$00
-    LDY #$00
-LoadLevelInsideLoop:
-    LDA [pointer_lo], y
-CheckIfEndingPoint:
-    CMP #END
-    BEQ SaveEndingPointPosition
-CheckIfBox:
-    CMP #BOX
-    BEQ AddBox
-CheckIfPortalA:
-    CMP #PORTAL_A
-    BEQ AddPortalA
-    JMP LoadLevelIncrement
-
-SaveEndingPointPosition:
-    JSR _GetRealYPosition
-    STA ending_point_real_y
-
-    JSR _GetRealXPosition
-    STA ending_point_real_x
-    JMP LoadLevelIncrement
-
-AddBox:
-    JSR _AddBox
-
-    JMP LoadLevelIncrement
-
-AddPortalA:
-    JSR _AddPortalA
-    JMP LoadLevelIncrement
-
-AddPortalB:
-    JSR _AddPortalB
-    JMP LoadLevelIncrement
-
-LoadLevelIncrement:
-    INY
-    CPY #$10
-    BNE LoadLevelInsideLoop
-
-LoadLevelIncrementPointer:
-    LDA pointer_lo
-    CLC
-    ADC #$10
-    STA pointer_lo
-
-LoadLevelPostLoop:
-    LDY #$00
-    INX
-    CPX #$10
-    BNE LoadLevelInsideLoop
+    JSR _LoadLevel
 
 LoadBackground:
     JSR _LoadBackground

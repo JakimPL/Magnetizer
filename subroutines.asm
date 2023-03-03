@@ -67,6 +67,65 @@ _SetLevelPointer:
     STA pointer_hi
     RTS
 
+_LoadLevel:
+    LDA level_lo
+    STA pointer_lo
+
+    LDA level_hi
+    STA pointer_hi
+
+    LDX #$00
+    LDY #$00
+_LoadLevelInsideLoop:
+    LDA [pointer_lo], y
+_CheckIfEndingPoint:
+    CMP #END
+    BEQ _JumpToSaveEndingPosition
+_CheckIfBox:
+    CMP #BOX
+    BEQ _JumpToAddBox
+_CheckIfPortalA:
+    CMP #PORTAL_A
+    BEQ _JumpToAddPortalA
+_CheckIfPortalB:
+    CMP #PORTAL_B
+    BEQ _JumpToAddPortalB
+    JMP _LoadLevelIncrement
+
+_JumpToSaveEndingPosition:
+    JSR _SaveEndingPointPosition
+    JMP _LoadLevelIncrement
+
+_JumpToAddBox:
+    JSR _AddBox
+    JMP _LoadLevelIncrement
+
+_JumpToAddPortalA:
+    JSR _AddPortalA
+    JMP _LoadLevelIncrement
+
+_JumpToAddPortalB:
+    JSR _AddPortalB
+    JMP _LoadLevelIncrement
+
+_LoadLevelIncrement:
+    INY
+    CPY #$10
+    BNE _LoadLevelInsideLoop
+
+_LoadLevelIncrementPointer:
+    LDA pointer_lo
+    CLC
+    ADC #$10
+    STA pointer_lo
+
+_LoadLevelPostLoop:
+    LDY #$00
+    INX
+    CPX #$10
+    BNE _LoadLevelInsideLoop
+    RTS
+
 _LoadBackground:
     LDA #$20
     STA ppu_shift
@@ -192,7 +251,16 @@ _LoadTileAttribute:
     RTS
 
 ;; level loading ;;
+_SaveEndingPointPosition:
+    JSR _GetRealYPosition
+    STA ending_point_real_y
+
+    JSR _GetRealXPosition
+    STA ending_point_real_x
+    RTS
+
 _AddBox:
+    STY temp_x
     STX temp_y
 
     LDX boxes
@@ -203,31 +271,61 @@ _AddBox:
     STA box_x, x
 
     INC boxes
+    LDY temp_x
     LDX temp_y
     RTS
 
 _AddPortalA:
+    STY temp_x
+    STX temp_y
+
     LDX portals_a
     LDA temp_y
+    JSR _MultiplyAndShift
     STA portals_a_y, x
 
     LDA temp_x
+    JSR _MultiplyAndShift
     STA portals_a_x, x
 
     INC portals_a
+    LDY temp_x
     LDX temp_y
     RTS
 
 _AddPortalB:
+    STY temp_x
+    STX temp_y
+
     LDX portals_b
     LDA temp_y
+    JSR _MultiplyAndShift
     STA portals_b_y, x
 
     LDA temp_x
+    JSR _MultiplyAndShift
     STA portals_b_x, x
 
     INC portals_b
+    LDY temp_x
     LDX temp_y
+    RTS
+
+;; portals ;;
+_FindPortalID:
+    LDX #$00
+_FindPortalIDStep:
+    LDA portals_a_x, x
+    CMP position_x
+    BNE _FindPortalIDIncrement
+    LDA portals_a_y, x
+    CMP position_y
+    BNE _FindPortalIDIncrement
+    RTS
+_FindPortalIDIncrement
+    INX
+    CPX portals_a
+    BNE _FindPortalIDStep
     RTS
 
 ;; animation ;;
@@ -316,6 +414,19 @@ _CheckX:
 _CheckIfPositionIsFree:
     JSR _GetPositionWithoutOffset
 
+_PortalACheck:
+    JSR _GetTile
+    CMP #PORTAL_A
+    BNE _ArrowUpCheck
+_PortalATeleport:
+    JSR _FindPortalID
+    JSR _Stop
+    LDA portals_b_x, x
+    STA position_x
+    LDA portals_b_y, x
+    STA position_y
+    JMP _CheckIfNextPositionIsFree
+
 _ArrowUpCheck:
     JSR _GetTile
     CMP #ARROW_UP
@@ -370,6 +481,18 @@ _EndLevelReset:
     STX PPUMASK    ; disable rendering
 _StartNextLevel:
     JSR _ResetMoveCounter
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
+    INC level_hi
+    INC starting_position_lo
+    INC starting_position_lo
     INC level_hi
     INC starting_position_lo
     INC starting_position_lo
@@ -935,6 +1058,12 @@ _Divide:
     LSR a
     LSR a
     LSR a
+    RTS
+
+_MultiplyAndShift:
+    JSR _Multiply
+    CLC
+    ADC #$08
     RTS
 
 _GetRealXPosition:
