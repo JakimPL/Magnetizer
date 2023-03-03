@@ -488,9 +488,23 @@ _ArrowLeftCheck:
 _ArrowRightCheck:
     JSR _GetTile
     CMP #ARROW_RIGHT
-    BNE _StopperCheck
+    BNE _ArrowVerticalCheck
     LDX #RIGHT
     STX direction
+    JMP _CheckIfNextPositionIsFree
+
+_ArrowVerticalCheck:
+    JSR _GetTile
+    CMP #ARROW_VERTICAL
+    BNE _ArrowHorizontalCheck
+    JSR _Stop
+    JMP _CheckIfNextPositionIsFree
+
+_ArrowHorizontalCheck:
+    JSR _GetTile
+    CMP #ARROW_HORIZONTAL
+    BNE _StopperCheck
+    JSR _Stop
     JMP _CheckIfNextPositionIsFree
 
 _StopperCheck:
@@ -854,6 +868,29 @@ _GetTile:
     LDA [level_lo], y
     RTS
 
+_CheckDirectionalArrows:
+    LDA index
+    JSR _GetTile
+    CMP #ARROW_VERTICAL
+    BEQ _CheckVerticalArrow
+    CMP #ARROW_HORIZONTAL
+    BEQ _CheckHorizontalArrow
+    LDA #$00
+    RTS
+_CheckVerticalArrow:
+    LDA direction
+    SEC
+    SBC #$01
+    AND #%00000110
+    RTS
+_CheckHorizontalArrow:
+    LDA direction
+    SEC
+    SBC #$01
+    AND #%00000010
+    EOR #%00000010
+    RTS
+
 _CheckCollision:
     JSR _GetTile
     TAY
@@ -907,6 +944,11 @@ _CheckMovement:
     RTS
 _CheckObstacle:
     STY direction
+    JSR _GetPositionWithoutOffset
+    JSR _CheckDirectionalArrows
+    CMP #$00
+    BNE _Ground
+_CollisionCheck:
     JSR _GetPositionWithOffset
     JSR _CheckCollision
     CMP #$01
