@@ -191,6 +191,45 @@ _LoadTileAttribute:
     LDY temp_y
     RTS
 
+;; level loading ;;
+_AddBox:
+    STX temp_y
+
+    LDX boxes
+    LDA temp_y
+    STA box_y, x
+
+    LDA temp_x
+    STA box_x, x
+
+    INC boxes
+    LDX temp_y
+    RTS
+
+_AddPortalA:
+    LDX portals_a
+    LDA temp_y
+    STA portals_a_y, x
+
+    LDA temp_x
+    STA portals_a_x, x
+
+    INC portals_a
+    LDX temp_y
+    RTS
+
+_AddPortalB:
+    LDX portals_b
+    LDA temp_y
+    STA portals_b_y, x
+
+    LDA temp_x
+    STA portals_b_x, x
+
+    INC portals_b
+    LDX temp_y
+    RTS
+
 ;; animation ;;
 _ReverseAnimationDirection:
     LDA animation_direction
@@ -323,12 +362,12 @@ _EndCheck:
 
 _EndLevelReset:
     JSR _Stop
+    JSR _PreparePPU
     LDX #$FF
     TXS          ; Set up stack
     INX          ; now X = 0
     STX PPUCTRL    ; disable NMI
     STX PPUMASK    ; disable rendering
-    STX DMC_FREQ    ; disable DMC IRQ
 _StartNextLevel:
     JSR _ResetMoveCounter
     INC level_hi
