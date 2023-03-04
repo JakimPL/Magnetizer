@@ -370,41 +370,33 @@ DrawTargetBox
     JSR _DrawTargetBox
 
 PrepareMoveCounter:
+    LDA #%10010000
+    STA PPUCTRL
     LDA #$23
-    LDX #$00
+    LDX #$80
     LDY #$00
     STA ppu_shift
     JSR _PreparePPU
 
-DrawMoveCounterOffset:
-    LDA #%10010100
-    STA PPUCTRL
-
-    LDX #$04
-    JSR _ShiftPPU
-
-    LDA #%10010000
-    STA PPUCTRL
-
+DrawMoveCounter:
     LDA #$18
     STA ppu_shift
-DrawMoveCounter:
     JSR _DrawMoveCounter
 
-    LDA #%10010100
-    STA PPUCTRL
-
-    LDX #$03
-    JSR _ShiftPPU
-
-    LDA #%10010000
-    STA PPUCTRL
-
-    LDX ppu_shift
-    JSR _ShiftPPU
-
+ChangeCounterAttributes:
+    LDA #$23
+    LDX #$F8
+    LDY #$E0
+    STA ppu_shift
+    JSR _PreparePPU
     LDA #$0F
     STA PPUDATA
+
+ResetPPU:
+    LDA #$20
+    STA ppu_shift
+    LDX #$00
+    JSR _PreparePPU
 
 LatchController:
     LDA #$01

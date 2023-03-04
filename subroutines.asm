@@ -59,6 +59,9 @@ _DrawSingleTile
     JSR _DrawSingleTilePart
     RTS
 
+_ClearSprites:
+    RTS
+
 _SetLevelPointer:
     LDA level_lo
     STA pointer_lo
@@ -70,6 +73,7 @@ _SetLevelPointer:
 _LoadLevel:
     JSR _SetLevelPointer
     JSR _InitializeVariables
+    JSR _ClearSprites
 
     LDX #$00
     LDY #$00
