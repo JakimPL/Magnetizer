@@ -342,7 +342,7 @@ _AddBlockade:
     LDA temp_x
     STA blockades_x, x
 
-    LDA #$01
+    LDA #$00
     STA blockades_on, x
 
     INC blockades
@@ -604,6 +604,7 @@ _StartNextLevel:
 
 _CheckIfNextPositionIsFree:
     JSR _GetPositionWithOffset
+    JSR _BlockadeCheckLoop
     JSR _BoxCheckLoop
     LDA index
     JSR _CheckCollision
@@ -612,6 +613,24 @@ _CheckIfNextPositionIsFree:
     JSR _Stop
 
 _CheckIfPositionIsFreeEnd:
+    RTS
+
+;; blockade logic, y - index ;;
+_BlockadeCheckLoop:
+    LDY blockades
+    CPY #$00
+    BNE _BlockadeCheckStep
+    RTS
+_BlockadeCheckStep:
+    DEY
+    JSR _IsBlockadeOnIndex
+    CMP #$01
+    BNE _BlockadeCheckIncrement
+    JSR _Stop
+    RTS
+_BlockadeCheckIncrement
+    CPY #$00
+    BNE _BlockadeCheckStep
     RTS
 
 ;; box logic, y - index ;;
@@ -910,6 +929,25 @@ _ResetBoxSwap:
     RTS
 
 ;; y as argument ;;
+_IsBlockadeOnIndex:
+    LDA index
+    AND #%00001111
+    CMP blockades_x, y
+    BEQ _IsBlockadeOnYIndex
+    JMP _IsBlockadeOnIndexReturnFalse
+_IsBlockadeOnYIndex:
+    LDA index
+    JSR _Divide
+    CMP blockades_y, y
+    BEQ _IsBlockadeActive
+    JMP _IsBlockadeOnIndexReturnFalse
+_IsBlockadeActive:
+    LDA blockades_on, y
+    RTS
+_IsBlockadeOnIndexReturnFalse:
+    LDA #$00
+    RTS
+
 _IsBoxOnIndex:
     LDA index
     AND #%00001111
@@ -1023,6 +1061,7 @@ _CollisionCheck:
 _CheckBoxObstacle:
     TYA
     JSR _SetDirection
+    JSR _BlockadeCheckLoop
     JSR _BoxCheckLoop
     RTS
 _Ground:
