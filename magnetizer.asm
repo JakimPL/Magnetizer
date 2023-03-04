@@ -363,6 +363,9 @@ CheckIfBoxAnimationEnds:
 HideBoxSprite:
     JSR _HideBoxSprite
 
+CheckIfBoxUnlocksBlockade:
+    JSR _CheckIfBoxUnlocksBlockade
+
 DrawTargetBox
     JSR _DrawTargetBox
 
@@ -621,10 +624,6 @@ DrawBlockade:
     JSR _Multiply
     TAX
 
-    LDA blockades_on, y
-    CMP #$00
-    BEQ DrawBlockadeIncrement
-
     LDA #$09
     STA $0241, x
     STA $0245, x
@@ -649,10 +648,19 @@ DrawBlockade:
     STA $0247, x
     STA $024F, x
 
+    LDA blockades_on, y
+    CMP #$00
+    BNE DrawBlockadeLoadYPosition
+    LDA #$F0
+    JMP DrawBlockadeSetYPosition
+
+DrawBlockadeLoadYPosition:
     LDA blockades_y, y
     JSR _Multiply
     SEC
     SBC #$01
+
+DrawBlockadeSetYPosition:
     STA $0240, x
     STA $0244, x
     CLC

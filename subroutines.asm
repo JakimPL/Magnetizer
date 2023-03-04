@@ -342,7 +342,7 @@ _AddBlockade:
     LDA temp_x
     STA blockades_x, x
 
-    LDA #$00
+    LDA #$01
     STA blockades_on, x
 
     INC blockades
@@ -355,10 +355,10 @@ _AddBlockadeRemover:
     STX temp_y
 
     LDX blockade_removers
-    LDA temp_y
+    LDA temp_x
     STA blockade_removers_x, x
 
-    LDA temp_x
+    LDA temp_y
     STA blockade_removers_y, x
 
     INC blockade_removers
@@ -631,6 +631,60 @@ _BlockadeCheckStep:
 _BlockadeCheckIncrement
     CPY #$00
     BNE _BlockadeCheckStep
+    RTS
+
+_CheckIfBoxUnlocksBlockade:
+    LDA box_animation_x
+    JSR _Divide
+    STA temp_x
+
+    LDA box_animation_y
+    JSR _Divide
+    STA temp_y
+
+    JSR _BlockadeRemoverCheckLoop
+    CMP #$00
+    BNE _UnlockBlockade
+    RTS
+_UnlockBlockade:
+    LDA #$00
+    STA blockades_on, y
+    LDA #$01
+    STA draw_blockades
+
+    RTS
+
+_BlockadeRemoverCheckLoop:
+    LDY blockades
+    CPY #$00
+    BNE _BlockadeRemoverCheckStep
+    RTS
+_BlockadeRemoverCheckStep:
+    DEY
+    JSR _IsBlockadeRemoverOnPosition
+    CMP #$01
+    BNE _BlockadeRemoverCheckIncrement
+    RTS
+_BlockadeRemoverCheckIncrement
+    CPY #$00
+    BNE _BlockadeRemoverCheckStep
+    RTS
+
+_IsBlockadeRemoverOnPosition:
+    LDA blockade_removers_x, y
+    CMP temp_x
+    BEQ _IsBlockadeRemoverOnY
+    JMP _IsBlockadeRemoverReturnFalse
+_IsBlockadeRemoverOnY:
+    LDA blockade_removers_y, y
+    CMP temp_y
+    BEQ _IsBlockadeRemoverReturnTrue
+    JMP _IsBlockadeOnIndexReturnFalse
+_IsBlockadeRemoverReturnTrue:
+    LDA #$01
+    RTS
+_IsBlockadeRemoverReturnFalse:
+    LDA #$00
     RTS
 
 ;; box logic, y - index ;;
