@@ -64,13 +64,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
-portals_a              .rs  1
-portals_a_x            .rs 16
-portals_a_y            .rs 16
-portals_b              .rs  1
-portals_b_x            .rs 16
-portals_b_y            .rs 16
-
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -135,9 +128,17 @@ box_animation_y        .rs  1
 box_direction          .rs  1
 
 boxes                  .rs  1
-draw_boxes             .rs  1
 box_x                  .rs 64
 box_y                  .rs 64
+
+draw_blockades         .rs  1
+blockades              .rs  1
+blockades_on           .rs  8
+blockades_x            .rs  8
+blockades_y            .rs  8
+blockade_removers      .rs  1
+blockade_removers_x    .rs  8
+blockade_removers_y    .rs  8
 
 source_box             .rs  1
 source_box_x           .rs  1
@@ -150,6 +151,14 @@ target_box_x           .rs  1
 target_box_y           .rs  1
 target_box_z           .rs  1
 target_box_offset      .rs  1
+
+portals_a              .rs  1
+portals_a_x            .rs 16
+portals_a_y            .rs 16
+
+portals_b              .rs  1
+portals_b_x            .rs 16
+portals_b_y            .rs 16
 
 target_tile            .rs  1
 target_temp            .rs  1
@@ -593,8 +602,71 @@ DrawAnimation:
 IncrementCounterCheck:
     LDA increase_counter
     CMP #$01
-    BNE MainLoopEnd
+    BNE DrawBlockades
     JSR _IncreaseMoveCounter
+
+DrawBlockades:
+    LDA draw_blockades
+    CMP #$01
+    BNE MainLoopEnd
+
+    LDA blockades
+    CMP #$00
+    BEQ MainLoopEnd
+
+    LDY #$00
+    STY draw_blockades
+DrawBlockade:
+    TYA
+    JSR _Multiply
+    TAX
+
+    LDA blockades_on, y
+    CMP #$00
+    BEQ DrawBlockadeIncrement
+
+    LDA #$09
+    STA $0241, x
+    STA $0245, x
+    STA $0249, x
+    STA $024D, x
+
+    LDA #$14
+    STA $0242, x
+    LDA #$54
+    STA $0246, x
+    LDA #$94
+    STA $024A, x
+    LDA #$D4
+    STA $024E, x
+
+    LDA blockades_x, y
+    JSR _Multiply
+    STA $0243, x
+    STA $024B, x
+    CLC
+    ADC #$08
+    STA $0247, x
+    STA $024F, x
+
+    LDA blockades_y, y
+    JSR _Multiply
+    SEC
+    SBC #$01
+    STA $0240, x
+    STA $0244, x
+    CLC
+    ADC #$08
+    STA $0248, x
+    STA $024C, x
+
+DrawBlockadeIncrement:
+    INY
+    CPY blockades
+    BNE DrawBlockade
+
+    LDA #$01
+    STA draw_blockades
 
 MainLoopEnd:
     RTI
@@ -610,7 +682,7 @@ MainLoopEnd:
 
 palette:
     .db $19,$02,$17,$1D,  $22,$2C,$17,$0F,  $22,$26,$3C,$38,  $22,$27,$17,$0F ; background
-    .db $01,$1C,$15,$24,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
+    .db $01,$38,$1C,$2C,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
 
 sprites:
     ;; magnetizer ;;

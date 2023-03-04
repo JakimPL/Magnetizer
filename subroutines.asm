@@ -87,6 +87,12 @@ _CheckIfPortalA:
 _CheckIfPortalB:
     CMP #PORTAL_B
     BEQ _JumpToAddPortalB
+_CheckIfBlockade:
+    CMP #BLOCKADE
+    BEQ _JumpToAddBlockade
+_CheckIfBlockadeRemover:
+    CMP #BLOCKADE_REMOVER
+    BEQ _JumpToAddBlockadeRemover
     JMP _LoadLevelIncrement
 
 _JumpToSaveEndingPosition:
@@ -103,6 +109,14 @@ _JumpToAddPortalA:
 
 _JumpToAddPortalB:
     JSR _AddPortalB
+    JMP _LoadLevelIncrement
+
+_JumpToAddBlockade:
+    JSR _AddBlockade
+    JMP _LoadLevelIncrement
+
+_JumpToAddBlockadeRemover
+    JSR _AddBlockadeRemover
     JMP _LoadLevelIncrement
 
 _LoadLevelIncrement:
@@ -249,12 +263,12 @@ _LoadTileAttribute:
 
 ;; level loading ;;
 _InitializeVariables:
+    LDA #$01
+    STA draw_blockades
     LDA #$00
     STA boxes
     STA portals_a
     STA portals_b
-    LDA #$01
-    STA draw_boxes
     RTS
 
 _SaveEndingPointPosition:
@@ -313,6 +327,41 @@ _AddPortalB:
     STA portals_b_x, x
 
     INC portals_b
+    LDY temp_x
+    LDX temp_y
+    RTS
+
+_AddBlockade:
+    STY temp_x
+    STX temp_y
+
+    LDX blockades
+    LDA temp_y
+    STA blockades_y, x
+
+    LDA temp_x
+    STA blockades_x, x
+
+    LDA #$01
+    STA blockades_on, x
+
+    INC blockades
+    LDY temp_x
+    LDX temp_y
+    RTS
+
+_AddBlockadeRemover:
+    STY temp_x
+    STX temp_y
+
+    LDX blockade_removers
+    LDA temp_y
+    STA blockade_removers_x, x
+
+    LDA temp_x
+    STA blockade_removers_y, x
+
+    INC blockade_removers
     LDY temp_x
     LDX temp_y
     RTS
