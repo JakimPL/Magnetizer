@@ -42,6 +42,7 @@ ARROW_VERTICAL        = $0C
 ARROW_HORIZONTAL      = $0D
 BLOCKADE_REMOVER      = $0E
 BLOCKADE              = $0F
+TRAP_DOOR             = $10
 
 TILE_EMPTY            = $24
 TILE_BOX              = $3C
@@ -428,7 +429,9 @@ ReadControllerLoop:
     JMP Movement
 CheckButton:
     CPY #$06
-    BPL RestartLevel
+    BEQ RestartLevel
+    CPY #$07
+    BEQ EndLevelReset
     JSR _AssignDirection
     JSR _CheckMovement
     JMP Movement
@@ -437,6 +440,7 @@ RestartLevel:
     DEC level_hi
     DEC starting_position_lo
     DEC starting_position_lo
+EndLevelReset:
     JMP _EndLevelReset
 
 Movement:
@@ -704,16 +708,16 @@ sprites:
     .db $08, $04, $C2, $08
 
 tiles:
-    .db $30, $24, $24, $24, $38, $3C, $40, $44, $48, $4C, $50, $50, $54, $58, $5C, $24
+    .db $30, $24, $24, $24, $38, $3C, $40, $44, $48, $4C, $50, $50, $54, $58, $5C, $24, $60
 
 attributes:
-    .db $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $01, $02, $00, $00, $02, $00
+    .db $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $01, $02, $00, $00, $02, $00, $00
 
 solid
-    .db $01, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
+    .db $01, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 box_solid
-    .db $01, $00, $00, $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00
+    .db $01, $00, $00, $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00
 
 
 attribute_offsets:
