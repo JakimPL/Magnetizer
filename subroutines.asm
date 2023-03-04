@@ -273,6 +273,8 @@ _InitializeVariables:
     STA boxes
     STA portals_a
     STA portals_b
+    STA blockades
+    STA blockade_removers
     RTS
 
 _SaveEndingPointPosition:
@@ -637,11 +639,10 @@ _UnlockBlockade:
     STA blockades_on, y
     LDA #$01
     STA draw_blockades
-
     RTS
 
 _BlockadeRemoverCheckLoop:
-    LDY blockades
+    LDY blockade_removers
     CPY #$00
     BNE _BlockadeRemoverCheckStep
     RTS

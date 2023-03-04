@@ -428,10 +428,10 @@ ReadControllerLoop:
     BNE ReadControllerLoop
     JMP Movement
 CheckButton:
-    CPY #$06
-    BEQ RestartLevel
-    CPY #$07
+    CPY #$08
     BEQ EndLevelReset
+    CPY #$07
+    BEQ RestartLevel
     JSR _AssignDirection
     JSR _CheckMovement
     JMP Movement
