@@ -60,15 +60,20 @@ _DrawSingleTile
     RTS
 
 _ClearSprites:
-    LDX #$00
+    LDY #$00
 _ClearSpritesStep:
+    TYA
+    JSR _Multiply
+    TAX
+
     LDA #$F0
     STA $0240, x
     STA $0244, x
     STA $0248, x
     STA $024C, x
-    INX
-    CPX #$08
+
+    INY
+    CPY #$08
     BNE _ClearSpritesStep
     RTS
 

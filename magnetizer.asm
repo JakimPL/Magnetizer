@@ -254,6 +254,32 @@ LoadBoxSprites:
     LDA #$D7
     STA $023E
 
+LoadBlockadeSprites:
+    LDY #$00
+LoadBlockadeSpritesStep:
+    TYA
+    JSR _Multiply
+    TAX
+
+    LDA #$09
+    STA $0241, x
+    STA $0245, x
+    STA $0249, x
+    STA $024D, x
+
+    LDA #$14
+    STA $0242, x
+    LDA #$54
+    STA $0246, x
+    LDA #$94
+    STA $024A, x
+    LDA #$D4
+    STA $024E, x
+
+    INY
+    CPY #$08
+    BNE LoadBlockadeSpritesStep
+
 LoadLevel:
     JSR _LoadLevel
 
@@ -629,21 +655,6 @@ DrawBlockade:
     TYA
     JSR _Multiply
     TAX
-
-    LDA #$09
-    STA $0241, x
-    STA $0245, x
-    STA $0249, x
-    STA $024D, x
-
-    LDA #$14
-    STA $0242, x
-    LDA #$54
-    STA $0246, x
-    LDA #$94
-    STA $024A, x
-    LDA #$D4
-    STA $024E, x
 
     LDA blockades_x, y
     JSR _Multiply
