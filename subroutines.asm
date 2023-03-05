@@ -97,6 +97,9 @@ _CheckIfBlockade:
 _CheckIfBlockadeRemover:
     CMP #BLOCKADE_REMOVER
     BEQ _JumpToAddBlockadeRemover
+_CheckIfTrapDoor:
+    CMP #TRAP_DOOR
+    BEQ _JumpToAddTrapDoor
     JMP _LoadLevelIncrement
 
 _JumpToSaveEndingPosition:
@@ -121,6 +124,10 @@ _JumpToAddBlockade:
 
 _JumpToAddBlockadeRemover
     JSR _AddBlockadeRemover
+    JMP _LoadLevelIncrement
+
+_JumpToAddTrapDoor
+    JSR _AddTrapDoor
     JMP _LoadLevelIncrement
 
 _LoadLevelIncrement:
@@ -275,6 +282,8 @@ _InitializeVariables:
     STA portals_b
     STA blockades
     STA blockade_removers
+    JSR _ResetTrapDoor
+    JSR _ResetBoxSwap
     RTS
 
 _SaveEndingPointPosition:
@@ -368,6 +377,25 @@ _AddBlockadeRemover:
     STA blockade_removers_y, x
 
     INC blockade_removers
+    LDY temp_x
+    LDX temp_y
+    RTS
+
+_AddTrapDoor:
+    STY temp_x
+    STX temp_y
+
+    LDX trap_doors
+    LDA temp_x
+    STA trap_doors_x, x
+
+    LDA temp_y
+    STA trap_doors_y, x
+
+    LDA #$00
+    STA trap_doors_on, x
+
+    INC trap_doors
     LDY temp_x
     LDX temp_y
     RTS
@@ -558,8 +586,15 @@ _ArrowVerticalCheck:
 _ArrowHorizontalCheck:
     JSR _GetTile
     CMP #ARROW_HORIZONTAL
-    BNE _StopperCheck
+    BNE _TrapDoorCheck
     JSR _Stop
+    JMP _CheckIfNextPositionIsFree
+
+_TrapDoorCheck:
+    JSR _GetTile
+    CMP #TRAP_DOOR
+    BNE _StopperCheck
+    JSR _ActivateTrapDoor
     JMP _CheckIfNextPositionIsFree
 
 _StopperCheck:
@@ -592,6 +627,7 @@ _StartNextLevel:
 
 _CheckIfNextPositionIsFree:
     JSR _GetPositionWithOffset
+    JSR _TrapDoorCheckLoop
     JSR _BlockadeCheckLoop
     JSR _BoxCheckLoop
     LDA index
@@ -602,6 +638,79 @@ _CheckIfNextPositionIsFree:
 
 _CheckIfPositionIsFreeEnd:
     RTS
+
+;; trap door logic, y - index ;;
+_TrapDoorCheckLoop:
+    JSR _TrapDoorCheckIfOnPosition
+    CMP #$01
+    BNE _TrapDoorCheckLoopEnd
+_IsTrapDoorActive:
+    LDA trap_doors_on, y
+    CMP #$01
+    BNE _TrapDoorCheckLoopEnd
+    JSR _Stop
+_TrapDoorCheckLoopEnd:
+    RTS
+
+_TrapDoorCheckIfOnPosition:
+    LDY trap_doors
+    CPY #$00
+    BNE _TrapDoorCheckStep
+    RTS
+_TrapDoorCheckStep:
+    DEY
+    JSR _IsTrapDoorOnIndex
+    CMP #$01
+    BNE _TrapDoorCheckIncrement
+    RTS
+_TrapDoorCheckIncrement
+    CPY #$00
+    BNE _TrapDoorCheckStep
+    RTS
+
+;; y as argument ;;
+_IsTrapDoorOnIndex:
+    LDA index
+    AND #%00001111
+    CMP trap_doors_x, y
+    BEQ _IsTrapDoorOnYIndex
+    JMP _IsTrapDoorOnIndexReturnFalse
+_IsTrapDoorOnYIndex:
+    LDA index
+    JSR _Divide
+    CMP trap_doors_y, y
+    BEQ _IsTrapDoorOnIndexReturnTrue
+    JMP _IsTrapDoorOnIndexReturnFalse
+_IsTrapDoorOnIndexReturnTrue:
+    LDA #$01
+    RTS
+_IsTrapDoorOnIndexReturnFalse:
+    LDA #$00
+    RTS
+
+_ActivateTrapDoor:
+    JSR _TrapDoorCheckLoop
+    LDX index
+    STX trap_door
+    JSR _CalculateBoxX
+    STA trap_door_x
+
+    JSR _CalculateBoxY
+    STA trap_door_y
+
+    LDA #$01
+    STA trap_doors_on, y
+    RTS
+
+_DrawTrapDoor:
+    LDA trap_door_x
+    STA ppu_shift
+    LDX trap_door_y
+    JSR _PreparePPU
+
+    LDA #TILE_TRAP_DOOR_ACTIVE
+    STA target_tile
+    JSR _DrawSingleTile
 
 ;; blockade logic, y - index ;;
 _BlockadeCheckLoop:
@@ -962,6 +1071,10 @@ _PrepareTileAttributeStep:
     STA target_temp
     RTS
 
+_ResetTrapDoor:
+    LDA #$FF
+    STA trap_door
+    RTS
 
 _ResetBoxSwap:
     LDA #$FF
@@ -1102,6 +1215,7 @@ _CollisionCheck:
 _CheckBoxObstacle:
     TYA
     JSR _SetDirection
+    JSR _TrapDoorCheckLoop
     JSR _BlockadeCheckLoop
     JSR _BoxCheckLoop
     RTS

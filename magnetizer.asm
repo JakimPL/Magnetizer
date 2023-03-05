@@ -46,6 +46,7 @@ TRAP_DOOR             = $10
 
 TILE_EMPTY            = $24
 TILE_BOX              = $3C
+TILE_TRAP_DOOR_ACTIVE = $64
 
 ANIMATION_LENGTH      = $30
 BOX_SPEED             = $02
@@ -64,6 +65,10 @@ COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
+
+trap_door              .rs  1
+trap_door_x            .rs  1
+trap_door_y            .rs  1
 
 attribute              .rs  1
 tile_attribute         .rs  1
@@ -161,6 +166,11 @@ portals_b              .rs  1
 portals_b_x            .rs 16
 portals_b_y            .rs 16
 
+trap_doors             .rs  1
+trap_doors_on          .rs 16
+trap_doors_x           .rs 16
+trap_doors_y           .rs 16
+
 target_tile            .rs  1
 target_temp            .rs  1
 
@@ -222,6 +232,9 @@ SetStartingPositionPointer:
 
 SetBoxSwap:
     JSR _ResetBoxSwap
+
+SetTrapDoor:
+    JSR _ResetTrapDoor
 
 LoadSprites:
     LDX #$00
@@ -325,6 +338,13 @@ NMI:
     LDA #$02
     STA OAMDMA
 
+    LDA trap_door
+    CMP #$FF
+    BEQ CheckBoxesToDraw
+DrawTrapDoor:
+    JSR _DrawTrapDoor
+
+CheckBoxesToDraw
     LDA box_animation
     CMP #$00
     BNE RemoveSourceBox
