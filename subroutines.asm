@@ -1165,6 +1165,8 @@ _CheckBoxCollision:
     TAY
     LDA box_solid, y
     CMP #$01
+    BNE _CheckIfBlockIsBlocking
+    CMP #$01
     BNE _CheckIfBoxIsBlocking
     RTS
 _CheckIfBoxIsBlocking
@@ -1179,10 +1181,31 @@ _CheckIfBoxIsBlockingStep:
     CPY #$00
     BNE _CheckIfBoxIsBlockingStep
 _CheckIfBoxIsBlockingFalse:
-    JSR _RestoreIndex
     LDA #$00
     RTS
 _CheckIfBoxIsBlockingTrue:
+    JSR _RestoreIndex
+    LDA #$01
+    RTS
+
+_CheckIfBlockIsBlocking:
+    LDY blockades
+    CPY #$00
+    BEQ _CheckIfBlockIsBlockingFalse
+    LDA #$00
+_CheckIfBlockIsBlockingStep:
+    DEY
+    JSR _IsBlockadeOnIndex
+    CMP #$01
+    BEQ _CheckIfBlockIsBlockingTrue
+
+    CPY #$00
+    BNE _CheckIfBlockIsBlockingStep
+_CheckIfBlockIsBlockingFalse:
+    JSR _RestoreIndex
+    LDA #$00
+    RTS
+_CheckIfBlockIsBlockingTrue:
     JSR _RestoreIndex
     LDA #$01
     RTS

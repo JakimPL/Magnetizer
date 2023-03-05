@@ -66,10 +66,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
-trap_door              .rs  1
-trap_door_x            .rs  1
-trap_door_y            .rs  1
-
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -170,6 +166,9 @@ trap_doors             .rs  1
 trap_doors_on          .rs 16
 trap_doors_x           .rs 16
 trap_doors_y           .rs 16
+trap_door              .rs  1
+trap_door_x            .rs  1
+trap_door_y            .rs  1
 
 target_tile            .rs  1
 target_temp            .rs  1
@@ -369,6 +368,7 @@ BoxAnimationMovement:
     STA box_animation
 DrawBox:
     JSR _DrawBox
+    JSR _ResetTrapDoor
 
 CheckIfBoxAnimationEnds:
     LDA box_animation_x
@@ -737,7 +737,7 @@ solid
     .db $01, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
 
 box_solid
-    .db $01, $00, $00, $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $00
+    .db $01, $00, $00, $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $01
 
 
 attribute_offsets:
