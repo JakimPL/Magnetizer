@@ -60,6 +60,16 @@ _DrawSingleTile
     RTS
 
 _ClearSprites:
+    LDX #$00
+_ClearSpritesStep:
+    LDA #$F0
+    STA $0240, x
+    STA $0244, x
+    STA $0248, x
+    STA $024C, x
+    INX
+    CPX #$08
+    BNE _ClearSpritesStep
     RTS
 
 _SetLevelPointer:
@@ -1173,14 +1183,18 @@ _CheckBoxCollision:
     JSR _SaveIndex
     LDA target
     STA index
+    JSR _CheckBoxRoutine
+    JSR _RestoreIndex
+    RTS
 
+_CheckBoxRoutine:
     JSR _GetTile
     TAY
     LDA box_solid, y
-    CMP #$01
-    BNE _CheckIfBlockIsBlocking
-    CMP #$01
-    BNE _CheckIfBoxIsBlocking
+_CheckBoxes:
+    BEQ _CheckIfBoxIsBlocking
+_CheckBlockades:
+    BEQ _CheckIfBlockIsBlocking
     RTS
 _CheckIfBoxIsBlocking
     LDY boxes
@@ -1195,11 +1209,10 @@ _CheckIfBoxIsBlockingStep:
     BNE _CheckIfBoxIsBlockingStep
 _CheckIfBoxIsBlockingFalse:
     LDA #$00
-    RTS
+    JMP _CheckBlockades
 _CheckIfBoxIsBlockingTrue:
-    JSR _RestoreIndex
     LDA #$01
-    RTS
+    JMP _CheckBlockades
 
 _CheckIfBlockIsBlocking:
     LDY blockades
@@ -1215,11 +1228,9 @@ _CheckIfBlockIsBlockingStep:
     CPY #$00
     BNE _CheckIfBlockIsBlockingStep
 _CheckIfBlockIsBlockingFalse:
-    JSR _RestoreIndex
     LDA #$00
     RTS
 _CheckIfBlockIsBlockingTrue:
-    JSR _RestoreIndex
     LDA #$01
     RTS
 
@@ -1227,9 +1238,10 @@ _SaveIndex:
     LDA index
     STA index_temp
     RTS
+
 _RestoreIndex:
-    LDA index_temp
-    STA index
+    LDX index_temp
+    STX index
     RTS
 
 _CheckMovement:
