@@ -83,8 +83,8 @@ tiles_hi               .rs  1
 pointer_lo             .rs  1
 pointer_hi             .rs  1
 
-starting_position_lo   .rs  1
-starting_position_hi   .rs  1
+starting_position_x    .rs  1
+starting_position_y    .rs  1
 
 direction              .rs  1
 grounded               .rs  1
@@ -223,12 +223,6 @@ SetLevelPointer:
     LDA #HIGH(levels)
     STA level_hi
 
-SetStartingPositionPointer:
-    LDA #LOW(starting_positions)
-    STA starting_position_lo
-    LDA #HIGH(starting_positions)
-    STA starting_position_hi
-
 SetBoxSwap:
     JSR _ResetBoxSwap
 
@@ -296,29 +290,27 @@ DrawMode:
     STA PPUMASK
 
 InitializePosition:
-    LDY #$00
-    LDA [starting_position_lo], y
-    STA position_x
-
-    SBC #POINT_X_OFFSET
+    LDA starting_position_x
+    SEC
+    SBC #$00
     STA $0213
     STA $021B
     CLC
     ADC #$08
     STA $0217
     STA $021F
+    STA position_x
 
-    INY
-    LDA [starting_position_lo], y
-    STA position_y
-
-    SBC #POINT_Y_OFFSET
+    LDA starting_position_y
+    SEC
+    SBC #$01
     STA $0210
     STA $0214
     CLC
     ADC #$08
     STA $0218
     STA $021C
+    STA position_y
 
 InitializeAnimation:
     LDA #$01
@@ -458,8 +450,6 @@ CheckButton:
 
 RestartLevel:
     DEC level_hi
-    DEC starting_position_lo
-    DEC starting_position_lo
 EndLevelReset:
     JMP _EndLevelReset
 

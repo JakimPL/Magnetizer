@@ -79,6 +79,9 @@ _LoadLevel:
     LDY #$00
 _LoadLevelInsideLoop:
     LDA [pointer_lo], y
+_CheckIfStartingPoint:
+    CMP #START
+    BEQ _JumpToSaveStartingPosition
 _CheckIfEndingPoint:
     CMP #END
     BEQ _JumpToSaveEndingPosition
@@ -100,6 +103,10 @@ _CheckIfBlockadeRemover:
 _CheckIfTrapDoor:
     CMP #TRAP_DOOR
     BEQ _JumpToAddTrapDoor
+    JMP _LoadLevelIncrement
+
+_JumpToSaveStartingPosition:
+    JSR _SaveStartingPointPosition
     JMP _LoadLevelIncrement
 
 _JumpToSaveEndingPosition:
@@ -284,6 +291,14 @@ _InitializeVariables:
     STA blockade_removers
     JSR _ResetTrapDoor
     JSR _ResetBoxSwap
+    RTS
+
+_SaveStartingPointPosition:
+    JSR _GetRealYPosition
+    STA starting_position_y
+
+    JSR _GetRealXPosition
+    STA starting_position_x
     RTS
 
 _SaveEndingPointPosition:
@@ -620,8 +635,6 @@ _EndLevelReset:
 _StartNextLevel:
     JSR _ResetMoveCounter
     INC level_hi
-    INC starting_position_lo
-    INC starting_position_lo
     JSR _LoadLevel
     JMP VBlank
 
