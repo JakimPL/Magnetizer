@@ -19,29 +19,6 @@ _ShiftPPU:
     BNE _ShiftPPU
     RTS
 
-;; x, y as arguments ;;
-_MovePPU:
-    LDA #%10010100
-    STA PPUCTRL
-
-    CPX #$00
-    BEQ _MovePPUChangeFlag
-_MovePPUX:
-    JSR _ShiftPPU
-
-_MovePPUChangeFlag:
-    LDA #%10010000
-    STA PPUCTRL
-
-    TYA
-    TAX
-    CPX #$00
-    BNE _MovePPUY
-    RTS
-_MovePPUY:
-    JSR _ShiftPPU
-    RTS
-
 _DrawSingleTilePart:
     LDA target_tile
     STA PPUDATA
@@ -91,6 +68,7 @@ _NextLevelSet:
     STA level_set_counter
     INC level_set
     LDA palette_lo
+    CLC
     ADC #$20
     STA palette_lo
     RTS

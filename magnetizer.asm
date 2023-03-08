@@ -223,9 +223,9 @@ SetTilesPointer:
     STA tiles_hi
 
 SetLevelPointer:
-    LDA #LOW(levels)
+    LDA #LOW(level_02_07)
     STA level_lo
-    LDA #HIGH(levels)
+    LDA #HIGH(level_02_07)
     STA level_hi
 
 SetPalettePointer:
@@ -437,91 +437,6 @@ ResetPPU:
     LDX #$00
     JSR _PreparePPU
 
-LatchController:
-    LDA #$01
-    STA JOY1
-    LDA #$00
-    STA JOY1
-
-PreRead:
-    LDY #$00
-    STA increase_counter
-    LDA box_direction
-    CMP #$00
-    BEQ ReadController
-    JMP UpdatePosition
-
-ReadController:
-    LDA #$01
-    STA JOY1
-    LDA #$00
-    STA JOY1
-    LDY #$08
-ReadControllerLoop:
-    LDA JOY1
-    AND #%00000001
-    BNE CheckButton
-
-    DEY
-    BNE ReadControllerLoop
-    JMP Movement
-CheckButton:
-    CPY #$08
-    BEQ EndLevelReset
-    CPY #$07
-    BEQ RestartLevel
-    JSR _AssignDirection
-    JSR _CheckMovement
-    JMP Movement
-
-RestartLevel:
-    DEC level_hi
-EndLevelReset:
-    JMP _EndLevelReset
-
-Movement:
-    LDA grounded
-    CMP #$01
-    BNE Move
-CalculateSpeed:
-    JSR _CalculateRealSpeed
-    JSR _IncreaseSpeed
-Move:
-    LDX direction
-    CPX #UP
-    BEQ MoveUp
-    CPX #DOWN
-    BEQ MoveDown
-    CPX #LEFT
-    BEQ MoveLeft
-    CPX #RIGHT
-    BEQ MoveRight
-    JMP UpdatePosition
-
-MoveUp:
-    DEC position_y
-    JSR _AfterStep
-    BNE MoveUp
-    JMP UpdatePosition
-
-MoveDown:
-    INC position_y
-    JSR _AfterStep
-    BNE MoveDown
-    JMP UpdatePosition
-
-MoveLeft:
-    DEC position_x
-    JSR _AfterStep
-    BNE MoveLeft
-    JMP UpdatePosition
-
-MoveRight:
-    INC position_x
-    JSR _AfterStep
-    BNE MoveRight
-    JMP UpdatePosition
-
 UpdatePosition:
     LDA position_x
     SEC
@@ -634,20 +549,14 @@ DrawAnimation:
     STA $0229
     STA $022D
 
-IncrementCounterCheck:
-    LDA increase_counter
-    CMP #$01
-    BNE DrawBlockades
-    JSR _IncreaseMoveCounter
-
 DrawBlockades:
     LDA draw_blockades
     CMP #$01
-    BNE MainLoopEnd
+    BNE LatchController
 
     LDA blockades
     CMP #$00
-    BEQ MainLoopEnd
+    BEQ LatchController
 
     LDY #$00
     STY draw_blockades
@@ -692,6 +601,98 @@ DrawBlockadeIncrement:
 
     LDA #$01
     STA draw_blockades
+
+LatchController:
+    LDA #$01
+    STA JOY1
+    LDA #$00
+    STA JOY1
+
+PreRead:
+    LDY #$00
+    STA increase_counter
+    LDA box_direction
+    CMP #$00
+    BEQ ReadController
+    JMP IncrementCounterCheck
+
+ReadController:
+    LDA #$01
+    STA JOY1
+    LDA #$00
+    STA JOY1
+    LDY #$08
+ReadControllerLoop:
+    LDA JOY1
+    AND #%00000001
+    BNE CheckButton
+
+    DEY
+    BNE ReadControllerLoop
+    JMP Movement
+CheckButton:
+    CPY #$08
+    BEQ EndLevelReset
+    CPY #$07
+    BEQ RestartLevel
+    JSR _AssignDirection
+    JSR _CheckMovement
+    JMP Movement
+
+RestartLevel:
+    DEC level_hi
+    DEC level_set_counter
+EndLevelReset:
+    JMP _EndLevelReset
+
+Movement:
+    LDA grounded
+    CMP #$01
+    BNE Move
+CalculateSpeed:
+    JSR _CalculateRealSpeed
+    JSR _IncreaseSpeed
+Move:
+    LDX direction
+    CPX #UP
+    BEQ MoveUp
+    CPX #DOWN
+    BEQ MoveDown
+    CPX #LEFT
+    BEQ MoveLeft
+    CPX #RIGHT
+    BEQ MoveRight
+    JMP IncrementCounterCheck
+
+MoveUp:
+    DEC position_y
+    JSR _AfterStep
+    BNE MoveUp
+    JMP IncrementCounterCheck
+
+MoveDown:
+    INC position_y
+    JSR _AfterStep
+    BNE MoveDown
+    JMP IncrementCounterCheck
+
+MoveLeft:
+    DEC position_x
+    JSR _AfterStep
+    BNE MoveLeft
+    JMP IncrementCounterCheck
+
+MoveRight:
+    INC position_x
+    JSR _AfterStep
+    BNE MoveRight
+    JMP IncrementCounterCheck
+
+IncrementCounterCheck:
+    LDA increase_counter
+    CMP #$01
+    BNE MainLoopEnd
+    JSR _IncreaseMoveCounter
 
 MainLoopEnd:
     RTI
