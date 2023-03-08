@@ -14,9 +14,10 @@ _PreparePPU:
 
 ;; x as argument ;;
 _ShiftPPU:
-    LDA PPUDATA
-    DEX
-    BNE _ShiftPPU
+    CLC
+    ADC #$20
+    TAX
+    JSR _PreparePPU
     RTS
 
 _DrawSingleTilePart:
@@ -26,12 +27,6 @@ _DrawSingleTilePart:
     RTS
 
 _DrawSingleTile
-    JSR _DrawSingleTilePart
-    JSR _DrawSingleTilePart
-
-    LDX #$1E
-    JSR _ShiftPPU
-
     JSR _DrawSingleTilePart
     JSR _DrawSingleTilePart
     RTS
@@ -751,6 +746,10 @@ _DrawTrapDoor:
 
     LDA #TILE_TRAP_DOOR_ACTIVE
     STA target_tile
+
+    JSR _DrawSingleTile
+    LDA trap_door_x
+    JSR _ShiftPPU
     JSR _DrawSingleTile
 
 ;; blockade logic, y - index ;;
@@ -925,6 +924,10 @@ _RemoveSourceBox:
 
     LDA #TILE_EMPTY
     STA target_tile
+
+    JSR _DrawSingleTile
+    LDA source_box_y
+    JSR _ShiftPPU
     JSR _DrawSingleTile
 _GetSourceBoxAttribute:
     LDA #$23
@@ -952,6 +955,10 @@ _DrawTargetBox:
 
     LDA #TILE_BOX
     STA target_tile
+
+    JSR _DrawSingleTile
+    LDA target_box_y
+    JSR _ShiftPPU
     JSR _DrawSingleTile
 _GetTargetBoxAttribute:
     LDA #$23

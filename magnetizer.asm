@@ -223,9 +223,9 @@ SetTilesPointer:
     STA tiles_hi
 
 SetLevelPointer:
-    LDA #LOW(level_02_07)
+    LDA #LOW(levels)
     STA level_lo
-    LDA #HIGH(level_02_07)
+    LDA #HIGH(levels)
     STA level_hi
 
 SetPalettePointer:
