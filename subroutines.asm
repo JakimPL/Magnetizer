@@ -507,7 +507,7 @@ _CalculateRealSpeed:
 
 _IncreaseSpeed:
     LDY speed
-    CPY #$0F
+    CPY #$7F
     BNE _IncreaseSpeedStep
     RTS
 _IncreaseSpeedStep:

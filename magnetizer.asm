@@ -66,9 +66,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
-position_x             .rs  1
-position_y             .rs  1
-
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -95,6 +92,8 @@ speed                  .rs  1
 real_speed             .rs  1
 
 position               .rs  1
+position_x             .rs  1
+position_y             .rs  1
 px                     .rs  1
 py                     .rs  1
 
@@ -175,6 +174,8 @@ target_tile            .rs  1
 target_temp            .rs  1
 
 ppu_shift              .rs  1
+palette_lo             .rs  1
+palette_hi             .rs  1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -704,61 +705,7 @@ MainLoopEnd:
     .org $E000
 
     .include "levels.asm"
-
-
-palette:
-    .db $19,$02,$17,$1D,  $22,$2C,$17,$0F,  $22,$26,$3C,$38,  $22,$02,$27,$0F ; background
-    .db $01,$38,$1C,$2C,  $22,$02,$12,$3C,  $22,$12,$30,$2C,  $16,$27,$2A,$2B ; sprites
-
-sprites:
-    ;; magnetizer ;;
-    .db $70, $00, $01, $70
-    .db $70, $01, $01, $78
-    .db $78, $00, $81, $70
-    .db $78, $01, $81, $78
-
-    ;; start ;;
-    .db $40, $04, $03, $40
-    .db $40, $04, $43, $48
-    .db $48, $04, $83, $40
-    .db $48, $04, $C3, $48
-
-    ;; end ;;
-    .db $00, $04, $02, $00
-    .db $00, $04, $42, $08
-    .db $08, $04, $82, $00
-    .db $08, $04, $C2, $08
-
-tiles:
-    .db $30, $24, $24, $24, $38, $3C, $40, $44, $48, $4C, $50, $50, $54, $58, $5C, $24, $60
-
-attributes:
-    .db $00, $00, $00, $00, $00, $03, $00, $00, $00, $00, $01, $02, $00, $00, $02, $00, $00
-
-solid
-    .db $01, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
-
-box_solid
-    .db $01, $00, $00, $00, $01, $00, $01, $01, $01, $01, $01, $01, $01, $01, $00, $00, $01
-
-
-attribute_offsets:
-    .db $11, $10, $01, $00
-
-movement:
-    .db $00, $F0, $10, $FF, $01
-
-movement_x:
-    .db $00, $00, $00, $FF, $01
-
-movement_y:
-    .db $00, $FF, $01, $00, $00
-
-magnetizer_metasprite:
-    .db $C2, $82, $80, $C0
-    .db $00, $40, $42, $02
-    .db $41, $40, $C1, $C0
-    .db $00, $01, $80, $81
+    .include "constants.asm"
 
 ;;;;;;;;;;;;;;
 
