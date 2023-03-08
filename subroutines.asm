@@ -77,6 +77,24 @@ _ClearSpritesStep:
     BNE _ClearSpritesStep
     RTS
 
+_NextLevel:
+    INC level_hi
+    INC level_set_counter
+    LDX level_set
+    LDA level_set_count, x
+    CMP level_set_counter
+    BEQ _NextLevelSet
+    RTS
+
+_NextLevelSet:
+    LDA #$00
+    STA level_set_counter
+    INC level_set
+    LDA palette_lo
+    ADC #$20
+    STA palette_lo
+    RTS
+
 _SetLevelPointer:
     LDA level_lo
     STA pointer_lo
@@ -170,6 +188,22 @@ _LoadLevelPostLoop:
     BNE _LoadLevelInsideLoop
     RTS
 
+_LoadPalettes:
+    LDA PPUSTATUS
+    LDA #$3F
+    STA PPUADDR
+    LDA #$00
+    STA PPUADDR
+    LDX #$00
+    LDY #$00
+_LoadPalettesLoop:
+    LDA [palette_lo], y
+    STA PPUDATA
+    INY
+    CPY #$20
+    BNE _LoadPalettesLoop
+    RTS
+
 _LoadBackground:
     LDA #$20
     STA ppu_shift
@@ -177,7 +211,6 @@ _LoadBackground:
     JSR _PreparePPU
 
     JSR _SetLevelPointer
-
     LDY #$00
 _LoadBackgroundInsideLoop:
     LDA [pointer_lo], y
@@ -651,7 +684,7 @@ _EndLevelReset:
     STX PPUMASK    ; disable rendering
 _StartNextLevel:
     JSR _ResetMoveCounter
-    INC level_hi
+    JSR _NextLevel
     JSR _LoadLevel
     JMP VBlank
 

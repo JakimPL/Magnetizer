@@ -66,6 +66,11 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
+level_set              .rs  1
+level_set_counter      .rs  1
+level_lo               .rs  1
+level_hi               .rs  1
+
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -74,14 +79,14 @@ increase_counter       .rs  1
 move_counter           .rs  4
 move_counter_limit     .rs  1
 
-level_lo               .rs  1
-level_hi               .rs  1
-
 tiles_lo               .rs  1
 tiles_hi               .rs  1
 
 pointer_lo             .rs  1
 pointer_hi             .rs  1
+
+palette_lo             .rs  1
+palette_hi             .rs  1
 
 starting_position_x    .rs  1
 starting_position_y    .rs  1
@@ -174,8 +179,6 @@ target_tile            .rs  1
 target_temp            .rs  1
 
 ppu_shift              .rs  1
-palette_lo             .rs  1
-palette_hi             .rs  1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -224,6 +227,12 @@ SetLevelPointer:
     STA level_lo
     LDA #HIGH(levels)
     STA level_hi
+
+SetPalettePointer:
+    LDA #LOW(palettes)
+    STA palette_lo
+    LDA #HIGH(palettes)
+    STA palette_hi
 
 SetBoxSwap:
     JSR _ResetBoxSwap
@@ -291,18 +300,7 @@ VBlank:
 
 ;; load graphics ;;
 LoadPalettes:
-    LDA PPUSTATUS
-    LDA #$3F
-    STA PPUADDR
-    LDA #$00
-    STA PPUADDR
-    LDX #$00
-LoadPalettesLoop:
-    LDA palette, x
-    STA PPUDATA
-    INX
-    CPX #$20
-    BNE LoadPalettesLoop
+    JSR _LoadPalettes
 
 LoadBackground:
     JSR _LoadBackground
