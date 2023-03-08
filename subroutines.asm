@@ -193,6 +193,7 @@ _ProcessTile:
 _DrawTile:
     LDA current_tile
     STA PPUDATA
+    CLC
     ADC #$01
     STA PPUDATA
 
@@ -274,6 +275,7 @@ _LoadTileAttribute:
     STA tile_attribute
 
     LDA temp_y
+    CLC
     ADC #$11
     TAY
     JSR _LoadSingleTileAttribute
@@ -505,7 +507,7 @@ _CalculateRealSpeed:
 
 _IncreaseSpeed:
     LDY speed
-    CPY #$FF
+    CPY #$0F
     BNE _IncreaseSpeedStep
     RTS
 _IncreaseSpeedStep:

@@ -66,6 +66,9 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
+position_x             .rs  1
+position_y             .rs  1
+
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -92,8 +95,6 @@ speed                  .rs  1
 real_speed             .rs  1
 
 position               .rs  1
-position_x             .rs  1
-position_y             .rs  1
 px                     .rs  1
 py                     .rs  1
 
@@ -329,7 +330,7 @@ InitializePosition:
 
     LDA starting_position_y
     SEC
-    SBC #$01
+    SBC #$00
     STA $0210
     STA $0214
     CLC
