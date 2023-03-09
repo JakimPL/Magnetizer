@@ -48,6 +48,7 @@ TILE_EMPTY            = $24
 TILE_BOX              = $3C
 TILE_TRAP_DOOR_ACTIVE = $64
 
+MAX_SPEED             = $30
 ANIMATION_LENGTH      = $30
 BOX_SPEED             = $02
 
@@ -66,11 +67,6 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
 ;;;;;;;   variables   ;;;;;;;
 
-level_set              .rs  1
-level_set_counter      .rs  1
-level_lo               .rs  1
-level_hi               .rs  1
-
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -78,6 +74,11 @@ button                 .rs  1
 increase_counter       .rs  1
 move_counter           .rs  4
 move_counter_limit     .rs  1
+
+level_set              .rs  1
+level_set_counter      .rs  1
+level_lo               .rs  1
+level_hi               .rs  1
 
 tiles_lo               .rs  1
 tiles_hi               .rs  1
@@ -93,12 +94,13 @@ starting_position_y    .rs  1
 
 direction              .rs  1
 grounded               .rs  1
+
 speed                  .rs  1
 real_speed             .rs  1
 
-position               .rs  1
 position_x             .rs  1
 position_y             .rs  1
+position               .rs  1
 px                     .rs  1
 py                     .rs  1
 
@@ -223,9 +225,9 @@ SetTilesPointer:
     STA tiles_hi
 
 SetLevelPointer:
-    LDA #LOW(levels)
+    LDA #LOW(level_02_09)
     STA level_lo
-    LDA #HIGH(levels)
+    LDA #HIGH(level_02_09)
     STA level_hi
 
 SetPalettePointer:
@@ -667,25 +669,25 @@ Move:
 MoveUp:
     DEC position_y
     JSR _AfterStep
-    BNE MoveUp
+    BNE Move
     JMP IncrementCounterCheck
 
 MoveDown:
     INC position_y
     JSR _AfterStep
-    BNE MoveDown
+    BNE Move
     JMP IncrementCounterCheck
 
 MoveLeft:
     DEC position_x
     JSR _AfterStep
-    BNE MoveLeft
+    BNE Move
     JMP IncrementCounterCheck
 
 MoveRight:
     INC position_x
     JSR _AfterStep
-    BNE MoveRight
+    BNE Move
     JMP IncrementCounterCheck
 
 IncrementCounterCheck:
