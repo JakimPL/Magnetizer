@@ -137,17 +137,10 @@ box_animation_y        .rs  1
 box_direction          .rs  1
 
 boxes                  .rs  1
-box_x                  .rs 64
-box_y                  .rs 64
 
 draw_blockades         .rs  1
 blockades              .rs  1
-blockades_on           .rs  8
-blockades_x            .rs  8
-blockades_y            .rs  8
 blockade_removers      .rs  1
-blockade_removers_x    .rs  8
-blockade_removers_y    .rs  8
 
 source_box             .rs  1
 source_box_x           .rs  1
@@ -162,17 +155,9 @@ target_box_z           .rs  1
 target_box_offset      .rs  1
 
 portals_a              .rs  1
-portals_a_x            .rs 16
-portals_a_y            .rs 16
-
 portals_b              .rs  1
-portals_b_x            .rs 16
-portals_b_y            .rs 16
 
 trap_doors             .rs  1
-trap_doors_on          .rs 16
-trap_doors_x           .rs 16
-trap_doors_y           .rs 16
 trap_door              .rs  1
 trap_door_x            .rs  1
 trap_door_y            .rs  1
@@ -182,6 +167,20 @@ target_temp            .rs  1
 
 ppu_shift              .rs  1
 
+box_x                  .rs 64
+box_y                  .rs 64
+blockades_on           .rs 12
+blockades_x            .rs 12
+blockades_y            .rs 12
+blockade_removers_x    .rs 12
+blockade_removers_y    .rs 12
+portals_a_x            .rs 40
+portals_a_y            .rs 40
+portals_b_x            .rs 40
+portals_b_y            .rs 40
+trap_doors_on          .rs 16
+trap_doors_x           .rs 16
+trap_doors_y           .rs 16
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .bank 0
