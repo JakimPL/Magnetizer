@@ -748,7 +748,7 @@ _DrawTrapDoor:
     STA target_tile
 
     JSR _DrawSingleTile
-    LDA trap_door_x
+    LDA trap_door_y
     JSR _ShiftPPU
     JSR _DrawSingleTile
 
