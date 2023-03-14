@@ -17,7 +17,9 @@ LoadCursorLoop:
     RTS
 
 MenuLogic:
-    ;JSR _EnterLevel
+    JSR _EnterLevel
+    RTS
+
 
 MenuResetPPU:
     JSR _ResetPPU

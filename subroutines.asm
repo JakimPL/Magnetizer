@@ -3,6 +3,13 @@
 ;;;;;;;;;;;;;;;;;
 
 ;; x as arguments ;;
+_LatchController
+    LDA #$01
+    STA JOY1
+    LDA #$00
+    STA JOY1
+    RTS
+
 _EnableNMI:
     LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
@@ -786,6 +793,7 @@ _EndLevelReset:
 _StartNextLevel:
     JSR _ResetMoveCounter
     JSR _NextLevel
+    JSR InitializeSprites
     JSR _LoadLevel
     JMP VBlank
 

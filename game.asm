@@ -244,10 +244,7 @@ DrawBlockadeIncrement:
     STA draw_blockades
 
 LatchController:
-    LDA #$01
-    STA JOY1
-    LDA #$00
-    STA JOY1
+    JSR _LatchController
 
 PreRead:
     LDY #$00
@@ -258,10 +255,6 @@ PreRead:
     JMP IncrementCounterCheck
 
 ReadController:
-    LDA #$01
-    STA JOY1
-    LDA #$00
-    STA JOY1
     LDY #$08
 ReadControllerLoop:
     LDA JOY1
@@ -383,7 +376,9 @@ InitializeAnimation:
     STA animation_direction
     LDA #$00
     STA animation_cycle
-    RTS
+
+VBlankLoop:
+    JMP VBlankLoop
 
 ;; setting pointers ;;
 InitializeGame:
@@ -427,6 +422,12 @@ LoadBoxSprites:
     STA $023A
     LDA #$D7
     STA $023E
+
+    LDA #$F0
+    STA $0230
+    STA $0234
+    STA $0238
+    STA $023C
 
 LoadBlockadeSprites:
     LDY #$00

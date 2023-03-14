@@ -72,6 +72,8 @@ TEXT_LEVELS_X_OFFSET  = $74
 TEXT_TOTAL_Y_OFFSET   = $22
 TEXT_TOTAL_X_OFFSET   = $D4
 
+LEVEL_SETS            = $03
+
 ;;;;;;;   variables   ;;;;;;;
 
 game                   .rs  1
@@ -194,6 +196,7 @@ portals_b_y            .rs 40
 trap_doors_on          .rs 16
 trap_doors_x           .rs 16
 trap_doors_y           .rs 16
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .bank 0
