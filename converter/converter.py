@@ -1,6 +1,8 @@
 import numpy as np
 import argparse
 
+from auxiliary import to_hex
+
 OFFSET = 16
 BYTE_WIDTH = 8
 BYTE_HEIGHT = 10
@@ -33,10 +35,6 @@ DICTIONARY = {
     98: 3,
     99: 2
 }
-
-
-def to_hex(integer: int):
-    return "{0:#0{1}X}".format(integer, 4)[2:]
 
 
 parser = argparse.ArgumentParser()
