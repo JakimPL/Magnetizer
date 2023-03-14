@@ -82,6 +82,9 @@ text_length            .rs  1
 text_pointer_lo        .rs  1
 text_pointer_hi        .rs  1
 
+input                  .rs  1
+button_pressed         .rs  1
+
 attribute              .rs  1
 tile_attribute         .rs  1
 button                 .rs  1
@@ -90,6 +93,7 @@ increase_counter       .rs  1
 move_counter           .rs  4
 move_counter_limit     .rs  1
 
+level                  .rs  1
 level_set              .rs  1
 level_set_counter      .rs  1
 level_lo               .rs  1
@@ -236,7 +240,6 @@ ClearGraphics:
     JSR _LoadPalettes
     JSR _LoadBackground
     JSR _DrawMenu
-    JSR LoadCursor
     JSR _EnableNMI
 Forever:
     JMP Forever

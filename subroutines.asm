@@ -44,11 +44,13 @@ _ShiftPPU:
 
 _DrawText:
     STY temp_y
-    LDY #$01
-    LDA text_level
+    LDY #$00
+    LDA [text_pointer_lo], y
     CLC
     ADC #$01
     STA text_length
+
+    LDY #$01
 _DrawLevelText:
     LDA [text_pointer_lo], y
     STA PPUDATA
@@ -92,7 +94,7 @@ _SetZero:
 _DrawSecondDigit:
     STA PPUDATA
 
-DrawLevelIncrement:
+_DrawLevelIncrement:
     INY
     CPY #$0A
     BNE _DrawLevelLine
@@ -140,11 +142,22 @@ _DrawTotalText:
     JSR _DrawText
     RTS
 
+_LoadCursor:
+    LDX #$00
+_LoadCursorLoop:
+    LDA cursor, x
+    STA $0230, x
+    INX
+    CPX #$10
+    BNE _LoadCursorLoop
+    RTS
+
 _DrawMenu:
     JSR _DrawLevelTexts
     JSR _DrawScoreText
     JSR _DrawLevelsText
     JSR _DrawTotalText
+    JSR _LoadCursor
     RTS
 
 _DrawSingleTilePart:
@@ -180,6 +193,12 @@ _EnterLevel:
     LDA #$01
     STA game
     JSR InitializeGame
+
+    LDA level_hi
+    CLC
+    ADC level
+    STA level_hi
+
     JSR InitializeSprites
     JSR RestartLevel
     RTS
@@ -1605,4 +1624,13 @@ _GetRealXPosition:
 _GetRealYPosition:
     TXA
     JSR _Multiply
+    RTS
+
+_CalculateCursorPosition:
+    LDA level
+    ASL a
+    ASL a
+    ASL a
+    CLC
+    ADC #$80
     RTS
