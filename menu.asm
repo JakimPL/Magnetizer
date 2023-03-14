@@ -33,18 +33,18 @@ CheckInput:
     JMP ReleaseController
 MoveCursorDown:
     INC button_pressed
-    INC level
+    INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     SEC
     SBC #$01
-    CMP level
+    CMP level_set_counter
     BCC SetLevelToMax
     JMP SetCursor
 MoveCursorUp:
     INC button_pressed
-    DEC level
-    LDA level
+    DEC level_set_counter
+    LDA level_set_counter
     BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
@@ -52,15 +52,14 @@ EnterLevel:
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00
-    STA level
+    STA level_set_counter
     JMP SetCursor
 SetLevelToMax:
     LDA level_set_count, x
-    STA level
-    DEC level
+    STA level_set_counter
+    DEC level_set_counter
 SetCursor:
-    JSR _CalculateCursorPosition
-    STA $0230
+    JSR _CalculateAndSetCursorPosition
     JMP MenuLogicEnd
 
 ReleaseController:

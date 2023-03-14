@@ -87,13 +87,11 @@ button_pressed         .rs  1
 
 attribute              .rs  1
 tile_attribute         .rs  1
-button                 .rs  1
 
 increase_counter       .rs  1
 move_counter           .rs  4
 move_counter_limit     .rs  1
 
-level                  .rs  1
 level_set              .rs  1
 level_set_counter      .rs  1
 level_lo               .rs  1

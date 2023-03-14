@@ -278,7 +278,6 @@ JumpToMovement:
 GoToMenu:
     LDA #$00
     STA game
-    STA level
     JSR InitializeMenu
     JSR _PreparePPU
     LDX #$FF

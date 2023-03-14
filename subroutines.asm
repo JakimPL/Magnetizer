@@ -184,6 +184,7 @@ _DrawMenu:
     JSR _DrawLevelsText
     JSR _DrawTotalText
     JSR _LoadCursor
+    JSR _CalculateAndSetCursorPosition
     RTS
 
 _DrawSingleTilePart:
@@ -222,8 +223,9 @@ _EnterLevel:
 
     LDA level_hi
     CLC
-    ADC level
+    ADC level_set_counter
     STA level_hi
+
 
     JSR _ResetMoveCounter
     JSR InitializeSprites
@@ -1658,11 +1660,12 @@ _GetRealYPosition:
     JSR _Multiply
     RTS
 
-_CalculateCursorPosition:
-    LDA level
+_CalculateAndSetCursorPosition:
+    LDA level_set_counter
     ASL a
     ASL a
     ASL a
     CLC
     ADC #$80
+    STA $0230
     RTS
