@@ -255,25 +255,21 @@ PreRead:
     JMP IncrementCounterCheck
 
 ReadController:
-    LDY #$08
-ReadControllerLoop:
-    LDA JOY1
-    AND #%00000001
-    BNE CheckButton
-
-    DEY
-    BNE ReadControllerLoop
-    JMP Movement
+    JSR _ReadController
 CheckButton:
-    CPY #$08
+    LDA input
+    CMP #$80
     BEQ EndLevelReset
-    CPY #$07
+    CMP #$40
     BEQ RestartLevel
-    CPY #$06
+    CMP #$20
     BEQ GoToMenu
-    CPY #$05
+    CMP #$10
     BEQ JumpToMovement
+
     JSR _AssignDirection
+    CPY #$00
+    BEQ JumpToMovement
     JSR _CheckMovement
     JMP Movement
 
@@ -345,6 +341,8 @@ IncrementCounterCheck:
     CMP #$01
     BNE GameLogicEnd
     JSR _IncreaseMoveCounter
+    LDA #$00
+    STA increase_counter
 
 GameLogicEnd:
     RTS

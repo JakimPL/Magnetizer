@@ -10,6 +10,18 @@ _LatchController
     STA JOY1
     RTS
 
+_ReadController:
+    LDA #$00
+    STA input
+    LDY #$08
+_ReadControllerLoop:
+    LDA JOY1
+    LSR A
+    ROL input
+    DEY
+    BNE _ReadControllerLoop
+    RTS
+
 _EnableNMI:
     LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
@@ -1515,15 +1527,20 @@ _LoadIndex:
     STA index
     RTS
 
-; Y as argument ;
 _AssignDirection:
-    TYA
-    STA button
-    LDA #$05
-    SEC
-    SBC button
-    STA button
-    TAY
+    LDA input
+    AND #%00001111
+    LDY #$04
+_AssignDirectionStep:
+    TAX
+    AND #%00000001
+    BNE _AssignDirectionReturn
+    TXA
+    LSR a
+    DEY
+    CPY #$00
+    BNE _AssignDirectionStep
+_AssignDirectionReturn:
     RTS
 
 _SetDirection:

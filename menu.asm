@@ -8,18 +8,10 @@ InitializeMenu:
 
 MenuLogic:
     JSR _ResetPPU
-    JSR _LatchController
 
 ReadMenuController:
-    LDA #$00
-    STA input
-    LDY #$08
-ReadMenuControllerLoop:
-    LDA JOY1
-    LSR A
-    ROL input
-    DEY
-    BNE ReadMenuControllerLoop
+    JSR _LatchController
+    JSR _ReadController
 
 CheckIfButtonPressed:
     LDA button_pressed
