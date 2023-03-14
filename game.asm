@@ -1,9 +1,4 @@
 GameLogic:
-    LDA #$00
-    STA OAMADDR
-    LDA #$02
-    STA OAMDMA
-
     LDA trap_door
     CMP #$FF
     BEQ CheckBoxesToDraw
@@ -80,11 +75,8 @@ ChangeCounterAttributes:
     LDA #$0F
     STA PPUDATA
 
-ResetPPU:
-    LDA #$20
-    STA ppu_shift
-    LDX #$00
-    JSR _PreparePPU
+GameResetPPU:
+    JSR _ResetPPU
 
 UpdatePosition:
     LDA position_x
@@ -394,12 +386,8 @@ InitializeAnimation:
     RTS
 
 ;; setting pointers ;;
-Initialize:
-SetTilesPointer:
-    LDA #LOW(tiles)
-    STA tiles_lo
-    LDA #HIGH(tiles)
-    STA tiles_hi
+InitializeGame:
+    JSR Initialize
 
 SetLevelPointer:
     LDA #LOW(levels)
@@ -407,18 +395,14 @@ SetLevelPointer:
     LDA #HIGH(levels)
     STA level_hi
 
-SetPalettePointer:
-    LDA #LOW(palettes)
-    STA palette_lo
-    LDA #HIGH(palettes)
-    STA palette_hi
-
 SetBoxSwap:
     JSR _ResetBoxSwap
 
 SetTrapDoor:
     JSR _ResetTrapDoor
+    RTS
 
+InitializeSprites:
 LoadSprites:
     LDX #$00
 LoadSpritesLoop:

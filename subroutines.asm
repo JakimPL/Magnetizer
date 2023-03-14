@@ -35,6 +35,52 @@ _ShiftPPU:
     JSR _PreparePPU
     RTS
 
+_DrawLevelTexts:
+    LDY #$00
+_DrawLevelLine:
+    LDA text_y_offsets, y
+    STA ppu_shift
+    LDX text_x_offsets, y
+    JSR _PreparePPU
+
+    LDX #$01
+    LDA text_level
+    CLC
+    ADC #$01
+    STA text_length
+_DrawLevelText:
+    LDA text_level, x
+    STA PPUDATA
+
+    INX
+    CPX text_length
+    BNE _DrawLevelText
+_DrawLevelNumber:
+    TYA
+    CMP #$09
+    BCC _SetZero
+    LDA #$01
+    STA PPUDATA
+    TYA
+    SEC
+    SBC #$09
+    JMP _DrawSecondDigit
+_SetZero:
+    LDA #$00
+    STA PPUDATA
+    TYA
+    CLC
+    ADC #$01
+
+_DrawSecondDigit:
+    STA PPUDATA
+
+DrawLevelIncrement:
+    INY
+    CPY #$0A
+    BNE _DrawLevelLine
+    RTS
+
 _DrawSingleTilePart:
     LDA target_tile
     STA PPUDATA
