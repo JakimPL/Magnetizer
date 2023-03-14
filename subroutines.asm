@@ -35,26 +35,36 @@ _ShiftPPU:
     JSR _PreparePPU
     RTS
 
-_DrawLevelTexts:
-    LDY #$00
-_DrawLevelLine:
-    LDA text_y_offsets, y
-    STA ppu_shift
-    LDX text_x_offsets, y
-    JSR _PreparePPU
-
-    LDX #$01
+_DrawText:
+    STY temp_y
+    LDY #$01
     LDA text_level
     CLC
     ADC #$01
     STA text_length
 _DrawLevelText:
-    LDA text_level, x
+    LDA [text_pointer_lo], y
     STA PPUDATA
 
-    INX
-    CPX text_length
+    INY
+    CPY text_length
     BNE _DrawLevelText
+    LDY temp_y
+    RTS
+
+_DrawLevelTexts:
+    LDY #$00
+_DrawLevelLine:
+    LDA text_levels_y_offsets, y
+    STA ppu_shift
+    LDX text_levels_x_offsets, y
+    JSR _PreparePPU
+
+    LDA #LOW(text_level)
+    STA text_pointer_lo
+    LDA #HIGH(text_level)
+    STA text_pointer_hi
+    JSR _DrawText
 _DrawLevelNumber:
     TYA
     CMP #$09
@@ -79,6 +89,55 @@ DrawLevelIncrement:
     INY
     CPY #$0A
     BNE _DrawLevelLine
+    RTS
+
+_DrawScoreText:
+    LDA #TEXT_SCORE_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_SCORE_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LOW(text_score)
+    STA text_pointer_lo
+    LDA #HIGH(text_score)
+    STA text_pointer_hi
+
+    JSR _DrawText
+    RTS
+
+_DrawLevelsText:
+    LDA #TEXT_LEVELS_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_LEVELS_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LOW(text_levels)
+    STA text_pointer_lo
+    LDA #HIGH(text_levels)
+    STA text_pointer_hi
+
+    JSR _DrawText
+    RTS
+
+_DrawTotalText:
+    LDA #TEXT_TOTAL_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_TOTAL_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LOW(text_total)
+    STA text_pointer_lo
+    LDA #HIGH(text_total)
+    STA text_pointer_hi
+
+    JSR _DrawText
+    RTS
+
+_DrawMenu:
+    JSR _DrawLevelTexts
+    JSR _DrawScoreText
+    JSR _DrawLevelsText
+    JSR _DrawTotalText
     RTS
 
 _DrawSingleTilePart:

@@ -65,10 +65,10 @@ magnetizer_metasprite:
     .db $00, $01, $80, $81
 
 
-text_y_offsets:
+text_levels_y_offsets:
     .db $22, $22, $22, $22, $22, $22, $22, $22, $23, $23
 
-text_x_offsets:
+text_levels_x_offsets:
     .db $06, $26, $46, $66, $86, $A6, $C6, $E6, $06, $26
 
 texts:

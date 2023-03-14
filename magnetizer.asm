@@ -65,10 +65,20 @@ LAST_DIGIT            = TEN - 1
 COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
+TEXT_SCORE_Y_OFFSET   = $22
+TEXT_SCORE_X_OFFSET   = $14
+TEXT_LEVELS_Y_OFFSET  = $22
+TEXT_LEVELS_X_OFFSET  = $74
+TEXT_TOTAL_Y_OFFSET   = $22
+TEXT_TOTAL_X_OFFSET   = $D4
+
 ;;;;;;;   variables   ;;;;;;;
 
 game                   .rs  1
 text_length            .rs  1
+
+text_pointer_lo        .rs  1
+text_pointer_hi        .rs  1
 
 attribute              .rs  1
 tile_attribute         .rs  1
@@ -222,7 +232,7 @@ ClearGraphics:
     JSR InitializeMenu
     JSR _LoadPalettes
     JSR _LoadBackground
-    JSR _DrawLevelTexts
+    JSR _DrawMenu
     JSR LoadCursor
     JSR _EnableNMI
 Forever:
