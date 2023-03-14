@@ -223,6 +223,7 @@ ClearGraphics:
     JSR _LoadPalettes
     JSR _LoadBackground
     JSR _DrawLevelTexts
+    JSR LoadCursor
     JSR _EnableNMI
 Forever:
     JMP Forever
