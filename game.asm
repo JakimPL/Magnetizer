@@ -269,10 +269,28 @@ CheckButton:
     BEQ EndLevelReset
     CPY #$07
     BEQ RestartLevel
+    CPY #$06
+    BEQ GoToMenu
+    CPY #$05
+    BEQ JumpToMovement
     JSR _AssignDirection
     JSR _CheckMovement
     JMP Movement
 
+JumpToMovement:
+    JMP Movement
+GoToMenu:
+    LDA #$00
+    STA game
+    STA level
+    JSR InitializeMenu
+    JSR _PreparePPU
+    LDX #$FF
+    TXS          ; Set up stack
+    INX          ; now X = 0
+    STX PPUCTRL    ; disable NMI
+    STX PPUMASK    ; disable rendering
+    JMP GoToMenuVBlank
 RestartLevel:
     DEC level_hi
     DEC level_set_counter
@@ -331,21 +349,26 @@ IncrementCounterCheck:
 GameLogicEnd:
     RTS
 
+GoToMenuVBlank:
+    BIT PPUSTATUS
+    BPL GoToMenuVBlank
+    JSR _ClearBasicSprites
+    JSR _LoadPalettes
+    JSR _LoadBackground
+    JSR _LoadAttributes
+    JSR _DrawMenu
+    JSR _EnableNMI
+
+GoToMenuVBlankLoop:
+    JMP GoToMenuVBlankLoop
+
 VBlank:
     BIT PPUSTATUS
     BPL VBlank
 
-;; load graphics ;;
-LoadPalettes:
     JSR _LoadPalettes
-
-LoadBackground:
     JSR _LoadBackground
-
-LoadAttributes:
     JSR _LoadAttributes
-
-DrawMode:
     JSR _EnableNMI
 
 InitializePosition:

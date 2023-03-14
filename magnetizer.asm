@@ -241,6 +241,7 @@ ClearGraphics:
     JSR _LoadBackground
     JSR _DrawMenu
     JSR _EnableNMI
+
 Forever:
     JMP Forever
 

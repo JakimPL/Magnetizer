@@ -42,6 +42,20 @@ _ShiftPPU:
     JSR _PreparePPU
     RTS
 
+_ClearBasicSprites:
+    LDY #$00
+_ClearBasicSpritesStep:
+    TYA
+    ASL a
+    ASL a
+    TAX
+    LDA #$F0
+    STA $0200, x
+    INY
+    CPY #$20
+    BNE _ClearBasicSpritesStep
+    RTS
+
 _DrawText:
     STY temp_y
     LDY #$00
@@ -199,6 +213,7 @@ _EnterLevel:
     ADC level
     STA level_hi
 
+    JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR RestartLevel
     RTS
