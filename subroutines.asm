@@ -3,6 +3,14 @@
 ;;;;;;;;;;;;;;;;;
 
 ;; x as arguments ;;
+_EnableNMI:
+    LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
+    STA PPUCTRL
+
+    LDA #%00011110   ; enable sprites
+    STA PPUMASK
+    RTS
+
 _PreparePPU:
     LDA PPUSTATUS
     LDA ppu_shift

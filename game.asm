@@ -345,3 +345,128 @@ IncrementCounterCheck:
 
 GameLogicEnd:
     RTS
+
+VBlank:
+    BIT PPUSTATUS
+    BPL VBlank
+
+;; load graphics ;;
+LoadPalettes:
+    JSR _LoadPalettes
+
+LoadBackground:
+    JSR _LoadBackground
+
+LoadAttributes:
+    JSR _LoadAttributes
+
+DrawMode:
+    JSR _EnableNMI
+
+InitializePosition:
+    LDA starting_position_x
+    SEC
+    SBC #$00
+    STA $0213
+    STA $021B
+    CLC
+    ADC #$08
+    STA $0217
+    STA $021F
+    STA position_x
+
+    LDA starting_position_y
+    SEC
+    SBC #$00
+    STA $0210
+    STA $0214
+    CLC
+    ADC #$08
+    STA $0218
+    STA $021C
+    STA position_y
+
+InitializeAnimation:
+    LDA #$01
+    STA animation_direction
+    LDA #$00
+    STA animation_cycle
+    RTS
+
+;; setting pointers ;;
+Initialize:
+SetTilesPointer:
+    LDA #LOW(tiles)
+    STA tiles_lo
+    LDA #HIGH(tiles)
+    STA tiles_hi
+
+SetLevelPointer:
+    LDA #LOW(levels)
+    STA level_lo
+    LDA #HIGH(levels)
+    STA level_hi
+
+SetPalettePointer:
+    LDA #LOW(palettes)
+    STA palette_lo
+    LDA #HIGH(palettes)
+    STA palette_hi
+
+SetBoxSwap:
+    JSR _ResetBoxSwap
+
+SetTrapDoor:
+    JSR _ResetTrapDoor
+
+LoadSprites:
+    LDX #$00
+LoadSpritesLoop:
+    LDA sprites, x
+    STA $0200, x
+    INX
+    CPX #$30
+    BNE LoadSpritesLoop
+
+LoadBoxSprites:
+    LDA #$08
+    STA $0231
+    STA $0235
+    STA $0239
+    STA $023D
+
+    LDA #$17
+    STA $0232
+    LDA #$57
+    STA $0236
+    LDA #$97
+    STA $023A
+    LDA #$D7
+    STA $023E
+
+LoadBlockadeSprites:
+    LDY #$00
+LoadBlockadeSpritesStep:
+    TYA
+    JSR _Multiply
+    TAX
+
+    LDA #$09
+    STA $0241, x
+    STA $0245, x
+    STA $0249, x
+    STA $024D, x
+
+    LDA #$14
+    STA $0242, x
+    LDA #$54
+    STA $0246, x
+    LDA #$94
+    STA $024A, x
+    LDA #$D4
+    STA $024E, x
+
+    INY
+    CPY #$08
+    BNE LoadBlockadeSpritesStep
+    RTS
