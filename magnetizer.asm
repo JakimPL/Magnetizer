@@ -68,6 +68,7 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 ;;;;;;;   variables   ;;;;;;;
 
 game                   .rs  1
+text_length            .rs  1
 
 attribute              .rs  1
 tile_attribute         .rs  1
@@ -218,15 +219,34 @@ ClearGraphics:
     INX
     BNE ClearMemory
 
-    JSR Initialize
+    JSR InitializeMenu
+    JSR _LoadPalettes
+    JSR _LoadBackground
     JSR _EnableNMI
-
 Forever:
     JMP Forever
 
+Initialize:
+SetTilesPointer:
+    LDA #LOW(tiles)
+    STA tiles_lo
+    LDA #HIGH(tiles)
+    STA tiles_hi
+
+SetPalettePointer:
+    LDA #LOW(palettes)
+    STA palette_lo
+    LDA #HIGH(palettes)
+    STA palette_hi
+    RTS
 
 ;; NMI ;;
 NMI:
+    LDA #$00
+    STA OAMADDR
+    LDA #$02
+    STA OAMDMA
+
     LDA game
     BNE JumpToGameLogic
     JSR MenuLogic

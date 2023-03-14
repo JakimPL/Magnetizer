@@ -4,7 +4,7 @@
 
 ;; x as arguments ;;
 _EnableNMI:
-    LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
+    LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
 
     LDA #%00011110   ; enable sprites
@@ -18,6 +18,13 @@ _PreparePPU:
     STX PPUADDR
     LDA #$00
     STA PPUADDR
+    RTS
+
+_ResetPPU:
+    LDA #$20
+    STA ppu_shift
+    LDX #$00
+    JSR _PreparePPU
     RTS
 
 ;; x as argument ;;
@@ -55,6 +62,14 @@ _ClearSpritesStep:
     INY
     CPY #$08
     BNE _ClearSpritesStep
+    RTS
+
+_EnterLevel:
+    LDA #$01
+    STA game
+    JSR InitializeGame
+    JSR InitializeSprites
+    JSR RestartLevel
     RTS
 
 _NextLevel:
