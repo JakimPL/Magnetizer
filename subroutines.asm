@@ -121,8 +121,11 @@ _DrawSecondDigit:
     STA PPUDATA
 
 _DrawLevelIncrement:
+    LDX level_set
+    LDA level_set_count, x
+    STA text_length
     INY
-    CPY #$0A
+    CPY text_length
     BNE _DrawLevelLine
     RTS
 
@@ -226,10 +229,40 @@ _EnterLevel:
     ADC level_set_counter
     STA level_hi
 
+    LDY level_set
+    BEQ _EnterLeveLInitialize
+    LDX #$00
+_EnterLevelIncreasePointer:
+    LDA level_set_count, x
+    ADC level_hi
+    STA level_hi
+    INX
+    CPX level_set
+    BNE _EnterLevelIncreasePointer
 
+    JSR _CalculatePalettePointer
+
+_EnterLeveLInitialize:
     JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR RestartLevel
+    RTS
+
+_CalculatePalettePointer:
+    LDA #LOW(palettes)
+    STA palette_lo
+    LDA #HIGH(palettes)
+    STA palette_hi
+
+    LDX level_set
+    CPX #$00
+    BEQ _CalculatePalettePointerEnd
+_CalculatePalettePointerStep:
+    JSR _IncrementPalettePointer
+    DEX
+    CPX #$00
+    BNE _CalculatePalettePointerStep
+_CalculatePalettePointerEnd:
     RTS
 
 _NextLevel:
@@ -241,14 +274,18 @@ _NextLevel:
     BEQ _NextLevelSet
     RTS
 
-_NextLevelSet:
-    LDA #$00
-    STA level_set_counter
-    INC level_set
+_IncrementPalettePointer:
     LDA palette_lo
     CLC
     ADC #$20
     STA palette_lo
+    RTS
+
+_NextLevelSet:
+    LDA #$00
+    STA level_set_counter
+    INC level_set
+    JSR _IncrementPalettePointer
     RTS
 
 _SetLevelPointer:
