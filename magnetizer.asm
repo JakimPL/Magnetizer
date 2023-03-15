@@ -76,6 +76,11 @@ LEVEL_SETS            = $03
 
 ;;;;;;;   variables   ;;;;;;;
 
+remainder              .rs  2
+dividend               .rs  2
+divisor                .rs  2
+decimal                .rs  4
+
 game                   .rs  1
 text_length            .rs  1
 
@@ -198,6 +203,7 @@ portals_b_y            .rs 40
 trap_doors_on          .rs 16
 trap_doors_x           .rs 16
 trap_doors_y           .rs 16
+score                  .rs 100
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -279,6 +285,7 @@ MainLoopEnd:
     .include "menu.asm"
     .include "game.asm"
     .include "subroutines.asm"
+    .include "hex2dec.asm"
 
     .bank 1
     .org $E000

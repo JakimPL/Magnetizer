@@ -5,7 +5,7 @@ Divide:
     STA remainder
     STA remainder + 1
     LDX #$10
-L1:
+DivideMainPart:
     ASL dividend
     ROL dividend + 1
     ROL remainder
@@ -16,11 +16,26 @@ L1:
     TAY
     LDA remainder + 1
     SBC divisor + 1
-    BCC L2
+    BCC DivideShift
     STA remainder + 1
     STY remainder
     INC dividend
-L2:
+DivideShift:
     DEX
-    BNE L1
+    BNE DivideMainPart
+    RTS
+
+Hex2Dec:
+    LDA #$00
+    STA temp_x
+Hex2DecStep:
+    JSR Divide
+    LDA remainder
+
+    LDX temp_x
+    STA decimal, x
+    INX
+    STX temp_x
+    CPX #$04
+    BNE Hex2DecStep
     RTS
