@@ -73,11 +73,13 @@ TEXT_SCORE_X_OFFSET   = $14
 SCORE_Y_OFFSET        = $22
 SCORE_X_OFFSET        = $31
 SCORE_DIGITS          = $03
+
 TEXT_LEVELS_Y_OFFSET  = $22
 TEXT_LEVELS_X_OFFSET  = $74
 LEVELS_Y_OFFSET       = $22
 LEVELS_X_OFFSET       = $93
 LEVELS_DIGITS         = $01
+
 TEXT_TOTAL_Y_OFFSET   = $22
 TEXT_TOTAL_X_OFFSET   = $D4
 TOTAL_Y_OFFSET        = $22
@@ -216,9 +218,6 @@ portals_b_y            .rs  40
 trap_doors_on          .rs  16
 trap_doors_x           .rs  16
 trap_doors_y           .rs  16
-
-counters               .rs  80
-score                  .rs 100
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

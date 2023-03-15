@@ -8,6 +8,12 @@ InitializeMenu:
     RTS
 
 PrecalculateCounters:
+    LDX #$50
+PrecalculateCountersStep:
+    TXA
+    STA box_x, x
+    DEX
+    BNE PrecalculateCountersStep
     RTS
 
 MenuLogic:

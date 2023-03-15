@@ -149,20 +149,28 @@ _DrawScores:
     LDX #SCORE_X_OFFSET
     JSR _PreparePPU
 
-    LDA #$03
+    LDA #SCORE_DIGITS
     STA digits
+
+    LDA level_set_counter
+    ASL a
+    ASL a
+    ASL a
+    TAX
+
     JSR _DrawNumber
     JSR _DrawSeparator
     JSR _DrawNumber
     RTS
 
 _DrawNumber:
-    LDX digits
+    LDY digits
 _DrawNumberStep:
-    LDA decimal, x
+    LDA box_x, x
     STA PPUDATA
-    DEX
-    CPX #$FF
+    INX
+    DEY
+    CPY #$FF
     BNE _DrawNumberStep
     RTS
 
