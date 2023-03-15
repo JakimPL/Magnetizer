@@ -25,6 +25,26 @@ DivideShift:
     BNE DivideMainPart
     RTS
 
+MultiplyByTen:
+    LDA dividend
+    STA result
+    LDA dividend + 1
+    STA result + 1
+    ASL result
+    ROL result + 1
+    ASL result
+    ROL result + 1
+    CLC
+    LDA dividend
+    ADC result
+    STA result
+    LDA dividend + 1
+    ADC result + 1
+    STA result + 1
+    ASL result
+    ROL result + 1
+    RTS
+
 Hex2Dec:
     LDA #$00
     STA temp_x
