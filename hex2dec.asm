@@ -64,3 +64,36 @@ SetDivisor:
     LDA #TEN
     STA divisor
     RTS
+
+CounterToHex:
+    LDX #$00
+    LDA #$00
+    CLC
+    STA dividend
+    STA dividend + 1
+CounterToHexStep:
+    LDA move_counter, x
+    ADC dividend
+    STA dividend
+
+    CPX #$03
+    BEQ CounterIncrement
+    JSR MultiplyByTen
+    LDA result
+    STA dividend
+    LDA result + 1
+    STA dividend + 1
+
+CounterIncrement:
+    INX
+    CPX #$04
+    BNE CounterToHexStep
+
+SaveScore:
+    LDA dividend
+    STA score
+    LDA dividend + 1
+    STA score + 1
+    RTS
+
+

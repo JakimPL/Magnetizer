@@ -340,12 +340,32 @@ _CalculatePalettePointerEnd:
     RTS
 
 _NextLevel:
+    LDA level_clear
+    BEQ _NextLevelIncreaseCounters
+    JSR _SaveScore
+_NextLevelIncreaseCounters:
     INC level_hi
     INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
     BEQ _NextLevelSet
+    RTS
+
+_SaveScore:
+    LDA level_set_counter
+    ASL a
+    STA temp_x
+
+    JSR CounterToHex
+
+    LDX temp_x
+    LDA score
+    STA scores, x
+    INX
+    LDA score + 1
+    STA scores, x
+
     RTS
 
 _IncrementPalettePointer:
@@ -939,9 +959,10 @@ _EndCheck:
     JSR _GetTile
     CMP #END
     BNE _CheckIfNextPositionIsFree
-    JSR _Stop
 
 _EndLevelReset:
+    LDA #$01
+    STA level_clear
     JSR _Stop
     JSR _PreparePPU
     LDX #$FF
@@ -950,8 +971,8 @@ _EndLevelReset:
     STX PPUCTRL    ; disable NMI
     STX PPUMASK    ; disable rendering
 _StartNextLevel:
-    JSR _ResetMoveCounter
     JSR _NextLevel
+    JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR _LoadLevel
     JMP VBlank
@@ -1666,6 +1687,7 @@ _SetDirection:
 _ResetMoveCounter:
     LDA #$00
     STA move_counter_limit
+    STA level_clear
     LDX #$00
 _ResetMoveCounterStep:
     STA move_counter, x
