@@ -41,6 +41,6 @@ Hex2DecStep:
     RTS
 
 SetDivisor:
-    LDA #$0A
+    LDA #TEN
     STA divisor
     RTS

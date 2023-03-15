@@ -8,11 +8,41 @@ InitializeMenu:
     RTS
 
 PrecalculateCounters:
-    LDX #$50
+    LDY #$00
 PrecalculateCountersStep:
-    TXA
+    STY temp_y
+    LDA medals, y
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+
+    LDA temp_y
+    ASL a
+    ASL a
+    ASL a
+    TAX
+
+CopyScoreDecimals:
+    LDY #SCORE_DIGITS
+CopyScoreDigit:
+    LDA decimal, y
     STA box_x, x
-    DEX
+    INX
+    DEY
+    BPL CopyMedalDigit
+
+CopyMedalDecimals:
+    LDY #SCORE_DIGITS
+CopyMedalDigit:
+    LDA decimal, y
+    STA box_x, x
+    INX
+    DEY
+    BPL CopyMedalDigit
+
+    LDY temp_y
+    INY
+    CPY #$0A ; to replace by level_set_count
     BNE PrecalculateCountersStep
     RTS
 

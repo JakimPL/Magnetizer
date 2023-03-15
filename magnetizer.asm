@@ -219,6 +219,10 @@ trap_doors_on          .rs  16
 trap_doors_x           .rs  16
 trap_doors_y           .rs  16
 
+    .rsset $0400
+
+scores                 .rs 512
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .bank 0
