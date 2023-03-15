@@ -1,5 +1,6 @@
 InitializeMenu:
     JSR Initialize
+    JSR _DisableNMI
     JSR PrecalculateCounters
     LDA #LOW(menu)
     STA level_lo
@@ -19,6 +20,8 @@ PrecalculateCountersStep:
 
     LDA medals, y
     STA dividend
+    LDA #$00
+    STA dividend + 1
     JSR SetDivisor
     JSR Hex2Dec
 

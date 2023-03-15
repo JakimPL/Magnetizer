@@ -30,6 +30,11 @@ _EnableNMI:
     STA PPUMASK
     RTS
 
+_DisableNMI:
+    LDA #%00010000   ; enable NMI, sprites from Pattern Table 1
+    STA PPUCTRL
+    RTS
+
 _PreparePPU:
     LDA PPUSTATUS
     LDA ppu_shift
