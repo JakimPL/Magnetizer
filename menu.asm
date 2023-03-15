@@ -1,9 +1,13 @@
 InitializeMenu:
     JSR Initialize
+    JSR PrecalculateCounters
     LDA #LOW(menu)
     STA level_lo
     LDA #HIGH(menu)
     STA level_hi
+    RTS
+
+PrecalculateCounters:
     RTS
 
 MenuLogic:
@@ -67,4 +71,6 @@ ReleaseController:
     STA button_pressed
 
 MenuLogicEnd:
+    JSR _DrawScores
+    JSR _ResetPPU
     RTS

@@ -143,6 +143,38 @@ _DrawScoreText:
     JSR _DrawText
     RTS
 
+_DrawScores:
+    LDA #SCORE_Y_OFFSET
+    STA ppu_shift
+    LDX #SCORE_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #$03
+    STA digits
+    JSR _DrawNumber
+    JSR _DrawSeparator
+    JSR _DrawNumber
+    RTS
+
+_DrawNumber:
+    LDX digits
+_DrawNumberStep:
+    LDA decimal, x
+    STA PPUDATA
+    DEX
+    CPX #$FF
+    BNE _DrawNumberStep
+    RTS
+
+_DrawSeparator:
+    LDA #SPACE_CHARACTER
+    STA PPUDATA
+    LDA #SLASH_CHARACTER
+    STA PPUDATA
+    LDA #SPACE_CHARACTER
+    STA PPUDATA
+    RTS
+
 _DrawLevelsText:
     LDA #TEXT_LEVELS_Y_OFFSET
     STA ppu_shift
@@ -155,6 +187,19 @@ _DrawLevelsText:
     STA text_pointer_hi
 
     JSR _DrawText
+    RTS
+
+_DrawLevels:
+    LDA #LEVELS_Y_OFFSET
+    STA ppu_shift
+    LDX #LEVELS_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LEVELS_DIGITS
+    STA digits
+    JSR _DrawNumber
+    JSR _DrawSeparator
+    JSR _DrawNumber
     RTS
 
 _DrawTotalText:
@@ -171,6 +216,19 @@ _DrawTotalText:
     JSR _DrawText
     RTS
 
+_DrawTotal:
+    LDA #TOTAL_Y_OFFSET
+    STA ppu_shift
+    LDX #TOTAL_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #TOTAL_DIGITS
+    STA digits
+    JSR _DrawNumber
+    JSR _DrawSeparator
+    JSR _DrawNumber
+    RTS
+
 _LoadCursor:
     LDX #$00
 _LoadCursorLoop:
@@ -184,8 +242,11 @@ _LoadCursorLoop:
 _DrawMenu:
     JSR _DrawLevelTexts
     JSR _DrawScoreText
+    JSR _DrawScores
     JSR _DrawLevelsText
+    JSR _DrawLevels
     JSR _DrawTotalText
+    JSR _DrawTotal
     JSR _LoadCursor
     JSR _CalculateAndSetCursorPosition
     RTS

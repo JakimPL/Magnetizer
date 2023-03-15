@@ -39,3 +39,8 @@ Hex2DecStep:
     CPX #$04
     BNE Hex2DecStep
     RTS
+
+SetDivisor:
+    LDA #$0A
+    STA divisor
+    RTS

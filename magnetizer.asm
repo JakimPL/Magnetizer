@@ -65,144 +65,159 @@ LAST_DIGIT            = TEN - 1
 COUNTER_DIGITS        = $04
 COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 
+SLASH_CHARACTER       = $29
+SPACE_CHARACTER       = $2C
+
 TEXT_SCORE_Y_OFFSET   = $22
 TEXT_SCORE_X_OFFSET   = $14
+SCORE_Y_OFFSET        = $22
+SCORE_X_OFFSET        = $31
+SCORE_DIGITS          = $03
 TEXT_LEVELS_Y_OFFSET  = $22
 TEXT_LEVELS_X_OFFSET  = $74
+LEVELS_Y_OFFSET       = $22
+LEVELS_X_OFFSET       = $93
+LEVELS_DIGITS         = $01
 TEXT_TOTAL_Y_OFFSET   = $22
 TEXT_TOTAL_X_OFFSET   = $D4
+TOTAL_Y_OFFSET        = $22
+TOTAL_X_OFFSET        = $F2
+TOTAL_DIGITS          = $02
 
 LEVEL_SETS            = $03
 
 ;;;;;;;   variables   ;;;;;;;
 
-remainder              .rs  2
-dividend               .rs  2
-divisor                .rs  2
-decimal                .rs  4
+remainder              .rs   2
+dividend               .rs   2
+divisor                .rs   2
+decimal                .rs   4
+digits                 .rs   1
 
-game                   .rs  1
-text_length            .rs  1
+game                   .rs   1
+text_length            .rs   1
 
-text_pointer_lo        .rs  1
-text_pointer_hi        .rs  1
+text_pointer_lo        .rs   1
+text_pointer_hi        .rs   1
 
-input                  .rs  1
-button_pressed         .rs  1
+input                  .rs   1
+button_pressed         .rs   1
 
-attribute              .rs  1
-tile_attribute         .rs  1
+attribute              .rs   1
+tile_attribute         .rs   1
 
-increase_counter       .rs  1
-move_counter           .rs  4
-move_counter_limit     .rs  1
+increase_counter       .rs   1
+move_counter           .rs   4
+move_counter_limit     .rs   1
 
-level_set              .rs  1
-level_set_counter      .rs  1
-level_lo               .rs  1
-level_hi               .rs  1
+level_set              .rs   1
+level_set_counter      .rs   1
+level_lo               .rs   1
+level_hi               .rs   1
 
-tiles_lo               .rs  1
-tiles_hi               .rs  1
+tiles_lo               .rs   1
+tiles_hi               .rs   1
 
-pointer_lo             .rs  1
-pointer_hi             .rs  1
+pointer_lo             .rs   1
+pointer_hi             .rs   1
 
-palette_lo             .rs  1
-palette_hi             .rs  1
+palette_lo             .rs   1
+palette_hi             .rs   1
 
-starting_position_x    .rs  1
-starting_position_y    .rs  1
+starting_position_x    .rs   1
+starting_position_y    .rs   1
 
-direction              .rs  1
-grounded               .rs  1
+direction              .rs   1
+grounded               .rs   1
 
-speed                  .rs  1
-real_speed             .rs  1
+speed                  .rs   1
+real_speed             .rs   1
 
-position_x             .rs  1
-position_y             .rs  1
-position               .rs  1
-px                     .rs  1
-py                     .rs  1
+position_x             .rs   1
+position_y             .rs   1
+position               .rs   1
+px                     .rs   1
+py                     .rs   1
 
-current_tile           .rs  1
-index                  .rs  1
-index_temp             .rs  1
+current_tile           .rs   1
+index                  .rs   1
+index_temp             .rs   1
 
-target                 .rs  1
-offset                 .rs  1
-offset_x               .rs  1
-offset_y               .rs  1
+target                 .rs   1
+offset                 .rs   1
+offset_x               .rs   1
+offset_y               .rs   1
 
-temp_x                 .rs  1
-temp_y                 .rs  1
+temp_x                 .rs   1
+temp_y                 .rs   1
 
-check_x_offset         .rs  1
-check_y_offset         .rs  1
+check_x_offset         .rs   1
+check_y_offset         .rs   1
 
-metasprite_low         .rs  1
-metasprite_high        .rs  1
-metasprite_offset      .rs  1
+metasprite_low         .rs   1
+metasprite_high        .rs   1
+metasprite_offset      .rs   1
 
-starting_point_x       .rs  1
-starting_point_y       .rs  1
-ending_point_real_x    .rs  1
-ending_point_real_y    .rs  1
+starting_point_x       .rs   1
+starting_point_y       .rs   1
+ending_point_real_x    .rs   1
+ending_point_real_y    .rs   1
 
-animation_cycle        .rs  1
-animation_direction    .rs  1
+animation_cycle        .rs   1
+animation_direction    .rs   1
 
-box_animation          .rs  1
-box_animation_x        .rs  1
-box_animation_y        .rs  1
-box_direction          .rs  1
+box_animation          .rs   1
+box_animation_x        .rs   1
+box_animation_y        .rs   1
+box_direction          .rs   1
 
-boxes                  .rs  1
+boxes                  .rs   1
 
-draw_blockades         .rs  1
-blockades              .rs  1
-blockade_removers      .rs  1
+draw_blockades         .rs   1
+blockades              .rs   1
+blockade_removers      .rs   1
 
-source_box             .rs  1
-source_box_x           .rs  1
-source_box_y           .rs  1
-source_box_z           .rs  1
-source_box_offset      .rs  1
+source_box             .rs   1
+source_box_x           .rs   1
+source_box_y           .rs   1
+source_box_z           .rs   1
+source_box_offset      .rs   1
 
-target_box             .rs  1
-target_box_x           .rs  1
-target_box_y           .rs  1
-target_box_z           .rs  1
-target_box_offset      .rs  1
+target_box             .rs   1
+target_box_x           .rs   1
+target_box_y           .rs   1
+target_box_z           .rs   1
+target_box_offset      .rs   1
 
-portals_a              .rs  1
-portals_b              .rs  1
+portals_a              .rs   1
+portals_b              .rs   1
 
-trap_doors             .rs  1
-trap_door              .rs  1
-trap_door_x            .rs  1
-trap_door_y            .rs  1
+trap_doors             .rs   1
+trap_door              .rs   1
+trap_door_x            .rs   1
+trap_door_y            .rs   1
 
-target_tile            .rs  1
-target_temp            .rs  1
+target_tile            .rs   1
+target_temp            .rs   1
 
-ppu_shift              .rs  1
+ppu_shift              .rs   1
 
-box_x                  .rs 64
-box_y                  .rs 64
-blockades_on           .rs 12
-blockades_x            .rs 12
-blockades_y            .rs 12
-blockade_removers_x    .rs 12
-blockade_removers_y    .rs 12
-portals_a_x            .rs 40
-portals_a_y            .rs 40
-portals_b_x            .rs 40
-portals_b_y            .rs 40
-trap_doors_on          .rs 16
-trap_doors_x           .rs 16
-trap_doors_y           .rs 16
+box_x                  .rs  64
+box_y                  .rs  64
+blockades_on           .rs  12
+blockades_x            .rs  12
+blockades_y            .rs  12
+blockade_removers_x    .rs  12
+blockade_removers_y    .rs  12
+portals_a_x            .rs  40
+portals_a_y            .rs  40
+portals_b_x            .rs  40
+portals_b_y            .rs  40
+trap_doors_on          .rs  16
+trap_doors_x           .rs  16
+trap_doors_y           .rs  16
+
+counters               .rs  80
 score                  .rs 100
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
