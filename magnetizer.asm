@@ -221,7 +221,7 @@ trap_doors_y           .rs  16
 
     .rsset $0400
 
-scores                 .rs 512
+scores                 .rs 256
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

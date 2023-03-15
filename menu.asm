@@ -10,28 +10,23 @@ InitializeMenu:
 PrecalculateCounters:
     LDY #$00
 PrecalculateCountersStep:
-    STY temp_y
+    STY offset_y
+    TYA
+    ASL a
+    ASL a
+    ASL a
+    STA offset_x
+
     LDA medals, y
     STA dividend
     JSR SetDivisor
     JSR Hex2Dec
 
-    LDA temp_y
-    ASL a
-    ASL a
-    ASL a
-    TAX
-
-CopyScoreDecimals:
-    LDY #SCORE_DIGITS
-CopyScoreDigit:
-    LDA decimal, y
-    STA box_x, x
-    INX
-    DEY
-    BPL CopyMedalDigit
-
 CopyMedalDecimals:
+    LDA offset_x
+    CLC
+    ADC #$04
+    TAX
     LDY #SCORE_DIGITS
 CopyMedalDigit:
     LDA decimal, y
@@ -40,7 +35,28 @@ CopyMedalDigit:
     DEY
     BPL CopyMedalDigit
 
-    LDY temp_y
+    LDA offset_y
+    ASL a
+    TAY
+    LDA scores, y
+    STA dividend
+    INY
+    LDA scores, y
+    STA dividend + 1
+    JSR SetDivisor
+    JSR Hex2Dec
+
+CopyScoreDecimals:
+    LDX offset_x
+    LDY #SCORE_DIGITS
+CopyScoreDigit:
+    LDA decimal, y
+    STA box_x, x
+    INX
+    DEY
+    BPL CopyScoreDigit
+
+    LDY offset_y
     INY
     CPY #$0A ; to replace by level_set_count
     BNE PrecalculateCountersStep
