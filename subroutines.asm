@@ -274,6 +274,9 @@ _DrawTotal:
     JSR _DrawNumber
     RTS
 
+_DrawLevelSetText:
+    RTS
+
 _LoadCursor:
     LDX #$00
 _LoadCursorLoop:
@@ -285,6 +288,7 @@ _LoadCursorLoop:
     RTS
 
 _DrawMenu:
+    JSR _DrawLevelSetText
     JSR _DrawLevelTexts
     JSR _DrawScoreText
     JSR _DrawScores

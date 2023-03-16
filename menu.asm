@@ -171,11 +171,18 @@ CheckIfButtonPressed:
     JMP CheckInput
 CheckNoInput:
     LDA input
-    BEQ ReleaseController
+    BEQ JumpToReleaseController
     JMP MenuLogicEnd
+
+JumpToReleaseController:
+    JMP ReleaseController
 
 CheckInput:
     LDA input
+    CMP #$01
+    BEQ MoveCursorRight
+    CMP #$02
+    BEQ MoveCursorLeft
     CMP #$04
     BEQ MoveCursorDown
     CMP #$08
@@ -183,6 +190,31 @@ CheckInput:
     CMP #$10
     BEQ EnterLevel
     JMP ReleaseController
+MoveCursorLeft:
+    INC button_pressed
+    DEC level_set
+    LDA #$00
+    STA level_set_counter
+    LDA level_set
+    BMI SetLevelSetToZero
+    JMP SetCursor
+SetLevelSetToZero:
+    LDA #$00
+    STA level_set
+    JMP SetCursor
+MoveCursorRight:
+    INC button_pressed
+    INC level_set
+    LDA #$00
+    STA level_set_counter
+    LDA level_set
+    CMP #LEVEL_SETS
+    BEQ SetLevelSetToMax
+    JMP SetCursor
+SetLevelSetToMax:
+    LDA #LEVEL_SETS - 1
+    STA level_set
+    JMP SetCursor
 MoveCursorDown:
     INC button_pressed
     INC level_set_counter
