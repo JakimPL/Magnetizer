@@ -10,6 +10,12 @@ InitializeMenu:
 
 PrecalculateCounters:
     LDX #$00
+    LDA level_set_counter
+    STA level_hi
+    LDA level_set
+    STA level_lo
+    STX level_set_counter
+    STX level_set
 PrecalculateCountersStep:
     STX offset_y
     TXA
@@ -45,21 +51,7 @@ CopyMedalDigits:
     STA dividend + 1
     JSR SetDivisor
     JSR Hex2Dec
-
-CopyScoreDecimals:
-    LDY offset_x
-    LDX #SCORE_DIGITS
-    LDA #$00
-    STA level_cleared
-CopyScoreDigit:
-    LDA decimal, x
-    STA box_x, y
-    BEQ CopyScoreDigitIncrement
-    INC level_cleared
-CopyScoreDigitIncrement:
-    INY
-    DEX
-    BPL CopyScoreDigit
+    JSR CopyScoreDigits
 
 CheckIfLevelCleared:
     LDA level_cleared
@@ -67,6 +59,14 @@ CheckIfLevelCleared:
 AddClearedLevel:
     INC levels_cleared
     INC total_levels_cleared
+
+IncrementLevel:
+    INC level_set_counter
+    LDX level_set
+    LDA level_set_count, x
+    CMP level_set_counter
+    BEQ PrecalculateCountersStepEnd
+    JSR SaveLevelStatistics
 
 PrecalculateCountersStepEnd
     LDX offset_y
@@ -84,6 +84,47 @@ CopyClearedLevelsCountDigits:
     LDY level_set
     LDX #LEVELS_DIGITS
     JSR _CopyDigits
+
+RestoreVariables:
+    LDA level_hi
+    STA level_set_counter
+    LDA level_lo
+    STA level_set
+    RTS
+
+CopyScoreDigits:
+    LDY offset_x
+    LDX #SCORE_DIGITS
+    LDA #$00
+    STA level_cleared
+CopyScoreDigit:
+    LDA decimal, x
+    STA box_x, y
+    BEQ CopyScoreDigitIncrement
+    INC level_cleared
+CopyScoreDigitIncrement:
+    INY
+    DEX
+    BPL CopyScoreDigit
+    RTS
+
+SaveLevelStatistics:
+    JSR _SetDigitTargetCounters
+    LDA levels_cleared
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+
+    LDA level_set
+    ASL a
+    ASL a
+    TAY
+    LDX #LEVELS_DIGITS
+    JSR _CopyDigits
+
+    INC level_set
+    LDA #$00
+    STA level_set_counter
     RTS
 
 MenuLogic:
