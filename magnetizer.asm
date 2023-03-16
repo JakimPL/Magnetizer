@@ -1,12 +1,3 @@
-
-    .inesprg 1   ; 1x 16KB PRG code
-    .ineschr 1   ; 1x  8KB CHR data
-    .inesmap 0   ; mapper 0 = NROM, no bank swapping
-    .inesmir 1   ; background mirroring
-
-;;;;;;;;;;;;;;;
-    .rsset $0000
-
 ;;;;;;;   constants   ;;;;;;;
 
 PPUCTRL               = $2000
@@ -89,7 +80,14 @@ TOTAL_DIGITS          = $02
 LEVEL_SETS            = $03
 LEVELS                = $1D
 
+    .inesprg 1   ; 1x 16KB PRG code
+    .ineschr 1   ; 1x  8KB CHR data
+    .inesmap 0   ; mapper 0 = NROM, no bank swapping
+    .inesmir 1   ; background mirroring
+
 ;;;;;;;   variables   ;;;;;;;
+
+    .rsset $0000
 
 remainder              .rs   2
 dividend               .rs   2
@@ -119,6 +117,8 @@ level_set              .rs   1
 level_set_counter      .rs   1
 level_lo               .rs   1
 level_hi               .rs   1
+levels_cleared         .rs   LEVEL_SETS
+level_cleared          .rs   1
 
 tiles_lo               .rs   1
 tiles_hi               .rs   1
@@ -207,6 +207,9 @@ target_temp            .rs   1
 
 ppu_shift              .rs   1
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    .rsset $0300
 box_x                  .rs  64
 box_y                  .rs  64
 blockades_on           .rs  12
@@ -222,8 +225,9 @@ trap_doors_on          .rs  16
 trap_doors_x           .rs  16
 trap_doors_y           .rs  16
 
-    .rsset $0300
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+    .rsset $0500
 scores                 .rs 256
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;

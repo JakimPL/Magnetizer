@@ -9,16 +9,17 @@ InitializeMenu:
     RTS
 
 PrecalculateCounters:
-    LDY #$00
+    LDX #$00
+    STX level_cleared
 PrecalculateCountersStep:
-    STY offset_y
-    TYA
+    STX offset_y
+    TXA
     ASL a
     ASL a
     ASL a
     STA offset_x
 
-    LDA medals, y
+    LDA medals, x
     STA dividend
     LDA #$00
     STA dividend + 1
@@ -29,40 +30,58 @@ CopyMedalDecimals:
     LDA offset_x
     CLC
     ADC #$04
-    TAX
-    LDY #SCORE_DIGITS
+    TAY
+    LDX #SCORE_DIGITS
 CopyMedalDigit:
-    LDA decimal, y
-    STA box_x, x
-    INX
-    DEY
+    LDA decimal, x
+    STA box_x, y
+    INY
+    DEX
     BPL CopyMedalDigit
 
     LDA offset_y
     ASL a
-    TAY
-    LDA scores, y
+    TAX
+    LDA scores, x
     STA dividend
-    INY
-    LDA scores, y
+    INX
+    LDA scores, x
     STA dividend + 1
     JSR SetDivisor
     JSR Hex2Dec
 
 CopyScoreDecimals:
-    LDX offset_x
-    LDY #SCORE_DIGITS
+    LDY offset_x
+    LDX #SCORE_DIGITS
+    LDA #$00
+    STA level_cleared
 CopyScoreDigit:
-    LDA decimal, y
-    STA box_x, x
-    INX
-    DEY
+    LDA decimal, x
+    STA box_x, y
+    BNE CopyScoreDigitIncrement
+    INC level_cleared
+CopyScoreDigitIncrement:
+    INY
+    DEX
     BPL CopyScoreDigit
 
-    LDY offset_y
-    INY
-    CPY #LEVELS
+CheckIfLevelCleared:
+    LDA level_cleared
+    BNE PrecalculateCountersStepEnd
+AddClearedLevel:
+    INC levels_cleared
+
+PrecalculateCountersStepEnd
+    LDX offset_y
+    INX
+    CPX #LEVELS
     BNE PrecalculateCountersStep
+
+    LDA levels_cleared
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+    STA portals_a_x
     RTS
 
 MenuLogic:

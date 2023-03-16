@@ -59,6 +59,10 @@ _ShiftPPU:
     JSR _PreparePPU
     RTS
 
+
+_CopyDigits:
+    RTS
+
 _ClearBasicSprites:
     LDY #$00
 _ClearBasicSpritesStep:
@@ -163,20 +167,20 @@ _DrawScores:
     ASL a
     TAX
 
-    JSR _DrawNumber
+    JSR _DrawCachedNumber
     JSR _DrawSeparator
-    JSR _DrawNumber
+    JSR _DrawCachedNumber
     RTS
 
-_DrawNumber:
+_DrawCachedNumber:
     LDY digits
-_DrawNumberStep:
+_DrawCachedNumberStep:
     LDA box_x, x
     STA PPUDATA
     INX
     DEY
     CPY #$FF
-    BNE _DrawNumberStep
+    BNE _DrawCachedNumberStep
     RTS
 
 _DrawSeparator:
@@ -210,9 +214,10 @@ _DrawLevels:
 
     LDA #LEVELS_DIGITS
     STA digits
-    JSR _DrawNumber
-    JSR _DrawSeparator
-    JSR _DrawNumber
+
+    ;JSR _DrawNumber
+    ;JSR _DrawSeparator
+    ;JSR _DrawNumber
     RTS
 
 _DrawTotalText:
@@ -237,9 +242,10 @@ _DrawTotal:
 
     LDA #TOTAL_DIGITS
     STA digits
-    JSR _DrawNumber
-    JSR _DrawSeparator
-    JSR _DrawNumber
+
+    ;JSR _DrawNumber
+    ;JSR _DrawSeparator
+    ;JSR _DrawNumber
     RTS
 
 _LoadCursor:
