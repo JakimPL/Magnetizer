@@ -87,6 +87,7 @@ TOTAL_X_OFFSET        = $F2
 TOTAL_DIGITS          = $02
 
 LEVEL_SETS            = $03
+LEVELS                = $1D
 
 ;;;;;;;   variables   ;;;;;;;
 

@@ -61,7 +61,7 @@ CopyScoreDigit:
 
     LDY offset_y
     INY
-    CPY #$0A ; to replace by level_set_count
+    CPY #LEVELS
     BNE PrecalculateCountersStep
     RTS
 

@@ -157,7 +157,7 @@ _DrawScores:
     LDA #SCORE_DIGITS
     STA digits
 
-    LDA level_set_counter
+    JSR _CalculateAbsoluteLevel
     ASL a
     ASL a
     ASL a
@@ -350,7 +350,7 @@ _NextLevel:
     RTS
 
 _SaveScore:
-    LDA level_set_counter
+    JSR _CalculateAbsoluteLevel
     ASL a
     STA temp_x
     TAX
@@ -1776,6 +1776,22 @@ _ShiftVertically:
     ADC #$02
     STA current_tile
 _AfterShift:
+    RTS
+
+_CalculateAbsoluteLevel:
+    LDA #$00
+    LDY level_set
+    BEQ _CalculateAbsoluteLevelEnd
+    LDY #$00
+_CalculateAbsoluteLevelStep:
+    CLC
+    ADC level_set_count, y
+    INY
+    CPY level_set
+    BNE _CalculateAbsoluteLevelStep
+_CalculateAbsoluteLevelEnd:
+    CLC
+    ADC level_set_counter
     RTS
 
 _Snap:
