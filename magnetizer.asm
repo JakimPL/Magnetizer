@@ -118,7 +118,6 @@ level_set              .rs   1
 level_set_counter      .rs   1
 level_lo               .rs   1
 level_hi               .rs   1
-level_clear            .rs   1
 
 tiles_lo               .rs   1
 tiles_hi               .rs   1
@@ -260,20 +259,6 @@ ClearGraphics:
     STA $0200, x
     INX
     BNE ClearMemory
-
-    LDA #$F0
-    STA dividend
-    JSR MultiplyByTen
-
-    LDA #$00
-    STA move_counter
-    LDA #$02
-    STA move_counter + 1
-    LDA #$05
-    STA move_counter + 2
-    LDA #$0A
-    STA move_counter + 3
-    JSR CounterToHex
 
     JSR InitializeMenu
     JSR _LoadPalettes

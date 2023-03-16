@@ -340,10 +340,7 @@ _CalculatePalettePointerEnd:
     RTS
 
 _NextLevel:
-    LDA level_clear
-    BEQ _NextLevelIncreaseCounters
     JSR _SaveScore
-_NextLevelIncreaseCounters:
     INC level_hi
     INC level_set_counter
     LDX level_set
@@ -356,16 +353,41 @@ _SaveScore:
     LDA level_set_counter
     ASL a
     STA temp_x
+    TAX
 
     JSR CounterToHex
+    LDA score + 1
+    BNE _CheckIfCurrentScoreIsZero
+    LDA score
+    BNE _CheckIfCurrentScoreIsZero
+    RTS
+_CheckIfCurrentScoreIsZero:
+    LDX temp_x
+    LDA scores, x
+    BNE _SaveScoreCheck
+    INX
+    LDA scores, x
+    BNE _SaveScoreCheck
+    JMP _SaveScoreMain
+_SaveScoreCheck:
+    LDX temp_x
+    INX
+    LDA score + 1
+    CMP scores, x
+    BCC _SaveScoreMain
 
+    DEX
+    LDA score
+    CMP scores, x
+    BCC _SaveScoreMain
+    RTS
+_SaveScoreMain:
     LDX temp_x
     LDA score
     STA scores, x
     INX
     LDA score + 1
     STA scores, x
-
     RTS
 
 _IncrementPalettePointer:
@@ -961,8 +983,6 @@ _EndCheck:
     BNE _CheckIfNextPositionIsFree
 
 _EndLevelReset:
-    LDA #$01
-    STA level_clear
     JSR _Stop
     JSR _PreparePPU
     LDX #$FF
@@ -1687,7 +1707,6 @@ _SetDirection:
 _ResetMoveCounter:
     LDA #$00
     STA move_counter_limit
-    STA level_clear
     LDX #$00
 _ResetMoveCounterStep:
     STA move_counter, x
