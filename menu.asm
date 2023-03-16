@@ -16,6 +16,8 @@ PrecalculateCounters:
     STA level_lo
     STX level_set_counter
     STX level_set
+    STX total_levels
+    STX total_levels_cleared
 PrecalculateCountersStep:
     STX offset_y
     TXA
@@ -58,15 +60,17 @@ CheckIfLevelCleared:
     BEQ IncrementLevel
 AddClearedLevel:
     INC levels_cleared
+    INC total_levels
     INC total_levels_cleared
 
 IncrementLevel:
+    INC total_levels
     INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
     BNE PrecalculateCountersStepEnd
-    JSR SaveLevelStatistics
+    JSR SaveLevelSetStatistics
 ResetLevelSetCounter:
     INC level_set
     LDA #$00
@@ -79,16 +83,7 @@ PrecalculateCountersStepEnd
     CPX #LEVELS
     BNE PrecalculateCountersStep
 
-    LDA levels_cleared
-    STA dividend
-    JSR SetDivisor
-    JSR Hex2Dec
-
-CopyClearedLevelsCountDigits:
-    JSR _SetDigitTargetCounters
-    LDY #$80
-    LDX #LEVELS_DIGITS
-    JSR _CopyDigits
+    JSR SaveGlobalStatistics
 
 RestoreVariables:
     LDA level_hi
@@ -113,7 +108,7 @@ CopyScoreDigitIncrement:
     BPL CopyScoreDigit
     RTS
 
-SaveLevelStatistics:
+SaveLevelSetStatistics:
     JSR _SetDigitTargetCounters
     LDA levels_cleared
     STA dividend
@@ -129,6 +124,7 @@ SaveLevelStatistics:
     LDX #LEVELS_DIGITS
     JSR _CopyDigits
 
+SaveLevelSetLevelCount:
     LDA level_set_counter
     STA dividend
     JSR SetDivisor
@@ -140,6 +136,25 @@ SaveLevelStatistics:
     TAY
 
     LDX #LEVELS_DIGITS
+    JSR _CopyDigits
+    RTS
+
+SaveGlobalStatistics:
+    JSR _SetDigitTargetCounters
+    LDA total_levels_cleared
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+    LDY #$F0
+    LDX #TOTAL_DIGITS
+    JSR _CopyDigits
+CopyClearedLevelsCountDigits:
+    LDA total_levels
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+    LDY #$F0 + TOTAL_DIGITS + 1
+    LDX #TOTAL_DIGITS
     JSR _CopyDigits
     RTS
 

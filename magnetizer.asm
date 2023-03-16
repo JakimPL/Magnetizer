@@ -119,6 +119,7 @@ level_lo               .rs   1
 level_hi               .rs   1
 levels_cleared         .rs   LEVEL_SETS
 level_cleared          .rs   1
+total_levels           .rs   1
 total_levels_cleared   .rs   1
 
 tiles_lo               .rs   1

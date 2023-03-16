@@ -265,12 +265,13 @@ _DrawTotal:
     LDX #TOTAL_X_OFFSET
     JSR _PreparePPU
 
+    LDY #$F0
     LDA #TOTAL_DIGITS
     STA digits
 
-    ;JSR _DrawNumber
-    ;JSR _DrawSeparator
-    ;JSR _DrawNumber
+    JSR _DrawNumber
+    JSR _DrawSeparator
+    JSR _DrawNumber
     RTS
 
 _LoadCursor:
