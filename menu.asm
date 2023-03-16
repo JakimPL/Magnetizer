@@ -10,7 +10,6 @@ InitializeMenu:
 
 PrecalculateCounters:
     LDX #$00
-    STX level_cleared
 PrecalculateCountersStep:
     STX offset_y
     TXA
@@ -55,7 +54,7 @@ CopyScoreDecimals:
 CopyScoreDigit:
     LDA decimal, x
     STA box_x, y
-    BNE CopyScoreDigitIncrement
+    BEQ CopyScoreDigitIncrement
     INC level_cleared
 CopyScoreDigitIncrement:
     INY
@@ -64,9 +63,10 @@ CopyScoreDigitIncrement:
 
 CheckIfLevelCleared:
     LDA level_cleared
-    BNE PrecalculateCountersStepEnd
+    BEQ PrecalculateCountersStepEnd
 AddClearedLevel:
     INC levels_cleared
+    INC total_levels_cleared
 
 PrecalculateCountersStepEnd
     LDX offset_y
@@ -80,8 +80,9 @@ PrecalculateCountersStepEnd
     JSR Hex2Dec
 
 CopyClearedLevelsCountDigits:
+    JSR _SetDigitTargetCounters
+    LDY level_set
     LDX #LEVELS_DIGITS
-    JSR _SetDigitTargetPortal
     JSR _CopyDigits
     RTS
 

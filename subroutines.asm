@@ -68,6 +68,17 @@ _CopyDigits:
     BPL _CopyDigits
     RTS
 
+_DrawNumber:
+    LDX digits
+_DrawNumberStep:
+    LDA [digit_target_lo], y
+    STA PPUDATA
+    INY
+    DEX
+    CPX #$FF
+    BNE _DrawNumberStep
+    RTS
+
 _SetDigitTargetBox:
     LDA #LOW(box_x)
     STA digit_target_lo
@@ -75,10 +86,10 @@ _SetDigitTargetBox:
     STA digit_target_hi
     RTS
 
-_SetDigitTargetPortal:
-    LDA #LOW(portals_a_x)
+_SetDigitTargetCounters:
+    LDA #LOW(counters)
     STA digit_target_lo
-    LDA #HIGH(portals_a_x)
+    LDA #HIGH(counters)
     STA digit_target_hi
     RTS
 
@@ -186,20 +197,10 @@ _DrawScores:
     ASL a
     TAY
 
-    JSR _DrawCachedNumber
+    JSR _SetDigitTargetBox
+    JSR _DrawNumber
     JSR _DrawSeparator
-    JSR _DrawCachedNumber
-    RTS
-
-_DrawCachedNumber:
-    LDX digits
-_DrawCachedNumberStep:
-    LDA box_x, y
-    STA PPUDATA
-    INY
-    DEX
-    CPX #$FF
-    BNE _DrawCachedNumberStep
+    JSR _DrawNumber
     RTS
 
 _DrawSeparator:
@@ -231,16 +232,14 @@ _DrawLevels:
     LDX #LEVELS_X_OFFSET
     JSR _PreparePPU
 
+    LDY level_set
     LDA #LEVELS_DIGITS
     STA digits
 
-    JSR _DrawLevelsNumber
+    JSR _SetDigitTargetCounters
+    JSR _DrawNumber
     JSR _DrawSeparator
-    ;JSR _DrawNumber
-    RTS
-
-_DrawLevelsNumber:
-
+    JSR _DrawNumber
     RTS
 
 _DrawTotalText:

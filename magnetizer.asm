@@ -119,6 +119,7 @@ level_lo               .rs   1
 level_hi               .rs   1
 levels_cleared         .rs   LEVEL_SETS
 level_cleared          .rs   1
+total_levels_cleared   .rs   1
 
 tiles_lo               .rs   1
 tiles_hi               .rs   1
@@ -231,6 +232,7 @@ trap_doors_y           .rs  16
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .rsset $0500
+counters               .rs 256
 scores                 .rs 256
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
