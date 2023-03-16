@@ -207,6 +207,9 @@ target_temp            .rs   1
 
 ppu_shift              .rs   1
 
+digit_target_lo        .rs   1
+digit_target_hi        .rs   1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .rsset $0300

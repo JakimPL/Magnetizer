@@ -26,18 +26,15 @@ PrecalculateCountersStep:
     JSR SetDivisor
     JSR Hex2Dec
 
-CopyMedalDecimals:
+CopyMedalDigits:
     LDA offset_x
     CLC
     ADC #$04
     TAY
+
+    JSR _SetDigitTargetBox
     LDX #SCORE_DIGITS
-CopyMedalDigit:
-    LDA decimal, x
-    STA box_x, y
-    INY
-    DEX
-    BPL CopyMedalDigit
+    JSR _CopyDigits
 
     LDA offset_y
     ASL a
@@ -81,7 +78,11 @@ PrecalculateCountersStepEnd
     STA dividend
     JSR SetDivisor
     JSR Hex2Dec
-    STA portals_a_x
+
+CopyClearedLevelsCountDigits:
+    LDX #LEVELS_DIGITS
+    JSR _SetDigitTargetPortal
+    JSR _CopyDigits
     RTS
 
 MenuLogic:
