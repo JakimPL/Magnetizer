@@ -55,7 +55,7 @@ CopyMedalDigits:
 
 CheckIfLevelCleared:
     LDA level_cleared
-    BEQ PrecalculateCountersStepEnd
+    BEQ IncrementLevel
 AddClearedLevel:
     INC levels_cleared
     INC total_levels_cleared
@@ -65,8 +65,13 @@ IncrementLevel:
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
-    BEQ PrecalculateCountersStepEnd
+    BNE PrecalculateCountersStepEnd
     JSR SaveLevelStatistics
+ResetLevelSetCounter:
+    INC level_set
+    LDA #$00
+    STA level_set_counter
+    STA levels_cleared
 
 PrecalculateCountersStepEnd
     LDX offset_y
@@ -81,7 +86,7 @@ PrecalculateCountersStepEnd
 
 CopyClearedLevelsCountDigits:
     JSR _SetDigitTargetCounters
-    LDY level_set
+    LDY #$80
     LDX #LEVELS_DIGITS
     JSR _CopyDigits
 
@@ -119,12 +124,23 @@ SaveLevelStatistics:
     ASL a
     ASL a
     TAY
+    STY index
+
     LDX #LEVELS_DIGITS
     JSR _CopyDigits
 
-    INC level_set
-    LDA #$00
-    STA level_set_counter
+    LDA level_set_counter
+    STA dividend
+    JSR SetDivisor
+    JSR Hex2Dec
+
+    LDA index
+    CLC
+    ADC #$02
+    TAY
+
+    LDX #LEVELS_DIGITS
+    JSR _CopyDigits
     RTS
 
 MenuLogic:

@@ -232,7 +232,10 @@ _DrawLevels:
     LDX #LEVELS_X_OFFSET
     JSR _PreparePPU
 
-    LDY level_set
+    LDA level_set
+    ASL a
+    ASL a
+    TAY
     LDA #LEVELS_DIGITS
     STA digits
 
