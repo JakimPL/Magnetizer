@@ -252,5 +252,7 @@ ReleaseController:
 
 MenuLogicEnd:
     JSR _DrawScores
+    JSR _DrawLevels
+    JSR _DrawLevelSetText
     JSR _ResetPPU
     RTS

@@ -77,6 +77,9 @@ TOTAL_Y_OFFSET        = $22
 TOTAL_X_OFFSET        = $F2
 TOTAL_DIGITS          = $02
 
+TEXT_LSET_Y_OFFSET    = $21
+TEXT_LSET_X_OFFSET    = $A2
+
 LEVEL_SETS            = $03
 LEVELS                = $1D
 

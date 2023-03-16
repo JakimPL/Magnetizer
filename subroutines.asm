@@ -275,6 +275,20 @@ _DrawTotal:
     RTS
 
 _DrawLevelSetText:
+    LDA #TEXT_LSET_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_LSET_X_OFFSET
+    JSR _PreparePPU
+
+    LDX level_set
+    LDA labels_offsets, x
+    CLC
+    ADC #LOW(level_set_labels)
+    STA text_pointer_lo
+    LDA #HIGH(level_set_labels)
+    STA text_pointer_hi
+
+    JSR _DrawText
     RTS
 
 _LoadCursor:

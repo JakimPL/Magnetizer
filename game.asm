@@ -290,6 +290,11 @@ RestartLevel:
     DEC level_hi
     DEC level_set_counter
 EndLevelReset:
+    LDA #$00
+    STA move_counter
+    STA move_counter + 1
+    STA move_counter + 2
+    STA move_counter + 3
     JMP _EndLevelReset
 
 Movement:
