@@ -356,7 +356,7 @@ GoToMenuVBlank:
     BPL GoToMenuVBlank
     JSR _ClearBasicSprites
     JSR _LoadPalettes
-    JSR _LoadBackground
+    JSR _LoadBackgrounds
     JSR _LoadAttributes
     JSR _DrawMenu
     JSR _EnableNMI
@@ -369,7 +369,7 @@ VBlank:
     BPL VBlank
 
     JSR _LoadPalettes
-    JSR _LoadBackground
+    JSR _LoadBackgrounds
     JSR _LoadAttributes
     JSR _EnableNMI
 

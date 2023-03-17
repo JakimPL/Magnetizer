@@ -211,6 +211,7 @@ target_tile            .rs   1
 target_temp            .rs   1
 
 ppu_shift              .rs   1
+ppu_address            .rs   1
 
 digit_target_lo        .rs   1
 digit_target_hi        .rs   1
@@ -276,7 +277,7 @@ ClearGraphics:
 
     JSR InitializeMenu
     JSR _LoadPalettes
-    JSR _LoadBackground
+    JSR _LoadBackgrounds
     JSR _DrawMenu
     JSR _EnableNMI
 

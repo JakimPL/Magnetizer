@@ -563,13 +563,27 @@ _LoadPalettesLoop:
     BNE _LoadPalettesLoop
     RTS
 
-_LoadBackground:
+_LoadBackgrounds
+    JSR _SetLevelPointer
     LDA #$20
+    STA ppu_address
+    JSR _LoadBackground
+
+    INC level_hi
+    JSR _SetLevelPointer
+    LDA #$24
+    STA ppu_address
+    JSR _LoadBackground
+
+    DEC level_hi
+    RTS
+
+_LoadBackground:
+    LDA ppu_address
     STA ppu_shift
     LDX #$00
     JSR _PreparePPU
 
-    JSR _SetLevelPointer
     LDY #$00
 _LoadBackgroundInsideLoop:
     LDA [pointer_lo], y
