@@ -1,4 +1,22 @@
 GameLogic:
+    LDX screen_offset
+    BEQ CheckTrapDoor
+    INC screen_offset
+
+    LDA #$20
+    STA ppu_shift
+    JSR _PreparePPU
+
+    LDX screen_offset
+    CPX #$20
+    BNE JumpToLogicEnd
+EndLevel:
+    LDX #$00
+    STX screen_offset
+    JMP _EndLevelReset
+JumpToLogicEnd:
+    JMP GameLogicEnd
+CheckTrapDoor:
     LDA trap_door
     CMP #$FF
     BEQ CheckBoxesToDraw
@@ -295,7 +313,8 @@ EndLevelReset:
     STA move_counter + 1
     STA move_counter + 2
     STA move_counter + 3
-    JMP _EndLevelReset
+    LDA #$01
+    STA screen_offset
 
 Movement:
     LDA grounded

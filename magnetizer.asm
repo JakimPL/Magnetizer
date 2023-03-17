@@ -100,6 +100,9 @@ digits                 .rs   1
 result                 .rs   2
 score                  .rs   2
 
+digit_target_lo        .rs   1
+digit_target_hi        .rs   1
+
 game                   .rs   1
 text_length            .rs   1
 
@@ -213,8 +216,7 @@ target_temp            .rs   1
 ppu_shift              .rs   1
 ppu_address            .rs   1
 
-digit_target_lo        .rs   1
-digit_target_hi        .rs   1
+screen_offset          .rs   1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
