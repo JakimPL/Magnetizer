@@ -277,7 +277,7 @@ ClearGraphics:
 
     JSR InitializeMenu
     JSR _LoadPalettes
-    JSR _LoadBackgrounds
+    JSR _LoadBackgroundsAndAttributes
     JSR _DrawMenu
     JSR _EnableNMI
 

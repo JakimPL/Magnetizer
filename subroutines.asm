@@ -563,21 +563,6 @@ _LoadPalettesLoop:
     BNE _LoadPalettesLoop
     RTS
 
-_LoadBackgrounds
-    JSR _SetLevelPointer
-    LDA #$20
-    STA ppu_address
-    JSR _LoadBackground
-
-    INC level_hi
-    JSR _SetLevelPointer
-    LDA #$24
-    STA ppu_address
-    JSR _LoadBackground
-
-    DEC level_hi
-    RTS
-
 _LoadBackground:
     LDA ppu_address
     STA ppu_shift
@@ -625,18 +610,42 @@ _LoadBackgroundPostLoop:
     RTS
 
 ;; x as argument ;;
+_LoadBackgroundsAndAttributes:
+    JSR _DisableNMI
+    LDA #$20
+    STA ppu_shift
+    JSR _LoadBackgroundAndAttribute
+
+    INC level_hi
+    LDA #$24
+    STA ppu_shift
+    JSR _LoadBackgroundAndAttribute
+    DEC level_hi
+    RTS
+
+_LoadBackgroundAndAttribute:
+    JSR _SetLevelPointer
+    LDA ppu_shift
+    STA ppu_address
+    JSR _LoadBackground
+    JSR _SetLevelPointer
+    LDA ppu_shift
+    CLC
+    ADC #$03
+    STA ppu_address
+    LDX #$C0
+    JSR _PrepareAttributePPU
+    JSR _LoadAttribute
+    RTS
+
 _PrepareAttributePPU:
     LDA PPUSTATUS
-    LDA #$23
+    LDA ppu_address
     STA PPUADDR
     LDX PPUADDR
     RTS
 
-_LoadAttributes:
-    LDX #$C0
-    JSR _PrepareAttributePPU
-    JSR _SetLevelPointer
-
+_LoadAttribute:
     LDX #$00
     LDY #$00
 _LoadAttributeLoop:
@@ -657,6 +666,7 @@ _LoadAttributeLoopNextStep:
     CPX #$40
     BNE _LoadAttributeLoop
     RTS
+
 
 ;; y as argument ;;
 _LoadSingleTileAttribute:
