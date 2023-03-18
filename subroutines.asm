@@ -360,7 +360,7 @@ _EnterLevel:
     STA level_hi
 
     LDY level_set
-    BEQ _EnterLeveLInitialize
+    BEQ _EnterLevelInitialize
     LDX #$00
 _EnterLevelIncreasePointer:
     LDA level_set_count, x
@@ -372,7 +372,7 @@ _EnterLevelIncreasePointer:
 
     JSR _CalculatePalettePointer
 
-_EnterLeveLInitialize:
+_EnterLevelInitialize:
     JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR RestartLevel
@@ -697,9 +697,7 @@ _LoadAttributePart:
     LDA screen_offset
     JSR _TransformB
     TAY
-    ;LDY #$00
     JSR _LoadTileAttribute
-    ;LDA #$FF
     STA PPUDATA
     RTS
 

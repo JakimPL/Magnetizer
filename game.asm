@@ -1,48 +1,12 @@
 GameLogic:
+    LDX level_loading
+    BEQ CheckScreenMovement
+    JSR DrawNextLevel
+    JMP GameLogicEnd
+CheckScreenMovement:
     LDX screen_movement
     BEQ CheckTrapDoor
-
-    LDX screen_offset
-    CPX #$80
-    BNE DrawBackgroundPart
-EndLevel:
-    LDX #$00
-    STX screen_movement
-    STX screen_offset
-    INC screen_mode
-    LDA screen_mode
-    AND #%00000001
-    STA screen_mode
-    JMP _StartNextLevel
-DrawBackgroundPart:
-    JSR _SetNextLevelPointer
-
-    LDA screen_offset
-    LSR a
-    LSR a
-    STA screen_x
-
-    LDA screen_offset
-    AND #%00000001
-    BEQ DrawAttributesPart
-    JSR _LoadBackgroundPart
-    JMP ScreenIncrement
-DrawAttributesPart:
-    JSR _LoadAttributePart
-ScreenIncrement:
-    INC screen_offset
-    INC screen_x
-    INC screen_x
-    LDA screen_x
-    CMP #$20
-    BCC DrawMovingScreen
-    LDA #$00
-    STA screen_x
-DrawMovingScreen:
-    LDA #$20
-    STA ppu_shift
-    LDX screen_x
-    JSR _PreparePPU
+    JSR DrawTransition
     JMP GameLogicEnd
 
 CheckTrapDoor:
@@ -525,4 +489,55 @@ LoadBlockadeSpritesStep:
     INY
     CPY #$08
     BNE LoadBlockadeSpritesStep
+    RTS
+
+DrawTransition:
+    LDX screen_offset
+    CPX #$80
+    BNE DrawBackgroundPart
+EndLevel:
+    LDX #$01
+    STX level_loading
+    LDX #$00
+    STX screen_movement
+    STX screen_offset
+    INC screen_mode
+    LDA screen_mode
+    AND #%00000001
+    STA screen_mode
+    JMP _StartNextLevel
+DrawBackgroundPart:
+    JSR _SetNextLevelPointer
+
+    LDA screen_offset
+    LSR a
+    LSR a
+    STA screen_x
+
+    LDA screen_offset
+    AND #%00000001
+    BEQ DrawAttributesPart
+    JSR _LoadBackgroundPart
+    JMP ScreenIncrement
+DrawAttributesPart:
+    JSR _LoadAttributePart
+ScreenIncrement:
+    INC screen_offset
+    INC screen_x
+    INC screen_x
+    LDA screen_x
+    CMP #$20
+    BCC DrawMovingScreen
+    LDA #$00
+    STA screen_x
+DrawMovingScreen:
+    LDA #$20
+    STA ppu_shift
+    LDX screen_x
+    JSR _PreparePPU
+    RTS
+
+DrawNextLevel:
+    LDA #$00
+    STA level_loading
     RTS

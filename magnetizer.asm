@@ -219,6 +219,7 @@ target_temp            .rs   1
 ppu_shift              .rs   1
 ppu_address            .rs   1
 
+level_loading          .rs   1
 screen_movement        .rs   1
 screen_offset          .rs   1
 screen_mode            .rs   1
