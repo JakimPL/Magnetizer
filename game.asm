@@ -14,8 +14,17 @@ DrawBackgroundPart:
     LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
     JSR _LoadBackgroundPart
-MoveScreen:
+
+ScreenIncrement:
     INC screen_offset
+    INC screen_x
+    INC screen_x
+    LDA screen_x
+    CMP #$20
+    BCC DrawMovingScreen
+    LDA #$00
+    STA screen_x
+DrawMovingScreen:
     LDA #$20
     STA ppu_shift
     LDX screen_x
