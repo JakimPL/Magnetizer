@@ -533,8 +533,19 @@ ScreenIncrement:
 DrawMovingScreen:
     LDA #$20
     STA ppu_shift
-    LDX screen_x
-    JSR _PreparePPU
+    JSR _ResetPPU
+Scrolling:
+    LDA #$00
+    STA PPUSCROLL
+    LDA screen_offset
+    CLC
+    ADC #$01
+    CMP #$80
+    BCC Scroll
+    LDA #$80
+Scroll:
+    ASL a
+    STA PPUSCROLL
     RTS
 
 DrawNextLevel:
