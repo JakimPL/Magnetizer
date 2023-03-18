@@ -61,7 +61,8 @@ _ShiftPPU:
 
 _StartScreenMovement:
     LDA #$01
-    STA screen_offset
+    STA screen_movement
+    JSR _ClearBasicSprites
     RTS
 
 ; x, y arguments ;
@@ -568,6 +569,20 @@ _LoadPalettesLoop:
     BNE _LoadPalettesLoop
     RTS
 
+_DrawTileVerticalPart:
+    LDA current_tile
+    STA PPUDATA
+    ADC #$02
+    STA PPUDATA
+    RTS
+
+_DrawTileHorizontalPart:
+    LDA current_tile
+    STA PPUDATA
+    ADC #$01
+    STA PPUDATA
+    RTS
+
 _LoadBackground:
     LDA ppu_address
     STA ppu_shift
@@ -577,16 +592,8 @@ _LoadBackground:
     LDY #$00
 _LoadBackgroundInsideLoop:
     JSR _LoadTile
-
-_ProcessTile:
     JSR _ShiftVertically
-
-_DrawTile:
-    LDA current_tile
-    STA PPUDATA
-    CLC
-    ADC #$01
-    STA PPUDATA
+    JSR _DrawTileHorizontalPart
 
     INY
     CPY #$10
@@ -610,6 +617,7 @@ _LoadBackgroundPostLoop:
     RTS
 
 _LoadTile:
+    CLC
     LDA [pointer_lo], y
     STY temp_y
     TAY
@@ -619,18 +627,27 @@ _LoadTile:
     RTS
 
 _LoadBackgroundPart:
-    LDA #20
+    LDA #$20
     STA ppu_shift
-    LDX #$00
+    LDX screen_offset
     JSR _PreparePPU
 
+    TXA
+    LSR a
+    TAY
     LDX #$00
-    LDY #$00
 _LoadBackgroundPartInsideLoop:
-    LDA #$10
-    STA PPUDATA
+    JSR _LoadTile
+    JSR _ShiftHorizontally
+    JSR _DrawTileVerticalPart
+
+    LDA pointer_lo
+    CLC
+    ADC #$10
+    STA pointer_lo
+
     INX
-    CPX #$1E
+    CPX #$0F
     BNE _LoadBackgroundPartInsideLoop
     RTS
 
@@ -1861,12 +1878,23 @@ _DrawMoveCounterStep:
     BNE _DrawMoveCounterStep
     RTS
 
+_ShiftHorizontally:
+    LDA screen_offset
+    AND #%00000001
+    BEQ _AfterShift
+
+    LDA current_tile
+    CLC
+    ADC #$01
+    STA current_tile
+    RTS
 _ShiftVertically:
     TXA
     AND #%00000001
     BEQ _AfterShift
 
     LDA current_tile
+    CLC
     ADC #$02
     STA current_tile
 _AfterShift:

@@ -1,22 +1,29 @@
 GameLogic:
-    LDX screen_offset
+    LDX screen_movement
     BEQ CheckTrapDoor
+
+DrawBackgroundPart:
+    INC level_hi
+    JSR _SetLevelPointer
+    DEC level_hi
 
     LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
     JSR _LoadBackgroundPart
 
+    INC screen_offset
+MoveScreen:
     LDA #$20
     STA ppu_shift
     LDX screen_offset
     JSR _PreparePPU
 
-    INC screen_offset
     LDX screen_offset
     CPX #$20
     BNE JumpToLogicEnd
 EndLevel:
     LDX #$00
+    STX screen_movement
     STX screen_offset
     INC screen_mode
     LDA screen_mode
