@@ -23,7 +23,7 @@ _ReadControllerLoop:
     RTS
 
 _EnableNMI:
-    LDA #%10010000   ; enable NMI, sprites from Pattern Table 1
+    LDA #NMI_HORIZONTAL
     STA PPUCTRL
 
     LDA #%00011110   ; enable sprites
@@ -629,29 +629,32 @@ _LoadTile:
     RTS
 
 _LoadBackgroundPart:
+    LDA #NMI_VERTICAL
+    STA PPUCTRL
+
     LDA #$20
     STA ppu_shift
     LDX screen_x
     LDA screen_offset
+    LSR a
     AND #%00000001
-    BNE __LoadBackgroundPartPPU
+    BNE _LoadBackgroundPartPPU
 _BackgroundOffset:
     LDA #$22
     STA ppu_shift
-
     LDA pointer_lo
     CLC
     ADC #$80
     STA pointer_lo
-__LoadBackgroundPartPPU:
+_LoadBackgroundPartPPU:
     JSR _PreparePPU
 
     LDA screen_x
     LSR a
     TAY
-
-_SetXRegisterOffset:
+_LoadBackgroundSetXOffset:
     LDA screen_offset
+    LSR a
     CLC
     ADC #$01
     AND #%00000001
@@ -669,6 +672,11 @@ _LoadBackgroundPartInsideLoop:
     INX
     CPX #$08
     BNE _LoadBackgroundPartInsideLoop
+    RTS
+
+_LoadAttributePart:
+    LDA #NMI_HORIZONTAL
+    STA PPUCTRL
     RTS
 
 _LoadBackgroundsAndAttributes:

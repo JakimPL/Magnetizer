@@ -2,6 +2,18 @@ GameLogic:
     LDX screen_movement
     BEQ CheckTrapDoor
 
+    LDX screen_offset
+    CPX #$80
+    BNE DrawBackgroundPart
+EndLevel:
+    LDX #$00
+    STX screen_movement
+    STX screen_offset
+    INC screen_mode
+    LDA screen_mode
+    AND #%00000001
+    STA screen_mode
+    JMP _StartNextLevel
 DrawBackgroundPart:
     INC level_hi
     JSR _SetLevelPointer
@@ -9,12 +21,16 @@ DrawBackgroundPart:
 
     LDA screen_offset
     LSR a
+    LSR a
     STA screen_x
 
-    LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
-    STA PPUCTRL
+    LDA screen_offset
+    AND #%00000001
+    BEQ DrawAttributesPart
     JSR _LoadBackgroundPart
-
+    JMP ScreenIncrement
+DrawAttributesPart:
+    JSR _LoadAttributePart
 ScreenIncrement:
     INC screen_offset
     INC screen_x
@@ -29,20 +45,6 @@ DrawMovingScreen:
     STA ppu_shift
     LDX screen_x
     JSR _PreparePPU
-
-    LDX screen_offset
-    CPX #$40
-    BNE JumpToLogicEnd
-EndLevel:
-    LDX #$00
-    STX screen_movement
-    STX screen_offset
-    INC screen_mode
-    LDA screen_mode
-    AND #%00000001
-    STA screen_mode
-    JMP _StartNextLevel
-JumpToLogicEnd:
     JMP GameLogicEnd
 
 CheckTrapDoor:
@@ -100,7 +102,7 @@ DrawTargetBox
     JSR _DrawTargetBox
 
 PrepareMoveCounter:
-    LDA #%10010000
+    LDA #NMI_HORIZONTAL
     STA PPUCTRL
     LDA #$23
     LDX #$80
@@ -328,8 +330,8 @@ GoToMenu:
     JSR InitializeMenu
     JSR _PreparePPU
     LDX #$FF
-    TXS          ; Set up stack
-    INX          ; now X = 0
+    TXS            ; set up stack
+    INX
     STX PPUCTRL    ; disable NMI
     STX PPUMASK    ; disable rendering
     JMP GoToMenuVBlank
