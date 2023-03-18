@@ -217,6 +217,7 @@ ppu_shift              .rs   1
 ppu_address            .rs   1
 
 screen_offset          .rs   1
+screen_mode            .rs   1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

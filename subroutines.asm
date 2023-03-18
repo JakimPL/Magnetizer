@@ -16,7 +16,7 @@ _ReadController:
     LDY #$08
 _ReadControllerLoop:
     LDA JOY1
-    LSR A
+    LSR a
     ROL input
     DEY
     BNE _ReadControllerLoop
@@ -57,6 +57,11 @@ _ShiftPPU:
     ADC #$20
     TAX
     JSR _PreparePPU
+    RTS
+
+_StartScreenMovement:
+    LDA #$01
+    STA screen_offset
     RTS
 
 ; x, y arguments ;
@@ -571,12 +576,7 @@ _LoadBackground:
 
     LDY #$00
 _LoadBackgroundInsideLoop:
-    LDA [pointer_lo], y
-    STY temp_y
-    TAY
-    LDA tiles, y
-    STA current_tile
-    LDY temp_y
+    JSR _LoadTile
 
 _ProcessTile:
     JSR _ShiftVertically
@@ -609,7 +609,31 @@ _LoadBackgroundPostLoop:
     BNE _LoadBackgroundInsideLoop
     RTS
 
-;; x as argument ;;
+_LoadTile:
+    LDA [pointer_lo], y
+    STY temp_y
+    TAY
+    LDA tiles, y
+    STA current_tile
+    LDY temp_y
+    RTS
+
+_LoadBackgroundPart:
+    LDA #20
+    STA ppu_shift
+    LDX #$00
+    JSR _PreparePPU
+
+    LDX #$00
+    LDY #$00
+_LoadBackgroundPartInsideLoop:
+    LDA #$10
+    STA PPUDATA
+    INX
+    CPX #$1E
+    BNE _LoadBackgroundPartInsideLoop
+    RTS
+
 _LoadBackgroundsAndAttributes:
     JSR _DisableNMI
     LDA #$20
@@ -1056,20 +1080,16 @@ _EndCheck:
     CMP #END
     BNE _CheckIfNextPositionIsFree
 
-_EndLevelReset:
-    JSR _Stop
-    JSR _PreparePPU
-    LDX #$FF
-    TXS          ; Set up stack
-    INX          ; now X = 0
-    STX PPUCTRL    ; disable NMI
-    STX PPUMASK    ; disable rendering
+    JSR _StartScreenMovement
+    JMP _CheckIfNextPositionIsFree
 _StartNextLevel:
+    JSR _Stop
     JSR _NextLevel
     JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR _LoadLevel
-    JMP VBlank
+    ;JSR _LoadPalettes
+    JMP InitializePosition
 
 _CheckIfNextPositionIsFree:
     JSR _GetPositionWithOffset

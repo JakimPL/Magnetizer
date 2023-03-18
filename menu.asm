@@ -60,7 +60,6 @@ CheckIfLevelCleared:
     BEQ IncrementLevel
 AddClearedLevel:
     INC levels_cleared
-    INC total_levels
     INC total_levels_cleared
 
 IncrementLevel:
@@ -232,8 +231,9 @@ MoveCursorUp:
     BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
+    JSR _ResetPPU
     JSR _EnterLevel
-    JMP MenuLogicEnd
+    JMP MenuEnd
 SetLevelToZero:
     LDA #$00
     STA level_set_counter
@@ -255,4 +255,5 @@ MenuLogicEnd:
     JSR _DrawLevels
     JSR _DrawLevelSetText
     JSR _ResetPPU
+MenuEnd:
     RTS
