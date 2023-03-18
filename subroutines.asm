@@ -468,6 +468,12 @@ _SetLevelPointer:
     STA pointer_hi
     RTS
 
+_SetNextLevelPointer:
+    INC level_hi
+    JSR _SetLevelPointer
+    DEC level_hi
+    RTS
+
 _LoadLevel:
     JSR _SetLevelPointer
     JSR _InitializeVariables
@@ -677,6 +683,24 @@ _LoadBackgroundPartInsideLoop:
 _LoadAttributePart:
     LDA #NMI_HORIZONTAL
     STA PPUCTRL
+    LDA #$23
+    STA ppu_shift
+
+    LDA screen_offset
+    JSR _TransformA
+    STA offset_x
+    CLC
+    ADC #$C0
+    TAX
+    JSR _PreparePPU
+
+    LDA screen_offset
+    JSR _TransformB
+    TAY
+    ;LDY #$00
+    JSR _LoadTileAttribute
+    ;LDA #$FF
+    STA PPUDATA
     RTS
 
 _LoadBackgroundsAndAttributes:
@@ -1960,6 +1984,34 @@ _Divide:
     LSR a
     LSR a
     LSR a
+    RTS
+
+_TransformA:
+    JSR _Divide
+    STA offset_x
+
+    LDA screen_offset
+    LSR a
+    ASL a
+    ASL a
+    ASL a
+    AND #%00111111
+    CLC
+    ADC offset_x
+    RTS
+
+_TransformB:
+    JSR _Divide
+    STA offset_x
+
+    LDA screen_offset
+    LSR a
+    JSR _Multiply
+    AND #%01111111
+    CLC
+    ADC offset_x
+
+    ASL a
     RTS
 
 _MultiplyAndShift:

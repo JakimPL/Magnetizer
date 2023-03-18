@@ -15,9 +15,7 @@ EndLevel:
     STA screen_mode
     JMP _StartNextLevel
 DrawBackgroundPart:
-    INC level_hi
-    JSR _SetLevelPointer
-    DEC level_hi
+    JSR _SetNextLevelPointer
 
     LDA screen_offset
     LSR a
