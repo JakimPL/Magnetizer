@@ -7,19 +7,22 @@ DrawBackgroundPart:
     JSR _SetLevelPointer
     DEC level_hi
 
+    LDA screen_offset
+    LSR a
+    STA screen_x
+
     LDA #%10010100   ; enable NMI, sprites from Pattern Table 1
     STA PPUCTRL
     JSR _LoadBackgroundPart
-
-    INC screen_offset
 MoveScreen:
+    INC screen_offset
     LDA #$20
     STA ppu_shift
-    LDX screen_offset
+    LDX screen_x
     JSR _PreparePPU
 
     LDX screen_offset
-    CPX #$20
+    CPX #$40
     BNE JumpToLogicEnd
 EndLevel:
     LDX #$00

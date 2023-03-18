@@ -572,6 +572,7 @@ _LoadPalettesLoop:
 _DrawTileVerticalPart:
     LDA current_tile
     STA PPUDATA
+    CLC
     ADC #$02
     STA PPUDATA
     RTS
@@ -579,6 +580,7 @@ _DrawTileVerticalPart:
 _DrawTileHorizontalPart:
     LDA current_tile
     STA PPUDATA
+    CLC
     ADC #$01
     STA PPUDATA
     RTS
@@ -629,13 +631,31 @@ _LoadTile:
 _LoadBackgroundPart:
     LDA #$20
     STA ppu_shift
-    LDX screen_offset
+    LDX screen_x
+    LDA screen_offset
+    AND #%00000001
+    BNE __LoadBackgroundPartPPU
+_BackgroundOffset:
+    LDA #$22
+    STA ppu_shift
+
+    LDA pointer_lo
+    CLC
+    ADC #$80
+    STA pointer_lo
+__LoadBackgroundPartPPU:
     JSR _PreparePPU
 
-    TXA
+    LDA screen_x
     LSR a
     TAY
-    LDX #$00
+
+_SetXRegisterOffset:
+    LDA screen_offset
+    CLC
+    ADC #$01
+    AND #%00000001
+    TAX
 _LoadBackgroundPartInsideLoop:
     JSR _LoadTile
     JSR _ShiftHorizontally
@@ -647,7 +667,7 @@ _LoadBackgroundPartInsideLoop:
     STA pointer_lo
 
     INX
-    CPX #$0F
+    CPX #$08
     BNE _LoadBackgroundPartInsideLoop
     RTS
 
@@ -1879,7 +1899,7 @@ _DrawMoveCounterStep:
     RTS
 
 _ShiftHorizontally:
-    LDA screen_offset
+    LDA screen_x
     AND #%00000001
     BEQ _AfterShift
 
