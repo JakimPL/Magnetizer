@@ -59,9 +59,19 @@ _ShiftPPU:
     JSR _PreparePPU
     RTS
 
+_StartScreenRedraw:
+    LDA #$01
+    STA level_loading
+    LDA #$20
+    STA ppu_address
+    JSR _ClearBasicSprites
+    RTS
+
 _StartScreenMovement:
     LDA #$01
     STA screen_movement
+    LDA #$24
+    STA ppu_address
     JSR _ClearBasicSprites
     RTS
 
@@ -656,7 +666,7 @@ _LoadBackgroundHorizontalPart:
     LDA screen_offset
     JSR _Divide
     CLC
-    ADC #$24
+    ADC ppu_address
     STA ppu_shift
     LDA screen_offset
     AND #%00001111
@@ -1204,7 +1214,6 @@ _StartNextLevel:
     JSR _ResetMoveCounter
     JSR InitializeSprites
     JSR _LoadLevel
-    ;JSR _LoadPalettes
     JMP InitializePosition
 
 _CheckIfNextPositionIsFree:

@@ -300,12 +300,10 @@ GoToMenu:
 RestartLevel:
     DEC level_hi
     DEC level_set_counter
+    JSR _StartScreenRedraw
+    JMP GameLogicEnd
 EndLevelReset:
-    LDA #$00
-    STA move_counter
-    STA move_counter + 1
-    STA move_counter + 2
-    STA move_counter + 3
+    JSR _ResetMoveCounter
     JSR _StartScreenMovement
 
 Movement:
@@ -496,6 +494,8 @@ DrawTransition:
     CPX #$80
     BNE DrawBackgroundPart
 EndLevel:
+    LDX #$24
+    STX ppu_address
     LDX #$01
     STX level_loading
     LDX #$00
@@ -558,6 +558,10 @@ DrawNextLevel:
     STA level_loading
     STA screen_offset
     JSR _LoadPalettes
+    LDA ppu_address
+    CMP #$20
+    BNE DrawNextLevelFinish
+    JSR _StartNextLevel
     JMP DrawNextLevelFinish
 DrawingBackgroundPart:
     JSR _LoadBackgroundHorizontalPart
