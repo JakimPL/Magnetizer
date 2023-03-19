@@ -517,10 +517,10 @@ DrawBackgroundPart:
     LDA screen_offset
     AND #%00000001
     BEQ DrawAttributesPart
-    JSR _LoadBackgroundPart
+    JSR _LoadBackgroundVerticalPart
     JMP ScreenIncrement
 DrawAttributesPart:
-    JSR _LoadAttributePart
+    JSR _LoadAttributeVerticalPart
 ScreenIncrement:
     INC screen_offset
     INC screen_x
@@ -549,6 +549,18 @@ Scroll:
     RTS
 
 DrawNextLevel:
+    JSR _SetNextLevelPointer
+    INC screen_offset
+    LDA screen_offset
+    CMP #$3C
+    BNE DrawingBackgroundPart
     LDA #$00
     STA level_loading
+    STA screen_offset
+    JSR _LoadPalettes
+    JMP DrawNextLevelFinish
+DrawingBackgroundPart:
+    JSR _LoadBackgroundHorizontalPart
+DrawNextLevelFinish:
+    JSR _ResetPPU
     RTS

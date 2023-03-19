@@ -634,7 +634,56 @@ _LoadTile:
     LDY temp_y
     RTS
 
-_LoadBackgroundPart:
+_LoadBackgroundHorizontalPart:
+    LDA #NMI_HORIZONTAL
+    STA PPUCTRL
+
+    LDA screen_offset
+    AND #%11111100
+    ASL a
+    ASL a
+    STA pointer_lo
+
+    LDA screen_offset
+    AND #%00000001
+    ASL a
+    ASL a
+    ASL a
+    CLC
+    ADC pointer_lo
+    STA pointer_lo
+
+    LDA screen_offset
+    JSR _Divide
+    CLC
+    ADC #$24
+    STA ppu_shift
+    LDA screen_offset
+    AND #%00001111
+    ASL a
+    ASL a
+    ASL a
+    ASL a
+    TAX
+    JSR _PreparePPU
+
+    LDA screen_offset
+    AND #%00000010
+    LSR a
+    TAX
+
+    LDY #$00
+_LoadBackgroundHorizontalLoop:
+    JSR _LoadTile
+    JSR _ShiftVertically
+    JSR _DrawTileHorizontalPart
+
+    INY
+    CPY #$08
+    BNE _LoadBackgroundHorizontalLoop
+    RTS
+
+_LoadBackgroundVerticalPart:
     LDA #NMI_VERTICAL
     STA PPUCTRL
 
@@ -680,7 +729,7 @@ _LoadBackgroundPartInsideLoop:
     BNE _LoadBackgroundPartInsideLoop
     RTS
 
-_LoadAttributePart:
+_LoadAttributeVerticalPart:
     LDA #NMI_HORIZONTAL
     STA PPUCTRL
     LDA #$23
