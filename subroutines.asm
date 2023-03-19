@@ -385,7 +385,7 @@ _EnterLevelIncreasePointer:
 _EnterLevelInitialize:
     JSR _ResetMoveCounter
     JSR InitializeSprites
-    JSR RestartLevel
+    JSR EndLevelReset
     RTS
 
 _CalculatePalettePointer:
