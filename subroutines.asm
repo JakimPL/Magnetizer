@@ -385,7 +385,7 @@ _EnterLevelIncreasePointer:
 _EnterLevelInitialize:
     JSR _ResetMoveCounter
     JSR InitializeSprites
-    JSR EndLevelReset
+    JMP EndLevelReset
     RTS
 
 _CalculatePalettePointer:
@@ -406,7 +406,13 @@ _CalculatePalettePointerEnd:
     RTS
 
 _NextLevel:
+    LDA next_level
+    BNE _GoToNextLevel
+    RTS
+_GoToNextLevel:
     JSR _SaveScore
+    LDA #$00
+    STA next_level
     INC level_hi
     INC level_set_counter
     LDX level_set
@@ -758,6 +764,45 @@ _LoadAttributeVerticalPart:
     TAY
     JSR _LoadTileAttribute
     STA PPUDATA
+    RTS
+
+_LoadAttributeHorizontalPart:
+    LDA screen_offset
+    AND #%00000001
+    CLC
+    ADC #$08
+    STA pointer_lo
+
+    LDA screen_offset
+    SEC
+    SBC #$3C
+    AND #%00001110
+    JSR _Multiply
+    ADC pointer_lo
+    STA pointer_lo
+
+    LDA screen_offset
+    SEC
+    SBC #$3C
+    ASL a
+    ASL a
+    ADC #$C0
+    TAX
+
+    LDA ppu_address
+    CLC
+    ADC #$03
+    STA ppu_shift
+    JSR _PreparePPU
+
+    LDY #$00
+_LoadAttributeHorizontalLoop:
+    JSR _LoadTileAttribute
+    STA PPUDATA
+
+    INY
+    CPY #$04
+    BNE _LoadAttributeHorizontalLoop
     RTS
 
 _LoadBackgroundsAndAttributes:
@@ -1205,7 +1250,8 @@ _EndCheck:
     JSR _GetTile
     CMP #END
     BNE _CheckIfNextPositionIsFree
-
+    LDA #$00
+    STA next_level
     JSR _StartScreenMovement
     JMP _CheckIfNextPositionIsFree
 _StartNextLevel:

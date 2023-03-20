@@ -231,8 +231,6 @@ MoveCursorUp:
     BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
-    DEC level_hi
-    DEC level_set_counter
     JSR _ResetPPU
     JSR _EnterLevel
     JMP MenuEnd

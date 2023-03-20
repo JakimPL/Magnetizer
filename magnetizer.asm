@@ -122,6 +122,7 @@ increase_counter       .rs   1
 move_counter           .rs   4
 move_counter_limit     .rs   1
 
+next_level             .rs   1
 level_set              .rs   1
 level_set_counter      .rs   1
 level_lo               .rs   1

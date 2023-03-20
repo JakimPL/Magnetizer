@@ -270,7 +270,7 @@ ReadController:
 CheckButton:
     LDA input
     CMP #$80
-    BEQ EndLevelReset
+    BEQ EndLevel
     CMP #$40
     BEQ RestartLevel
     CMP #$20
@@ -298,10 +298,11 @@ GoToMenu:
     STX PPUMASK    ; disable rendering
     JMP GoToMenuVBlank
 RestartLevel:
-    DEC level_hi
-    DEC level_set_counter
     JSR _StartScreenRedraw
     JMP GameLogicEnd
+EndLevel:
+    LDA #$01
+    STA next_level
 EndLevelReset:
     JSR _ResetMoveCounter
     JSR _StartScreenMovement
@@ -493,7 +494,7 @@ DrawTransition:
     LDX screen_offset
     CPX #$80
     BNE DrawBackgroundPart
-EndLevel:
+TransitionEndLevel:
     LDX #$24
     STX ppu_address
     LDX #$01
@@ -549,11 +550,20 @@ Scroll:
     RTS
 
 DrawNextLevel:
+    LDA ppu_address
+    CMP #$20
+    BNE SetNextLevelPointer
+    JSR _SetLevelPointer
+    JMP DrawNextLevelIncrement
+SetNextLevelPointer:
     JSR _SetNextLevelPointer
+DrawNextLevelIncrement:
     INC screen_offset
     LDA screen_offset
     CMP #$3C
-    BNE DrawingBackgroundPart
+    BCC RedrawBackgroundPart
+    CMP #$4C
+    BCC RedrawAttributePart
     LDA #$00
     STA level_loading
     STA screen_offset
@@ -563,8 +573,11 @@ DrawNextLevel:
     BNE DrawNextLevelFinish
     JSR _StartNextLevel
     JMP DrawNextLevelFinish
-DrawingBackgroundPart:
+RedrawBackgroundPart:
     JSR _LoadBackgroundHorizontalPart
+    JMP DrawNextLevelFinish
+RedrawAttributePart:
+    JSR _LoadAttributeHorizontalPart
 DrawNextLevelFinish:
     JSR _ResetPPU
     RTS
