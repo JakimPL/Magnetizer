@@ -248,7 +248,8 @@ trap_doors_y           .rs  16
 
     .rsset $0500
 counters               .rs 256
-scores                 .rs 256
+scores                 .rs 128
+completed              .rs 128
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

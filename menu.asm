@@ -61,6 +61,8 @@ CheckIfLevelCleared:
 AddClearedLevel:
     INC levels_cleared
     INC total_levels_cleared
+    LDX offset_y
+    STA completed, x
 
 IncrementLevel:
     INC total_levels
@@ -81,7 +83,6 @@ PrecalculateCountersStepEnd
     INX
     CPX #LEVELS
     BNE PrecalculateCountersStep
-
     JSR SaveGlobalStatistics
 
 RestoreVariables:

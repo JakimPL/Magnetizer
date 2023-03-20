@@ -383,9 +383,7 @@ _EnterLevelIncreasePointer:
     INX
     CPX level_set
     BNE _EnterLevelIncreasePointer
-
     JSR _CalculatePalettePointer
-
 _EnterLevelInitialize:
     JSR _ResetMoveCounter
     JSR InitializeSprites
@@ -417,12 +415,12 @@ _GoToNextLevel:
     JSR _SaveScore
     LDA #$00
     STA next_level
-    INC level_hi
-    INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
     BEQ _NextLevelSet
+    INC level_hi
+    INC level_set_counter
     RTS
 
 _SaveScore:
@@ -478,6 +476,8 @@ _NextLevelSet:
     STA level_set_counter
     INC level_set
     JSR _IncrementPalettePointer
+    INC level_hi
+    INC level_set_counter
     RTS
 
 _SetLevelPointer:
@@ -773,8 +773,9 @@ _LoadAttributeVerticalPart:
 _LoadAttributeHorizontalPart:
     LDA screen_offset
     AND #%00000001
-    CLC
-    ADC #$08
+    ASL a
+    ASL a
+    ASL a
     STA pointer_lo
 
     LDA screen_offset
@@ -805,7 +806,8 @@ _LoadAttributeHorizontalLoop:
     STA PPUDATA
 
     INY
-    CPY #$04
+    INY
+    CPY #$08
     BNE _LoadAttributeHorizontalLoop
     RTS
 
@@ -2138,10 +2140,8 @@ _GetRealYPosition:
 
 _CalculateAndSetCursorPosition:
     LDA level_set_counter
-    ASL a
-    ASL a
-    ASL a
+    JSR _Multiply
     CLC
-    ADC #$80
+    ADC #$40
     STA $0230
     RTS
