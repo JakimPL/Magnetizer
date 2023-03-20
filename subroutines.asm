@@ -923,6 +923,7 @@ _InitializeVariables:
     STA portals_b
     STA blockades
     STA blockade_removers
+    STA trap_doors
     JSR _ResetTrapDoor
     JSR _ResetBoxSwap
     RTS
@@ -1284,6 +1285,7 @@ _CheckIfPositionIsFreeEnd:
 
 ;; trap door logic, y - index ;;
 _TrapDoorCheckLoop:
+    LDA #$00
     JSR _TrapDoorCheckIfOnPosition
     CMP #$01
     BNE _TrapDoorCheckLoopEnd
@@ -2140,8 +2142,10 @@ _GetRealYPosition:
 
 _CalculateAndSetCursorPosition:
     LDA level_set_counter
-    JSR _Multiply
+    ASL a
+    ASL a
+    ASL a
     CLC
-    ADC #$40
+    ADC #$80
     STA $0230
     RTS
