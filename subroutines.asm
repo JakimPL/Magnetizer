@@ -369,6 +369,10 @@ _EnterLevel:
     ADC level_set_counter
     STA level_hi
 
+    DEC level_hi
+    LDA #$01
+    STA next_level
+
     LDY level_set
     BEQ _EnterLevelInitialize
     LDX #$00
@@ -1250,7 +1254,7 @@ _EndCheck:
     JSR _GetTile
     CMP #END
     BNE _CheckIfNextPositionIsFree
-    LDA #$00
+    LDA #$01
     STA next_level
     JSR _StartScreenMovement
     JMP _CheckIfNextPositionIsFree
