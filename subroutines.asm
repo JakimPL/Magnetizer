@@ -490,7 +490,7 @@ _NextLevelSet:
     RTS
 
 _CalculateNextLevelPointer:
-    LDA level_hi
+    LDA #HIGH(levels)
     CLC
     ADC level_set_counter
     STA level_hi
@@ -605,6 +605,12 @@ _LoadLevelPostLoop:
     INX
     CPX #$10
     BNE _LoadLevelInsideLoop
+    RTS
+
+_PrepareAndLoadPalettes:
+    JSR _CalculateNextLevelPointer
+    JSR _CalculatePalettePointer
+    JSR _LoadPalettes
     RTS
 
 _LoadPalettes:

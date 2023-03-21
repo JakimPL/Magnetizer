@@ -163,9 +163,7 @@ MenuLogic:
     BEQ CheckIfLevelSelected
 ChangePalettes:
     DEC screen_movement
-    JSR _CalculateNextLevelPointer
-    JSR _CalculatePalettePointer
-    JSR _LoadPalettes
+    JSR _PrepareAndLoadPalettes
     JSR _ResetPPU
     JMP MenuLogicEnd
 CheckIfLevelSelected:
@@ -266,7 +264,7 @@ EnterLevel:
     INC screen_offset
     JSR _HideCursor
     JSR _CalculateNextLevelPointer
-    JSR _CalculatePalettePointer
+    ;JSR _CalculatePalettePointer
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00
@@ -291,7 +289,7 @@ DrawUpcomingLevel:
     LDA #$24
     STA ppu_address
     CMP #$40
-    JSR _SetNextLevelPointer
+    JSR _SetLevelPointer
     INC screen_offset
     LDA screen_offset
     CMP #$3C

@@ -365,6 +365,8 @@ GameLogicEnd:
 GoToMenuVBlank:
     BIT PPUSTATUS
     BPL GoToMenuVBlank
+    LDX #$01
+    STX screen_movement
     JSR _ClearBasicSprites
     JSR _LoadPalettes
     JSR _LoadBackgroundsAndAttributes
