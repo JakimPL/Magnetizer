@@ -159,6 +159,19 @@ CopyClearedLevelsCountDigits:
     RTS
 
 MenuLogic:
+    LDA speed
+    AND #%00000001
+    BNE DrawStatistics
+DrawLevelTexts:
+    JSR _CalculateTextRange
+    JSR _DrawLevelTexts
+    JMP MenuDrawEnd
+DrawStatistics:
+    JSR _DrawScores
+    JSR _DrawLevels
+    JSR _DrawLevelSetText
+MenuDrawEnd:
+    INC speed
     JSR _ResetPPU
 
 ReadMenuController:
@@ -234,7 +247,7 @@ MoveCursorUp:
 EnterLevel:
     JSR _ResetPPU
     JSR _EnterLevel
-    JMP MenuEnd
+    JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00
     STA level_set_counter
@@ -252,9 +265,4 @@ ReleaseController:
     STA button_pressed
 
 MenuLogicEnd:
-    JSR _DrawScores
-    JSR _DrawLevels
-    JSR _DrawLevelSetText
-    JSR _ResetPPU
-MenuEnd:
     RTS

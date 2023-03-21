@@ -64,6 +64,8 @@ magnetizer_metasprite:
     .db $41, $40, $C1, $C0
     .db $00, $01, $80, $81
 
+text_ranges:
+    .db $00, $04, $08, $0A, $0B
 
 text_levels_y_offsets:
     .db $22, $22, $22, $22, $22, $22, $22, $22, $23, $23
@@ -83,3 +85,8 @@ text_levels:
 
 text_total:
     .db $06, $1D, $18, $1D, $0A, $15, $2A
+
+text_fake_1:
+    .db $08, $24, $25, $24, $25, $24, $25, $24, $25
+text_fake_2:
+    .db $08, $26, $27, $26, $27, $26, $27, $26, $27

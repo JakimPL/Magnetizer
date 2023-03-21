@@ -142,14 +142,52 @@ _DrawLevelText:
     LDY temp_y
     RTS
 
-_DrawLevelTexts:
+_DrawAllLevelTexts:
     LDY #$00
+    STY position_x
+    LDY #$0A
+    STY position_y
+    JSR _DrawLevelTexts
+    RTS
+
+_DrawLevelTexts:
+    LDY position_x
+_DrawLevelLineLoop:
+    JSR _DrawLevelLine
+_DrawLevelIncrement:
+    INY
+    CPY position_y
+    BNE _DrawLevelLineLoop
+    RTS
+
 _DrawLevelLine:
     LDA text_levels_y_offsets, y
     STA ppu_shift
     LDX text_levels_x_offsets, y
     JSR _PreparePPU
 
+    TYA
+    LDX level_set
+    CMP level_set_count, x
+    BCC _DrawLevelLineStart
+
+    AND #%00000001
+    BEQ _SetFakeLine1
+_SetFakeLine2:
+    LDA #LOW(text_fake_2)
+    STA text_pointer_lo
+    LDA #HIGH(text_fake_2)
+    STA text_pointer_hi
+    JMP _DrawLevelLineDrawText
+_SetFakeLine1:
+    LDA #LOW(text_fake_1)
+    STA text_pointer_lo
+    LDA #HIGH(text_fake_1)
+    STA text_pointer_hi
+_DrawLevelLineDrawText:
+    JSR _DrawText
+    RTS
+_DrawLevelLineStart:
     LDA #LOW(text_level)
     STA text_pointer_lo
     LDA #HIGH(text_level)
@@ -171,17 +209,8 @@ _SetZero:
     TYA
     CLC
     ADC #$01
-
 _DrawSecondDigit:
     STA PPUDATA
-
-_DrawLevelIncrement:
-    LDX level_set
-    LDA level_set_count, x
-    STA text_length
-    INY
-    CPY text_length
-    BNE _DrawLevelLine
     RTS
 
 _DrawScoreText:
@@ -319,7 +348,7 @@ _LoadCursorLoop:
 
 _DrawMenu:
     JSR _DrawLevelSetText
-    JSR _DrawLevelTexts
+    JSR _DrawAllLevelTexts
     JSR _DrawScoreText
     JSR _DrawScores
     JSR _DrawLevelsText
@@ -2060,6 +2089,18 @@ _ShiftVertically:
     ADC #$02
     STA current_tile
 _AfterShift:
+    RTS
+
+_CalculateTextRange:
+    LDA speed
+    LSR a
+    AND #%00000011
+    TAX
+    LDY text_ranges, x
+    STY position_x
+    INX
+    LDY text_ranges, x
+    STY position_y
     RTS
 
 _CalculateAbsoluteLevel:
