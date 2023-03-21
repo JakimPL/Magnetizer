@@ -38,6 +38,7 @@ TRAP_DOOR             = $10
 TILE_EMPTY            = $24
 TILE_BOX              = $3C
 TILE_TRAP_DOOR_ACTIVE = $64
+SPRITE_STOPPER        = $10
 
 MAX_SPEED             = $30
 ANIMATION_LENGTH      = $30

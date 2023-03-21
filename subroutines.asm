@@ -110,6 +110,7 @@ _SetDigitTargetCounters:
     RTS
 
 _ClearBasicSprites:
+    JSR _HideStopper
     LDY #$00
 _ClearBasicSpritesStep:
     TYA
@@ -371,6 +372,7 @@ _DrawSingleTile
     RTS
 
 _ClearSprites:
+    JSR _HideStopper
     LDY #$00
 _ClearSpritesStep:
     TYA
@@ -386,6 +388,36 @@ _ClearSpritesStep:
     INY
     CPY #$08
     BNE _ClearSpritesStep
+    RTS
+
+_UpdateStopper:
+    LDA screen_x
+    LSR a
+    LSR a
+    LSR a
+    AND #%00000011
+    CLC
+    ADC #SPRITE_STOPPER
+    STA $02F1
+    RTS
+
+_DrawStopper:
+    LDA position_x
+    SEC
+    SBC #$04
+    STA $02F3
+    LDA position_y
+    SEC
+    SBC #$05
+    STA $02F0
+
+    LDA #$03
+    STA $02F2
+    RTS
+
+_HideStopper:
+    LDA #$F8
+    STA $02F0
     RTS
 
 _EnterLevel:
@@ -1315,6 +1347,7 @@ _StopperCheck:
     CMP #STOPPER
     BNE _EndCheck
     JSR _Stop
+    JSR _DrawStopper
 
 _EndCheck:
     JSR _GetTile
@@ -2038,6 +2071,7 @@ _AssignDirectionReturn:
     RTS
 
 _SetDirection:
+    JSR _HideStopper
     LDY #$01
     STY grounded
     STY increase_counter
