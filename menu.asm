@@ -252,8 +252,8 @@ MoveCursorUp:
     JMP SetCursor
 EnterLevel:
     INC screen_offset
-    JSR _CalculateNextLevelPointer
     JSR _HideCursor
+    JSR _CalculateNextLevelPointer
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00

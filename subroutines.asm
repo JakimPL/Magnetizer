@@ -391,23 +391,10 @@ _ClearSpritesStep:
 _EnterLevel:
     LDA #$01
     STA game
+    STA next_level
     JSR InitializeGame
 
     JSR _CalculateNextLevelPointer
-
-    LDA #$01
-    STA next_level
-
-    LDY level_set
-    BEQ _EnterLevelInitialize
-    LDX #$00
-_EnterLevelIncreasePointer:
-    LDA level_set_count, x
-    ADC level_hi
-    STA level_hi
-    INX
-    CPX level_set
-    BNE _EnterLevelIncreasePointer
     JSR _CalculatePalettePointer
 _EnterLevelInitialize:
     JSR _ResetMoveCounter
@@ -507,6 +494,18 @@ _CalculateNextLevelPointer:
     CLC
     ADC level_set_counter
     STA level_hi
+
+    LDX #$00
+    LDY level_set
+    BNE _EnterLevelIncreasePointer
+    RTS
+_EnterLevelIncreasePointer:
+    LDA level_set_count, x
+    ADC level_hi
+    STA level_hi
+    INX
+    CPX level_set
+    BNE _EnterLevelIncreasePointer
     RTS
 
 _SetLevelPointer:
