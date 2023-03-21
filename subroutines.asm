@@ -1291,7 +1291,7 @@ _EndCheck:
     JSR _NextLevel
     JSR _StartScreenMovement
     JMP _CheckIfNextPositionIsFree
-_StartNextLevel:
+_StartLevel:
     JSR _ResetPPU
     JSR InitializeSprites
     JSR _DisableNMI

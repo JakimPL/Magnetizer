@@ -159,6 +159,16 @@ CopyClearedLevelsCountDigits:
     RTS
 
 MenuLogic:
+    LDX screen_movement
+    BEQ CheckIfLevelSelected
+ChangePalettes:
+    DEC screen_movement
+    JSR _CalculateNextLevelPointer
+    JSR _CalculatePalettePointer
+    JSR _LoadPalettes
+    JSR _ResetPPU
+    JMP MenuLogicEnd
+CheckIfLevelSelected:
     LDX screen_offset
     BEQ ContinueMenuLogic
     JSR DrawUpcomingLevel
@@ -210,6 +220,7 @@ CheckInput:
     BEQ EnterLevel
     JMP ReleaseController
 MoveCursorLeft:
+    INC screen_movement
     INC button_pressed
     DEC level_set
     LDA #$00
@@ -222,6 +233,7 @@ SetLevelSetToZero:
     STA level_set
     JMP SetCursor
 MoveCursorRight:
+    INC screen_movement
     INC button_pressed
     INC level_set
     LDA #$00
@@ -254,6 +266,7 @@ EnterLevel:
     INC screen_offset
     JSR _HideCursor
     JSR _CalculateNextLevelPointer
+    JSR _CalculatePalettePointer
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00

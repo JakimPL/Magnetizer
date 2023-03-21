@@ -507,7 +507,7 @@ TransitionEndLevel:
     LDA screen_mode
     AND #%00000001
     STA screen_mode
-    JMP _StartNextLevel
+    JMP _StartLevel
 DrawBackgroundPart:
     JSR _SetLevelPointer
 
@@ -572,7 +572,7 @@ DrawNextLevelIncrement:
     LDA ppu_address
     CMP #$20
     BNE DrawNextLevelFinish
-    JMP _StartNextLevel
+    JMP _StartLevel
 RedrawBackgroundPart:
     JSR _LoadBackgroundHorizontalPart
     JMP DrawNextLevelFinish
