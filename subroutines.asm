@@ -486,7 +486,18 @@ _NextLevelSet:
     LDA #$00
     STA level_set_counter
     INC level_set
+    LDA level_set
+    CMP #LEVEL_SETS
+    BEQ _RollBack
     JSR _IncrementPalettePointer
+    RTS
+_RollBack:
+    LDA #LEVEL_SETS
+    SEC
+    SBC #$01
+    STA level_set
+    JSR _CalculateNextLevelPointer
+    JSR GoToMenu
     RTS
 
 _CalculateNextLevelPointer:

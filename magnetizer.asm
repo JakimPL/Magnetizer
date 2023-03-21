@@ -335,7 +335,6 @@ MainLoopEnd:
 
     .bank 1
     .org $E000
-
     .include "levels.asm"
     .include "constants.asm"
 
