@@ -290,7 +290,7 @@ GoToMenu:
     LDA #$00
     STA game
     JSR InitializeMenu
-    JSR _PreparePPU
+    JSR _ResetPPU
     LDX #$FF
     TXS            ; set up stack
     INX
@@ -303,6 +303,7 @@ RestartLevel:
 EndLevel:
     LDA #$01
     STA next_level
+    JSR _NextLevel
 EndLevelReset:
     JSR _ResetMoveCounter
     JSR _StartScreenMovement
@@ -508,7 +509,7 @@ TransitionEndLevel:
     STA screen_mode
     JMP _StartNextLevel
 DrawBackgroundPart:
-    JSR _SetNextLevelPointer
+    JSR _SetLevelPointer
 
     LDA screen_offset
     LSR a

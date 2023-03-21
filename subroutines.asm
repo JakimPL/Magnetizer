@@ -398,7 +398,6 @@ _EnterLevel:
     ADC level_set_counter
     STA level_hi
 
-    DEC level_hi
     LDA #$01
     STA next_level
 
@@ -441,15 +440,14 @@ _NextLevel:
     BNE _GoToNextLevel
     RTS
 _GoToNextLevel:
-    JSR _SaveScore
     LDA #$00
     STA next_level
+    INC level_hi
+    INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
     BEQ _NextLevelSet
-    INC level_hi
-    INC level_set_counter
     RTS
 
 _SaveScore:
@@ -505,8 +503,6 @@ _NextLevelSet:
     STA level_set_counter
     INC level_set
     JSR _IncrementPalettePointer
-    INC level_hi
-    INC level_set_counter
     RTS
 
 _SetLevelPointer:
@@ -1288,6 +1284,8 @@ _EndCheck:
     BNE _CheckIfNextPositionIsFree
     LDA #$01
     STA next_level
+    JSR _SaveScore
+    JSR _NextLevel
     JSR _StartScreenMovement
     JMP _CheckIfNextPositionIsFree
 _StartNextLevel:
@@ -1295,7 +1293,6 @@ _StartNextLevel:
     JSR InitializeSprites
     JSR _DisableNMI
     JSR _Stop
-    JSR _NextLevel
     JSR _ResetMoveCounter
     JSR _LoadLevel
     JSR _EnableNMI
