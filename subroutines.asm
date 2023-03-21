@@ -393,10 +393,7 @@ _EnterLevel:
     STA game
     JSR InitializeGame
 
-    LDA level_hi
-    CLC
-    ADC level_set_counter
-    STA level_hi
+    JSR _CalculateNextLevelPointer
 
     LDA #$01
     STA next_level
@@ -503,6 +500,13 @@ _NextLevelSet:
     STA level_set_counter
     INC level_set
     JSR _IncrementPalettePointer
+    RTS
+
+_CalculateNextLevelPointer:
+    LDA level_hi
+    CLC
+    ADC level_set_counter
+    STA level_hi
     RTS
 
 _SetLevelPointer:
@@ -2188,5 +2192,10 @@ _CalculateAndSetCursorPosition:
     ASL a
     CLC
     ADC #$80
+    STA $0230
+    RTS
+
+_HideCursor:
+    LDA #$F0
     STA $0230
     RTS

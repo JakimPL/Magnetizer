@@ -159,6 +159,12 @@ CopyClearedLevelsCountDigits:
     RTS
 
 MenuLogic:
+    LDX screen_offset
+    BEQ ContinueMenuLogic
+    JSR DrawUpcomingLevel
+    JSR _ResetPPU
+    JMP MenuLogicEnd
+ContinueMenuLogic:
     LDA speed
     AND #%00000001
     BNE DrawStatistics
@@ -245,8 +251,9 @@ MoveCursorUp:
     BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
-    JSR _ResetPPU
-    JSR _EnterLevel
+    INC screen_offset
+    JSR _CalculateNextLevelPointer
+    JSR _HideCursor
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00
@@ -265,4 +272,34 @@ ReleaseController:
     STA button_pressed
 
 MenuLogicEnd:
+    RTS
+
+DrawUpcomingLevel:
+    LDA #$24
+    STA ppu_address
+    CMP #$40
+    JSR _SetNextLevelPointer
+    INC screen_offset
+    LDA screen_offset
+    CMP #$3C
+    BCC MenuRedrawBackgroundPart
+    CMP #$4C
+    BCC MenuRedrawAttributePart
+    LDA #$00
+    STA level_loading
+    STA screen_offset
+    JSR _LoadPalettes
+    LDA #$01
+    STA game
+    JSR _DisableNMI
+    JSR InitializeGame
+    JSR _EnterLevel
+    JSR _EnableNMI
+    RTS
+MenuRedrawBackgroundPart:
+    JSR _LoadBackgroundHorizontalPart
+    JMP DrawUpcomingLevelFinish
+MenuRedrawAttributePart:
+    JSR _LoadAttributeHorizontalPart
+DrawUpcomingLevelFinish:
     RTS
