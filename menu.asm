@@ -288,29 +288,25 @@ MenuLogicEnd:
 DrawUpcomingLevel:
     LDA #$24
     STA ppu_address
-    CMP #$40
     JSR _SetLevelPointer
-    INC screen_offset
-    LDA screen_offset
-    CMP #$3C
-    BCC MenuRedrawBackgroundPart
-    CMP #$4C
-    BCC MenuRedrawAttributePart
+    JSR _RedrawLevelStep
+    BNE DrawUpcomingLevelEnd
+    RTS
+DrawUpcomingLevelEnd:
     LDA #$00
     STA level_loading
     STA screen_offset
-    JSR _LoadPalettes
     LDA #$01
     STA game
     JSR _DisableNMI
     JSR InitializeGame
     JSR _EnterLevel
     JSR _EnableNMI
-    RTS
+DrawUpcomingLevelLoop:
+    JMP DrawUpcomingLevelLoop
 MenuRedrawBackgroundPart:
     JSR _LoadBackgroundHorizontalPart
-    JMP DrawUpcomingLevelFinish
+    RTS
 MenuRedrawAttributePart:
     JSR _LoadAttributeHorizontalPart
-DrawUpcomingLevelFinish:
     RTS

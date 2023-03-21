@@ -947,6 +947,24 @@ _LoadTileAttribute:
     LDY temp_y
     RTS
 
+_RedrawLevelStep:
+    INC screen_offset
+    LDA screen_offset
+    CMP #$3C
+    BCC _RedrawBackgroundPart
+    CMP #$4C
+    BCC _RedrawAttributePart
+    LDA #$01
+    RTS
+_RedrawBackgroundPart:
+    JSR _LoadBackgroundHorizontalPart
+    LDA #$00
+    RTS
+_RedrawAttributePart:
+    JSR _LoadAttributeHorizontalPart
+    LDA #$00
+    RTS
+
 ;; level loading ;;
 _InitializeVariables:
     LDA #$01
