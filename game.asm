@@ -571,8 +571,7 @@ DrawNextLevelIncrement:
     LDA ppu_address
     CMP #$20
     BNE DrawNextLevelFinish
-    JSR _StartNextLevel
-    JMP DrawNextLevelFinish
+    JMP _StartNextLevel
 RedrawBackgroundPart:
     JSR _LoadBackgroundHorizontalPart
     JMP DrawNextLevelFinish
