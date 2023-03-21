@@ -561,12 +561,10 @@ DrawNextLevel:
 SetNextLevelPointer:
     JSR _SetNextLevelPointer
 DrawNextLevelIncrement:
-    INC screen_offset
-    LDA screen_offset
-    CMP #$3C
-    BCC RedrawBackgroundPart
-    CMP #$4C
-    BCC RedrawAttributePart
+    JSR _RedrawLevelStep
+    BNE DrawNextLevelEnd
+    JMP DrawNextLevelFinish
+DrawNextLevelEnd:
     LDA #$00
     STA level_loading
     STA screen_offset
@@ -575,11 +573,6 @@ DrawNextLevelIncrement:
     CMP #$20
     BNE DrawNextLevelFinish
     JMP _StartLevel
-RedrawBackgroundPart:
-    JSR _LoadBackgroundHorizontalPart
-    JMP DrawNextLevelFinish
-RedrawAttributePart:
-    JSR _LoadAttributeHorizontalPart
 DrawNextLevelFinish:
     JSR _ResetPPU
     RTS

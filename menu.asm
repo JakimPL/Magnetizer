@@ -304,9 +304,3 @@ DrawUpcomingLevelEnd:
     JSR _EnableNMI
 DrawUpcomingLevelLoop:
     JMP DrawUpcomingLevelLoop
-MenuRedrawBackgroundPart:
-    JSR _LoadBackgroundHorizontalPart
-    RTS
-MenuRedrawAttributePart:
-    JSR _LoadAttributeHorizontalPart
-    RTS
