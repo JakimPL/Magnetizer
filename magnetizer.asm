@@ -9,6 +9,19 @@ PPUSCROLL             = $2005
 PPUADDR               = $2006
 PPUDATA               = $2007
 
+PULSE1_TIMER          = $4000
+PULSE1_COUNTER        = $4001
+PULSE1_ENVELOPE       = $4002
+PULSE1_SWEEP          = $4003
+PULSE2_TIMER          = $4004
+PULSE2_COUNTER        = $4005
+PULSE2_ENVELOPE       = $4006
+PULSE2_SWEEP          = $4007
+TRIANGLE_TIMER        = $4008
+TRIANGLE_COUNTER      = $4009
+TRIANGLE_ENVELOPE     = $400A
+TRIANGLE_SWEEP        = $400B
+
 DMC_FREQ              = $4010
 DMC_RAW               = $4011
 DMC_START             = $4012
@@ -288,6 +301,9 @@ ClearGraphics:
     INX
     BNE ClearMemory
 
+    ;JSR EnableSound
+    ;JSR PlaySound
+
     JSR InitializeMenu
     JSR _LoadPalettes
     JSR _LoadBackgroundsAndAttributes
@@ -334,10 +350,14 @@ MainLoopEnd:
     .include "game.asm"
     .include "subroutines.asm"
     .include "hex2dec.asm"
+    .include "music.asm"
 
     .bank 1
     .org $E000
     .include "levels.asm"
+
+    .bank 1
+    .org $FE00
     .include "constants.asm"
 
 ;;;;;;;;;;;;;;
