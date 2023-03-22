@@ -497,12 +497,12 @@ _NextLevel:
 _GoToNextLevel:
     LDA #$00
     STA next_level
-    INC level_hi
     INC level_set_counter
     LDX level_set
     LDA level_set_count, x
     CMP level_set_counter
     BEQ _NextLevelSet
+    JSR _CalculateNextLevelPointer
     RTS
 
 _SaveScore:
@@ -561,6 +561,7 @@ _NextLevelSet:
     CMP #LEVEL_SETS
     BEQ _RollBack
     JSR _IncrementPalettePointer
+    JSR _CalculateNextLevelPointer
     RTS
 _RollBack:
     LDA #LEVEL_SETS
@@ -577,6 +578,15 @@ _CalculateNextLevelPointer:
     ADC level_set_counter
     STA level_hi
 
+    LDY level_set
+    CPY #LEVEL_SET_SWITCH
+    BCC _EnterLeveLIncreasePointers
+
+    CLC
+    ADC #LEVEL_POINTER_OFFSET
+    STA level_hi
+
+_EnterLeveLIncreasePointers:
     LDX #$00
     LDY level_set
     BNE _EnterLevelIncreasePointer
@@ -599,9 +609,20 @@ _SetLevelPointer:
     RTS
 
 _SetNextLevelPointer:
+    LDA level_hi
+    STA total_levels
     INC level_hi
+    LDA level_hi
+    CMP #SWITCH_POINTER_VALUE
+    BNE _SetNextLevelPointerOffset
+    CLC
+    ADC #LEVEL_POINTER_OFFSET
+    STA level_hi
+_SetNextLevelPointerOffset:
     JSR _SetLevelPointer
-    DEC level_hi
+_RestoreLevelPointer:
+    LDA total_levels
+    STA level_hi
     RTS
 
 _LoadLevel:
