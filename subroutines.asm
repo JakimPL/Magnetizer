@@ -111,6 +111,7 @@ _SetDigitTargetCounters:
 
 _ClearBasicSprites:
     JSR _HideStopper
+    JSR _HideElectric
     LDY #$00
 _ClearBasicSpritesStep:
     TYA
@@ -373,6 +374,7 @@ _DrawSingleTile
 
 _ClearSprites:
     JSR _HideStopper
+    JSR _HideElectric
     LDY #$00
 _ClearSpritesStep:
     TYA
@@ -401,6 +403,20 @@ _UpdateStopper:
     STA $02F1
     RTS
 
+_UpdateElectric:
+    LDA screen_x
+    LSR a
+    LSR a
+    AND #%00000011
+    LDX direction
+    CLC
+    ADC electric_sprite - 1, x
+    STA $02E1
+
+    LDA #$02
+    STA $02E2
+    RTS
+
 _DrawStopper:
     LDA position_x
     SEC
@@ -418,6 +434,29 @@ _DrawStopper:
 _HideStopper:
     LDA #$F8
     STA $02F0
+    RTS
+
+_DrawElectric:
+    STX temp_x
+    LDX direction
+    DEX
+
+    LDA position_x
+    CLC
+    ADC electric_offset_x, x
+    STA $02E3
+
+    LDA position_y
+    CLC
+    ADC electric_offset_y, x
+    STA $02E0
+
+    LDX temp_x
+    RTS
+
+_HideElectric:
+    LDA #$F8
+    STA $02E0
     RTS
 
 _EnterLevel:
@@ -1228,6 +1267,7 @@ _IncreaseSpeedStep:
     RTS
 
 _Stop:
+    JSR _HideElectric
     LDA #$00
     STA grounded
     STA increase_counter

@@ -171,6 +171,9 @@ ReverseAnimationDirection:
     JSR _ReverseAnimationDirection
 
 DrawAnimation:
+    JSR _UpdateElectric
+    JSR _UpdateStopper
+
     LDA ending_point_real_x
     STA $0223
     STA $022B
@@ -309,9 +312,11 @@ EndLevelReset:
     JSR _StartScreenMovement
 
 Movement:
+    JSR _HideElectric
     LDA grounded
     CMP #$01
     BNE Move
+    JSR _DrawElectric
 CalculateSpeed:
     JSR _CalculateRealSpeed
     JSR _IncreaseSpeed
@@ -360,6 +365,7 @@ IncrementCounterCheck:
     STA increase_counter
 
 GameLogicEnd:
+    INC screen_x
     RTS
 
 GoToMenuVBlank:

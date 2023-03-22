@@ -64,6 +64,16 @@ magnetizer_metasprite:
     .db $41, $40, $C1, $C0
     .db $00, $01, $80, $81
 
+electric_sprite:
+    .db $14, $14, $0C, $0C
+
+electric_offset_x:
+    .db $FC, $FC, $F8, $01
+
+electric_offset_y:
+    .db $F8, $01, $FC, $FC
+
+
 text_ranges:
     .db $00, $04, $08, $0A, $0B
 
