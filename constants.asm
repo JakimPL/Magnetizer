@@ -1,3 +1,6 @@
+    .bank 3
+    .org $FE00
+
 palettes:
 palette_01:
     .db $19,$02,$17,$1D,  $22,$2C,$17,$0F,  $22,$26,$3C,$38,  $22,$02,$27,$1D ; background
