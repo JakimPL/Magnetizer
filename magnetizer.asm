@@ -211,6 +211,7 @@ ending_point_real_y    .rs   1
 
 animation_cycle        .rs   1
 animation_direction    .rs   1
+blockade_flicker       .rs   1
 
 box_animation          .rs   1
 box_animation_x        .rs   1
@@ -237,6 +238,8 @@ target_box_offset      .rs   1
 
 portals_a              .rs   1
 portals_b              .rs   1
+
+blockade               .rs   1
 
 trap_doors             .rs   1
 trap_door              .rs   1

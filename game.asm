@@ -220,36 +220,10 @@ DrawBlockade:
     JSR _Multiply
     TAX
 
-    LDA blockades_x, y
-    JSR _Multiply
-    STA SPR_ADDRESS_BLOCKADE + $03, x
-    STA SPR_ADDRESS_BLOCKADE + $0B, x
-    CLC
-    ADC #$08
-    STA SPR_ADDRESS_BLOCKADE + $07, x
-    STA SPR_ADDRESS_BLOCKADE + $0F, x
-
-    LDA blockades_on, y
-    CMP #$00
-    BNE DrawBlockadeLoadYPosition
-    LDA #$F0
-    JMP DrawBlockadeSetYPosition
-
-DrawBlockadeLoadYPosition:
-    LDA blockades_y, y
-    JSR _Multiply
-    SEC
-    SBC #$01
-
-DrawBlockadeSetYPosition:
-    STA SPR_ADDRESS_BLOCKADE + $00, x
-    STA SPR_ADDRESS_BLOCKADE + $04, x
-    CLC
-    ADC #$08
-    STA SPR_ADDRESS_BLOCKADE + $08, x
-    STA SPR_ADDRESS_BLOCKADE + $0C, x
+    JSR _DrawBlockade
 
 DrawBlockadeIncrement:
+
     INY
     CPY blockades
     BNE DrawBlockade

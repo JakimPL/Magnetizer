@@ -119,6 +119,7 @@ _ClearBasicSprites:
     JSR _HideStopper
     JSR _HideElectric
     LDY #$00
+    STY blockade_flicker
 _ClearBasicSpritesStep:
     TYA
     ASL a
@@ -127,7 +128,7 @@ _ClearBasicSpritesStep:
     LDA #$F0
     STA $0200, x
     INY
-    CPY #$20
+    CPY #$40
     BNE _ClearBasicSpritesStep
     RTS
 
@@ -383,6 +384,7 @@ _ClearSprites:
     JSR _HideStopper
     JSR _HideElectric
     LDY #$00
+    STY blockade_flicker
 _ClearSpritesStep:
     TYA
     JSR _Multiply
@@ -1087,6 +1089,7 @@ _InitializeVariables:
     STA blockade_removers
     STA trap_doors
     JSR _ResetTrapDoor
+    JSR _ResetBlockade
     JSR _ResetBoxSwap
     RTS
 
@@ -1528,6 +1531,7 @@ _DrawTrapDoor:
     LDA trap_door_y
     JSR _ShiftPPU
     JSR _DrawSingleTile
+    RTS
 
 ;; blockade logic, y - index ;;
 _BlockadeCheckLoop:
@@ -1896,9 +1900,47 @@ _PrepareTileAttributeStep:
     STA target_temp
     RTS
 
+_DrawBlockade:
+    RTS
+    ;;; unused ;;
+    LDA blockades_x, y
+    JSR _Multiply
+    STA SPR_ADDRESS_BLOCKADE + $03, x
+    STA SPR_ADDRESS_BLOCKADE + $0B, x
+    CLC
+    ADC #$08
+    STA SPR_ADDRESS_BLOCKADE + $07, x
+    STA SPR_ADDRESS_BLOCKADE + $0F, x
+
+    LDA blockades_on, y
+    CMP #$00
+    BNE DrawBlockadeLoadYPosition
+    LDA #$F0
+    JMP DrawBlockadeSetYPosition
+
+DrawBlockadeLoadYPosition:
+    LDA blockades_y, y
+    JSR _Multiply
+    SEC
+    SBC #$01
+
+DrawBlockadeSetYPosition:
+    STA SPR_ADDRESS_BLOCKADE + $00, x
+    STA SPR_ADDRESS_BLOCKADE + $04, x
+    CLC
+    ADC #$08
+    STA SPR_ADDRESS_BLOCKADE + $08, x
+    STA SPR_ADDRESS_BLOCKADE + $0C, x
+    RTS
+
 _ResetTrapDoor:
     LDA #$FF
     STA trap_door
+    RTS
+
+_ResetBlockade:
+    LDA #$FF
+    STA blockade
     RTS
 
 _ResetBoxSwap:
