@@ -95,8 +95,8 @@ TOTAL_DIGITS          = $02
 TEXT_LSET_Y_OFFSET    = $21
 TEXT_LSET_X_OFFSET    = $A2
 
-LEVEL_SETS            = $05
-LEVELS                = $29
+LEVEL_SETS            = $06
+LEVELS                = $30
 LEVEL_SET_SWITCH      = $03
 LEVEL_POINTER_OFFSET  = $02
 SWITCH_POINTER_VALUE  = $BE
@@ -249,11 +249,11 @@ screen_x               .rs   1
     .rsset $0300
 box_x                  .rs  64
 box_y                  .rs  64
-blockades_on           .rs  12
-blockades_x            .rs  12
-blockades_y            .rs  12
-blockade_removers_x    .rs  12
-blockade_removers_y    .rs  12
+blockades_on           .rs  16
+blockades_x            .rs  16
+blockades_y            .rs  16
+blockade_removers_x    .rs  16
+blockade_removers_y    .rs  16
 portals_a_x            .rs  40
 portals_a_y            .rs  40
 portals_b_x            .rs  40
