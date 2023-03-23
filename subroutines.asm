@@ -432,7 +432,7 @@ _DrawStopper:
     LDA position_y
     SEC
     SBC #$05
-    STA SPR_ADDRESS_STOPPER
+    STA SPR_ADDRESS_STOPPER + $00
 
     LDA #$03
     STA SPR_ADDRESS_STOPPER + $02
@@ -440,7 +440,7 @@ _DrawStopper:
 
 _HideStopper:
     LDA #$F8
-    STA SPR_ADDRESS_STOPPER
+    STA SPR_ADDRESS_STOPPER + $00
     RTS
 
 _DrawElectric:
@@ -456,14 +456,14 @@ _DrawElectric:
     LDA position_y
     CLC
     ADC electric_offset_y, x
-    STA SPR_ADDRESS_ELECTRIC
+    STA SPR_ADDRESS_ELECTRIC + $00
 
     LDX temp_x
     RTS
 
 _HideElectric:
     LDA #$F8
-    STA SPR_ADDRESS_ELECTRIC
+    STA SPR_ADDRESS_ELECTRIC + $00
     RTS
 
 _EnterLevel:

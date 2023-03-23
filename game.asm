@@ -175,34 +175,34 @@ DrawAnimation:
     JSR _UpdateStopper
 
     LDA ending_point_real_x
-    STA $0223
-    STA $022B
+    STA SPR_ADDRESS_END + $03
+    STA SPR_ADDRESS_END + $0B
     CLC
     ADC #$08
-    STA $0227
-    STA $022F
+    STA SPR_ADDRESS_END + $07
+    STA SPR_ADDRESS_END + $0F
 
     LDA ending_point_real_y
     SBC #$00
-    STA $0220
-    STA $0224
+    STA SPR_ADDRESS_END + $00
+    STA SPR_ADDRESS_END + $04
     CLC
     ADC #$08
-    STA $0228
-    STA $022C
+    STA SPR_ADDRESS_END + $08
+    STA SPR_ADDRESS_END + $0C
 
     LDA animation_cycle
     CLC
     JSR _Divide
     ADC #$03
-    STA $0211
-    STA $0215
-    STA $0219
-    STA $021D
-    STA $0221
-    STA $0225
-    STA $0229
-    STA $022D
+    STA SPR_ADDRESS_START + $01
+    STA SPR_ADDRESS_START + $05
+    STA SPR_ADDRESS_START + $09
+    STA SPR_ADDRESS_START + $0D
+    STA SPR_ADDRESS_END + $01
+    STA SPR_ADDRESS_END + $05
+    STA SPR_ADDRESS_END + $09
+    STA SPR_ADDRESS_END + $0D
 
 DrawBlockades:
     LDA draw_blockades
@@ -222,12 +222,12 @@ DrawBlockade:
 
     LDA blockades_x, y
     JSR _Multiply
-    STA $0243, x
-    STA $024B, x
+    STA SPR_ADDRESS_BLOCKADE + $03, x
+    STA SPR_ADDRESS_BLOCKADE + $0B, x
     CLC
     ADC #$08
-    STA $0247, x
-    STA $024F, x
+    STA SPR_ADDRESS_BLOCKADE + $07, x
+    STA SPR_ADDRESS_BLOCKADE + $0F, x
 
     LDA blockades_on, y
     CMP #$00
@@ -242,12 +242,12 @@ DrawBlockadeLoadYPosition:
     SBC #$01
 
 DrawBlockadeSetYPosition:
-    STA $0240, x
-    STA $0244, x
+    STA SPR_ADDRESS_BLOCKADE + $00, x
+    STA SPR_ADDRESS_BLOCKADE + $04, x
     CLC
     ADC #$08
-    STA $0248, x
-    STA $024C, x
+    STA SPR_ADDRESS_BLOCKADE + $08, x
+    STA SPR_ADDRESS_BLOCKADE + $0C, x
 
 DrawBlockadeIncrement:
     INY
@@ -395,23 +395,23 @@ InitializePosition:
     LDA starting_position_x
     SEC
     SBC #$00
-    STA $0213
-    STA $021B
+    STA SPR_ADDRESS_START + $03
+    STA SPR_ADDRESS_START + $0B
     CLC
     ADC #$08
-    STA $0217
-    STA $021F
+    STA SPR_ADDRESS_START + $07
+    STA SPR_ADDRESS_START + $0F
     STA position_x
 
     LDA starting_position_y
     SEC
     SBC #$01
-    STA $0210
-    STA $0214
+    STA SPR_ADDRESS_START + $00
+    STA SPR_ADDRESS_START + $04
     CLC
     ADC #$08
-    STA $0218
-    STA $021C
+    STA SPR_ADDRESS_START + $08
+    STA SPR_ADDRESS_START + $0C
     STA position_y
 
 InitializeAnimation:
@@ -452,25 +452,25 @@ LoadSpritesLoop:
 
 LoadBoxSprites:
     LDA #$08
-    STA $0231
-    STA $0235
-    STA $0239
-    STA $023D
+    STA SPR_ADDRESS_BOX + $01
+    STA SPR_ADDRESS_BOX + $05
+    STA SPR_ADDRESS_BOX + $09
+    STA SPR_ADDRESS_BOX + $0D
 
     LDA #$17
-    STA $0232
+    STA SPR_ADDRESS_BOX + $02
     LDA #$57
-    STA $0236
+    STA SPR_ADDRESS_BOX + $06
     LDA #$97
-    STA $023A
+    STA SPR_ADDRESS_BOX + $0A
     LDA #$D7
-    STA $023E
+    STA SPR_ADDRESS_BOX + $0E
 
     LDA #$F0
-    STA $0230
-    STA $0234
-    STA $0238
-    STA $023C
+    STA SPR_ADDRESS_BOX + $00
+    STA SPR_ADDRESS_BOX + $04
+    STA SPR_ADDRESS_BOX + $08
+    STA SPR_ADDRESS_BOX + $0C
 
 LoadBlockadeSprites:
     LDY #$00
@@ -480,19 +480,19 @@ LoadBlockadeSpritesStep:
     TAX
 
     LDA #$09
-    STA $0241, x
-    STA $0245, x
-    STA $0249, x
-    STA $024D, x
+    STA SPR_ADDRESS_BLOCKADE + $01, x
+    STA SPR_ADDRESS_BLOCKADE + $05, x
+    STA SPR_ADDRESS_BLOCKADE + $09, x
+    STA SPR_ADDRESS_BLOCKADE + $0D, x
 
     LDA #$14
-    STA $0242, x
+    STA SPR_ADDRESS_BLOCKADE + $02, x
     LDA #$54
-    STA $0246, x
+    STA SPR_ADDRESS_BLOCKADE + $06, x
     LDA #$94
-    STA $024A, x
+    STA SPR_ADDRESS_BLOCKADE + $0A, x
     LDA #$D4
-    STA $024E, x
+    STA SPR_ADDRESS_BLOCKADE + $0E, x
 
     INY
     CPY #$08
