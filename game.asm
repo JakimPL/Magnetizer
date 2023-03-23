@@ -246,13 +246,14 @@ JumpToMovement:
 GoToMenu:
     LDA #$00
     STA game
-    JSR InitializeMenu
+    LDA #$01
+    STA screen_movement
+    JSR _ClearBasicSprites
     JSR _ResetPPU
-    LDX #$FF
-    TXS            ; set up stack
-    INX
-    STX PPUCTRL    ; disable NMI
-    STX PPUMASK    ; disable rendering
+    LDX #$00
+    STX PPUMASK
+    JSR _DisableNMI
+    JSR InitializeMenu
     JMP GoToMenuVBlank
 RestartLevel:
     JSR _StartScreenRedraw
@@ -325,12 +326,11 @@ GameLogicEnd:
 GoToMenuVBlank:
     BIT PPUSTATUS
     BPL GoToMenuVBlank
-    LDX #$01
-    STX screen_movement
-    JSR _ClearBasicSprites
-    JSR _LoadPalettes
-    JSR _LoadBackgroundsAndAttributes
+    LDA #$20
+    STA ppu_shift
+    JSR _LoadBackgroundAndAttribute
     JSR _DrawMenu
+    JSR _ResetPPU
     JSR _EnableNMI
 
 GoToMenuVBlankLoop:

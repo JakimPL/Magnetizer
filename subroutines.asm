@@ -128,7 +128,7 @@ _ClearBasicSpritesStep:
     LDA #$F0
     STA $0200, x
     INY
-    CPY #$40
+    CPY #$10
     BNE _ClearBasicSpritesStep
     RTS
 
