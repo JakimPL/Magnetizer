@@ -407,7 +407,7 @@ _UpdateStopper:
     AND #%00000011
     CLC
     ADC #SPRITE_STOPPER
-    STA $02F1
+    STA SPR_ADDRESS_STOPPER + 1
     RTS
 
 _UpdateElectric:
@@ -418,29 +418,29 @@ _UpdateElectric:
     LDX direction
     CLC
     ADC electric_sprite - 1, x
-    STA $02E1
+    STA SPR_ADDRESS_ELECTRIC + 1
 
     LDA #$02
-    STA $02E2
+    STA SPR_ADDRESS_ELECTRIC + 2
     RTS
 
 _DrawStopper:
     LDA position_x
     SEC
     SBC #$04
-    STA $02F3
+    STA SPR_ADDRESS_STOPPER + 3
     LDA position_y
     SEC
     SBC #$05
-    STA $02F0
+    STA SPR_ADDRESS_STOPPER
 
     LDA #$03
-    STA $02F2
+    STA SPR_ADDRESS_STOPPER + 2
     RTS
 
 _HideStopper:
     LDA #$F8
-    STA $02F0
+    STA SPR_ADDRESS_STOPPER
     RTS
 
 _DrawElectric:
@@ -451,19 +451,19 @@ _DrawElectric:
     LDA position_x
     CLC
     ADC electric_offset_x, x
-    STA $02E3
+    STA SPR_ADDRESS_ELECTRIC + 3
 
     LDA position_y
     CLC
     ADC electric_offset_y, x
-    STA $02E0
+    STA SPR_ADDRESS_ELECTRIC
 
     LDX temp_x
     RTS
 
 _HideElectric:
     LDA #$F8
-    STA $02E0
+    STA SPR_ADDRESS_ELECTRIC
     RTS
 
 _EnterLevel:

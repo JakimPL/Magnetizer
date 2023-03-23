@@ -106,6 +106,9 @@ GLOBAL_STATISTICS_OFF = 2 * (LEVELS_DIGITS + 1) * LEVEL_SETS
 NMI_HORIZONTAL        = %10010000
 NMI_VERTICAL          = %10010100
 
+SPR_ADDRESS_STOPPER   = $02F8
+SPR_ADDRESS_ELECTRIC  = $02FC
+
     .inesprg 2   ; 1x 16KB PRG code
     .ineschr 1   ; 1x  8KB CHR data
     .inesmap 3   ; mapper 0 = NROM, no bank swapping
