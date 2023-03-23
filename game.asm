@@ -405,7 +405,7 @@ InitializePosition:
 
     LDA starting_position_y
     SEC
-    SBC #$00
+    SBC #$01
     STA $0210
     STA $0214
     CLC

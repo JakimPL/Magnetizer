@@ -349,7 +349,7 @@ _LoadCursor:
     LDX #$00
 _LoadCursorLoop:
     LDA cursor, x
-    STA $0230, x
+    STA SPR_ADDRESS_CURSOR, x
     INX
     CPX #$10
     BNE _LoadCursorLoop
@@ -395,7 +395,7 @@ _ClearSpritesStep:
     STA $024C, x
 
     INY
-    CPY #$08
+    CPY #$0A
     BNE _ClearSpritesStep
     RTS
 
@@ -407,7 +407,7 @@ _UpdateStopper:
     AND #%00000011
     CLC
     ADC #SPRITE_STOPPER
-    STA SPR_ADDRESS_STOPPER + 1
+    STA SPR_ADDRESS_STOPPER + $01
     RTS
 
 _UpdateElectric:
@@ -418,24 +418,24 @@ _UpdateElectric:
     LDX direction
     CLC
     ADC electric_sprite - 1, x
-    STA SPR_ADDRESS_ELECTRIC + 1
+    STA SPR_ADDRESS_ELECTRIC + $01
 
     LDA #$02
-    STA SPR_ADDRESS_ELECTRIC + 2
+    STA SPR_ADDRESS_ELECTRIC + $02
     RTS
 
 _DrawStopper:
     LDA position_x
     SEC
     SBC #$04
-    STA SPR_ADDRESS_STOPPER + 3
+    STA SPR_ADDRESS_STOPPER + $03
     LDA position_y
     SEC
     SBC #$05
     STA SPR_ADDRESS_STOPPER
 
     LDA #$03
-    STA SPR_ADDRESS_STOPPER + 2
+    STA SPR_ADDRESS_STOPPER + $02
     RTS
 
 _HideStopper:
@@ -451,7 +451,7 @@ _DrawElectric:
     LDA position_x
     CLC
     ADC electric_offset_x, x
-    STA SPR_ADDRESS_ELECTRIC + 3
+    STA SPR_ADDRESS_ELECTRIC + $03
 
     LDA position_y
     CLC
@@ -1859,29 +1859,29 @@ _BoxAnimationMoveRight:
 
 _DrawBox:
     LDA box_animation_x
-    STA $0233
-    STA $023B
+    STA SPR_ADDRESS_BOX + $03
+    STA SPR_ADDRESS_BOX + $0B
     CLC
     ADC #$08
-    STA $0237
-    STA $023F
+    STA SPR_ADDRESS_BOX + $07
+    STA SPR_ADDRESS_BOX + $0F
 
     LDA box_animation_y
     SBC #$00
-    STA $0230
-    STA $0234
+    STA SPR_ADDRESS_BOX + $00
+    STA SPR_ADDRESS_BOX + $04
     CLC
     ADC #$08
-    STA $0238
-    STA $023C
+    STA SPR_ADDRESS_BOX + $08
+    STA SPR_ADDRESS_BOX + $0C
     RTS
 
 _HideBoxSprite:
     LDA #$F0
-    STA $0230
-    STA $0234
-    STA $0238
-    STA $023C
+    STA SPR_ADDRESS_BOX + $00
+    STA SPR_ADDRESS_BOX + $04
+    STA SPR_ADDRESS_BOX + $08
+    STA SPR_ADDRESS_BOX + $0C
     RTS
 
 _PrepareTileAttribute:

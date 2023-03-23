@@ -106,6 +106,8 @@ GLOBAL_STATISTICS_OFF = 2 * (LEVELS_DIGITS + 1) * LEVEL_SETS
 NMI_HORIZONTAL        = %10010000
 NMI_VERTICAL          = %10010100
 
+SPR_ADDRESS_BOX       = $0230
+SPR_ADDRESS_CURSOR    = $0230
 SPR_ADDRESS_STOPPER   = $02F8
 SPR_ADDRESS_ELECTRIC  = $02FC
 
@@ -269,7 +271,7 @@ trap_doors_y           .rs  16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $0500
+    .rsset $0600
 scores                 .rs   2 * LEVELS
 completed              .rs   1 * LEVELS
 counters               .rs   2 * (LEVELS_DIGITS + 1) * (LEVEL_SETS + 1)
