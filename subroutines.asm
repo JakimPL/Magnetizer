@@ -1516,6 +1516,21 @@ _ActivateTrapDoor:
     STA trap_doors_on, y
     RTS
 
+_RemoveBlockade:
+    LDA blockade_x
+    STA ppu_shift
+    LDX blockade_y
+    JSR _PreparePPU
+
+    LDA #TILE_EMPTY
+    STA target_tile
+
+    JSR _DrawSingleTile
+    LDA blockade_y
+    JSR _ShiftPPU
+    JSR _DrawSingleTile
+    RTS
+
 _DrawTrapDoor:
     LDA trap_door_x
     STA ppu_shift
@@ -1565,6 +1580,17 @@ _CheckIfBoxUnlocksBlockade:
 _UnlockBlockade:
     LDA #$00
     STA blockades_on, y
+    JSR _SaveBlockadeToRemove
+    RTS
+
+_SaveBlockadeToRemove:
+    LDX index
+    STX blockade
+    JSR _CalculateBoxX
+    STA blockade_x
+
+    JSR _CalculateBoxY
+    STA blockade_y
     RTS
 
 _BlockadeRemoverCheckLoop:
