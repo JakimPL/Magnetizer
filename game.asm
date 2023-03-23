@@ -5,7 +5,7 @@ GameLogic:
     JMP GameLogicEnd
 CheckScreenMovement:
     LDX screen_movement
-    BEQ CheckTrapDoorToDraw
+    BEQ CheckBlockadeToDraw
     JSR DrawTransition
     JMP GameLogicEnd
 
@@ -14,7 +14,7 @@ CheckBlockadeToDraw:
     CMP #$FF
     BEQ CheckTrapDoorToDraw
 RemoveBlockade:
-    NOP
+    JSR _RemoveBlockade
 
 CheckTrapDoorToDraw:
     LDA trap_door

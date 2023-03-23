@@ -1522,7 +1522,7 @@ _RemoveBlockade:
     LDX blockade_y
     JSR _PreparePPU
 
-    LDA #TILE_EMPTY
+    LDA #TILE_NONE
     STA target_tile
 
     JSR _DrawSingleTile
@@ -1584,8 +1584,13 @@ _UnlockBlockade:
     RTS
 
 _SaveBlockadeToRemove:
-    LDX index
-    STX blockade
+    LDA blockades_y, y
+    JSR _Multiply
+    CLC
+    ADC blockades_x, y
+    STA blockade
+    TAX
+
     JSR _CalculateBoxX
     STA blockade_x
 

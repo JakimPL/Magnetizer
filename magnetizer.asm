@@ -51,6 +51,8 @@ TRAP_DOOR             = $10
 TILE_EMPTY            = $24
 TILE_BOX              = $3C
 TILE_TRAP_DOOR_ACTIVE = $64
+TILE_NONE             = $2C
+
 SPRITE_STOPPER        = $10
 SPRITE_ELECTRIC       = $0C
 
@@ -113,7 +115,6 @@ SPR_ADDRESS_BLOCKADE  = $0240
 SPR_ADDRESS_CURSOR    = $0230
 SPR_ADDRESS_STOPPER   = $02F8
 SPR_ADDRESS_ELECTRIC  = $02FC
-MAX_BLOCKADES         = $0B
 
     .inesprg 2   ; 1x 16KB PRG code
     .ineschr 1   ; 1x  8KB CHR data
