@@ -248,7 +248,7 @@ screen_x               .rs   1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $0300
+    .rsset $0400
 box_x                  .rs  64
 box_y                  .rs  64
 blockades_on           .rs  16
