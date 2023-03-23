@@ -220,9 +220,12 @@ box_direction          .rs   1
 
 boxes                  .rs   1
 
-draw_blockades         .rs   1
 blockades              .rs   1
 blockade_removers      .rs   1
+
+blockade               .rs   1
+blockade_x             .rs   1
+blockade_y             .rs   1
 
 source_box             .rs   1
 source_box_x           .rs   1
@@ -238,8 +241,6 @@ target_box_offset      .rs   1
 
 portals_a              .rs   1
 portals_b              .rs   1
-
-blockade               .rs   1
 
 trap_doors             .rs   1
 trap_door              .rs   1

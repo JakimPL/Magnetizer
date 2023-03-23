@@ -5,11 +5,18 @@ GameLogic:
     JMP GameLogicEnd
 CheckScreenMovement:
     LDX screen_movement
-    BEQ CheckTrapDoor
+    BEQ CheckTrapDoorToDraw
     JSR DrawTransition
     JMP GameLogicEnd
 
-CheckTrapDoor:
+CheckBlockadeToDraw:
+    LDA blockade
+    CMP #$FF
+    BEQ CheckTrapDoorToDraw
+RemoveBlockade:
+    NOP
+
+CheckTrapDoorToDraw:
     LDA trap_door
     CMP #$FF
     BEQ CheckBoxesToDraw
@@ -203,33 +210,6 @@ DrawAnimation:
     STA SPR_ADDRESS_END + $05
     STA SPR_ADDRESS_END + $09
     STA SPR_ADDRESS_END + $0D
-
-DrawBlockades:
-    LDA draw_blockades
-    CMP #$01
-    BNE LatchController
-
-    LDA blockades
-    CMP #$00
-    BEQ LatchController
-
-    LDY #$00
-    STY draw_blockades
-DrawBlockade:
-    TYA
-    JSR _Multiply
-    TAX
-
-    JSR _DrawBlockade
-
-DrawBlockadeIncrement:
-
-    INY
-    CPY blockades
-    BNE DrawBlockade
-
-    LDA #$01
-    STA draw_blockades
 
 LatchController:
     JSR _LatchController
