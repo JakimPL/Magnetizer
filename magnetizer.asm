@@ -101,6 +101,8 @@ LEVEL_SET_SWITCH      = $03
 LEVEL_POINTER_OFFSET  = $02
 SWITCH_POINTER_VALUE  = $BE
 
+GLOBAL_STATISTICS_OFF = 2 * (LEVELS_DIGITS + 1) * LEVEL_SETS
+
 NMI_HORIZONTAL        = %10010000
 NMI_VERTICAL          = %10010100
 
@@ -145,7 +147,7 @@ level_set              .rs   1
 level_set_counter      .rs   1
 level_lo               .rs   1
 level_hi               .rs   1
-levels_cleared         .rs   LEVEL_SETS
+levels_cleared         .rs   1 * LEVEL_SETS
 level_cleared          .rs   1
 total_levels           .rs   1
 total_levels_cleared   .rs   1
@@ -265,9 +267,9 @@ trap_doors_y           .rs  16
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .rsset $0500
-counters               .rs 256
-scores                 .rs 128
-completed              .rs 128
+scores                 .rs   2 * LEVELS
+completed              .rs   1 * LEVELS
+counters               .rs   2 * (LEVELS_DIGITS + 1) * (LEVEL_SETS + 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

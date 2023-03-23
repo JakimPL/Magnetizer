@@ -99,7 +99,7 @@ CopyScoreDigits:
     STA level_cleared
 CopyScoreDigit:
     LDA decimal, x
-    STA box_x, y
+    STA [digit_target_lo], y
     BEQ CopyScoreDigitIncrement
     INC level_cleared
 CopyScoreDigitIncrement:
@@ -145,7 +145,7 @@ SaveGlobalStatistics:
     STA dividend
     JSR SetDivisor
     JSR Hex2Dec
-    LDY #$F0
+    LDY #GLOBAL_STATISTICS_OFF
     LDX #TOTAL_DIGITS
     JSR _CopyDigits
 CopyClearedLevelsCountDigits:
@@ -153,7 +153,7 @@ CopyClearedLevelsCountDigits:
     STA dividend
     JSR SetDivisor
     JSR Hex2Dec
-    LDY #$F0 + TOTAL_DIGITS + 1
+    LDY #GLOBAL_STATISTICS_OFF + TOTAL_DIGITS + 1
     LDX #TOTAL_DIGITS
     JSR _CopyDigits
     RTS

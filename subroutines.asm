@@ -100,6 +100,12 @@ _SetDigitTargetBox:
     STA digit_target_lo
     LDA #HIGH(box_x)
     STA digit_target_hi
+    LDA offset_y
+    CMP #$20
+    BCS _IncrementDigitTargetHi
+    RTS
+_IncrementDigitTargetHi:
+    INC digit_target_hi
     RTS
 
 _SetDigitTargetCounters:
@@ -312,7 +318,7 @@ _DrawTotal:
     LDX #TOTAL_X_OFFSET
     JSR _PreparePPU
 
-    LDY #$F0
+    LDY #GLOBAL_STATISTICS_OFF
     LDA #TOTAL_DIGITS
     STA digits
 
