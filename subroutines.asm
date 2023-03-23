@@ -245,6 +245,7 @@ _DrawScores:
     STA digits
 
     JSR _CalculateAbsoluteLevel
+    STA offset_y
     ASL a
     ASL a
     ASL a
