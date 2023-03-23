@@ -329,7 +329,7 @@ GoToMenuVBlank:
     LDA #$20
     STA ppu_shift
     JSR _LoadBackgroundAndAttribute
-    JSR _DrawMenu
+    JSR _DrawPartialMenu
     JSR _ResetPPU
     JSR _EnableNMI
 

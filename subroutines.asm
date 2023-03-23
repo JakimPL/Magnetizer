@@ -369,6 +369,16 @@ _DrawMenu:
     JSR _CalculateAndSetCursorPosition
     RTS
 
+_DrawPartialMenu:
+    JSR _DrawAllLevelTexts
+    JSR _DrawScoreText
+    JSR _DrawLevelsText
+    JSR _DrawTotalText
+    JSR _DrawTotal
+    JSR _LoadCursor
+    JSR _CalculateAndSetCursorPosition
+    RTS
+
 _DrawSingleTilePart:
     LDA target_tile
     STA PPUDATA
