@@ -369,7 +369,7 @@ MainLoopEnd:
     .include "game.asm"
     .include "subroutines.asm"
     .include "hex2dec.asm"
-    .include "music.asm"
+    .include "famitone2.asm"
     .include "levels.asm"
     .include "constants.asm"
 

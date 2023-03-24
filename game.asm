@@ -359,7 +359,7 @@ InitializePosition:
 
     LDA starting_position_y
     SEC
-    SBC #$01
+    SBC #$00
     STA SPR_ADDRESS_START + $00
     STA SPR_ADDRESS_START + $04
     CLC
