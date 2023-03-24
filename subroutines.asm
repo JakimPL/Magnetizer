@@ -1943,7 +1943,7 @@ _ResetTrapDoor:
     RTS
 
 _ResetBlockade:
-    LDA #$FF
+    LDA #$00
     STA blockade
     RTS
 

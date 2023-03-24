@@ -11,10 +11,10 @@ CheckScreenMovement:
 
 CheckBlockadeToDraw:
     LDA blockade
-    CMP #$FF
     BEQ CheckTrapDoorToDraw
 RemoveBlockade:
     JSR _RemoveBlockade
+    JSR _ResetBlockade
 
 CheckTrapDoorToDraw:
     LDA trap_door
