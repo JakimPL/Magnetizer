@@ -9,19 +9,6 @@ PPUSCROLL             = $2005
 PPUADDR               = $2006
 PPUDATA               = $2007
 
-PULSE1_TIMER          = $4000
-PULSE1_COUNTER        = $4001
-PULSE1_ENVELOPE       = $4002
-PULSE1_SWEEP          = $4003
-PULSE2_TIMER          = $4004
-PULSE2_COUNTER        = $4005
-PULSE2_ENVELOPE       = $4006
-PULSE2_SWEEP          = $4007
-TRIANGLE_TIMER        = $4008
-TRIANGLE_COUNTER      = $4009
-TRIANGLE_ENVELOPE     = $400A
-TRIANGLE_SWEEP        = $400B
-
 DMC_FREQ              = $4010
 DMC_RAW               = $4011
 DMC_START             = $4012
@@ -262,7 +249,7 @@ screen_x               .rs   1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $0400
+    .rsset $6000
 box_x                  .rs  64
 box_y                  .rs  64
 blockades_on           .rs  16
@@ -280,7 +267,7 @@ trap_doors_y           .rs  16
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $0600
+    .rsset $6200
 scores                 .rs   2 * LEVELS
 completed              .rs   1 * LEVELS
 counters               .rs   2 * (LEVELS_DIGITS + 1) * (LEVEL_SETS + 1)
@@ -319,9 +306,10 @@ ClearGraphics:
     STA $0200, x
     INX
     BNE ClearMemory
-
-    ;JSR EnableSound
-    ;JSR PlaySound
+ResetScroll:
+	LDA #$00
+	STA PPUSCROLL
+	STA PPUSCROLL
 
     JSR InitializeMenu
     JSR _LoadPalettes
@@ -329,6 +317,8 @@ ClearGraphics:
     JSR _DrawMenu
     JSR _EnableNMI
 
+    JSR EnableSound
+    JSR PlaySound
 Forever:
     JMP Forever
 
@@ -362,6 +352,7 @@ JumpToGameLogic:
     JMP MainLoopEnd
 
 MainLoopEnd:
+    JSR FamiToneUpdate
     RTI
 
 ;;;;;;;;;;;;;;
@@ -369,8 +360,9 @@ MainLoopEnd:
     .include "game.asm"
     .include "subroutines.asm"
     .include "hex2dec.asm"
-    .include "famitone2.asm"
     .include "levels.asm"
+    .include "famitone2.asm"
+    .include "music.asm"
     .include "constants.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -264,7 +264,6 @@ EnterLevel:
     INC screen_offset
     JSR _HideCursor
     JSR _CalculateNextLevelPointer
-    ;JSR _CalculatePalettePointer
     JMP MenuLogicEnd
 SetLevelToZero:
     LDA #$00
