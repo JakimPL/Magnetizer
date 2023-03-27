@@ -1,5 +1,5 @@
 InitializeMenu:
-    JSR Initialize
+    JSR _Initialize
     JSR _DisableNMI
     JSR PrecalculateCounters
     LDA #LOW(menu)

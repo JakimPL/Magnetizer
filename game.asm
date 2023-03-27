@@ -1,4 +1,7 @@
 GameLogic:
+    LDA #$00
+    JSR FamiToneMusicPause
+
     LDX level_loading
     BEQ CheckScreenMovement
     JSR DrawNextLevel
@@ -35,7 +38,7 @@ CheckBoxesToDraw
     LDA target_box
     CMP #$FF
     BNE JumpToDrawTargetBox
-    JMP PrepareMoveCounter
+    JMP DrawMoveCounter
 JumpToDrawTargetBox:
     JMP DrawTargetBox
 
@@ -53,10 +56,10 @@ DrawBox:
 CheckIfBoxAnimationEnds:
     LDA box_animation_x
     AND #%00001111
-    BNE PrepareMoveCounter
+    BNE DrawMoveCounter
     LDA box_animation_y
     AND #%00001111
-    BNE PrepareMoveCounter
+    BNE DrawMoveCounter
     LDA #$00
     STA box_direction
     STA box_animation
@@ -70,28 +73,14 @@ CheckIfBoxUnlocksBlockade:
 DrawTargetBox
     JSR _DrawTargetBox
 
-PrepareMoveCounter:
-    LDA #NMI_HORIZONTAL
-    STA PPUCTRL
-    LDA #$23
-    LDX #$80
-    LDY #$00
-    STA ppu_shift
-    JSR _PreparePPU
-
 DrawMoveCounter:
-    LDA #$18
-    STA ppu_shift
+    LDA draw_counter
+    BEQ GameResetPPU
+    JSR _PrepareMoveCounter
     JSR _DrawMoveCounter
-
-ChangeCounterAttributes:
-    LDA #$23
-    LDX #$F8
-    LDY #$E0
-    STA ppu_shift
-    JSR _PreparePPU
-    LDA #$0F
-    STA PPUDATA
+    JSR _ChangeCounterAttributes
+    LDA #$00
+    STA draw_counter
 
 GameResetPPU:
     JSR _ResetPPU
@@ -379,7 +368,7 @@ VBlankLoop:
 
 ;; setting pointers ;;
 InitializeGame:
-    JSR Initialize
+    JSR _Initialize
 
 SetLevelPointer:
     LDA #LOW(levels)

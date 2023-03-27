@@ -132,6 +132,16 @@ _ClearBasicSpritesStep:
     BNE _ClearBasicSpritesStep
     RTS
 
+_ChangeCounterAttributes:
+    LDA #$23
+    LDX #$F8
+    LDY #$E0
+    STA ppu_shift
+    JSR _PreparePPU
+    LDA #$0F
+    STA PPUDATA
+    RTS
+
 _DrawText:
     STY temp_y
     LDY #$00
@@ -481,6 +491,7 @@ _HideElectric:
 _EnterLevel:
     LDA #$01
     STA game
+    STA draw_counter
     STA next_level
     JSR InitializeGame
 
@@ -642,6 +653,20 @@ _SetNextLevelPointerOffset:
 _RestoreLevelPointer:
     LDA total_levels
     STA level_hi
+    RTS
+
+_Initialize:
+_SetTilesPointer:
+    LDA #LOW(tiles)
+    STA tiles_lo
+    LDA #HIGH(tiles)
+    STA tiles_hi
+
+_SetPalettePointer:
+    LDA #LOW(palettes)
+    STA palette_lo
+    LDA #HIGH(palettes)
+    STA palette_hi
     RTS
 
 _LoadLevel:
@@ -2189,6 +2214,7 @@ _SetDirection:
     LDY #$01
     STY grounded
     STY increase_counter
+    STY draw_counter
     RTS
 
 ;; move counter ;;
@@ -2244,7 +2270,19 @@ _SetMoveCounterMaxValue
     BNE _SetMoveCounterMaxValue
     RTS
 
+_PrepareMoveCounter:
+    LDA #NMI_HORIZONTAL
+    STA PPUCTRL
+    LDA #$23
+    LDX #$80
+    LDY #$00
+    STA ppu_shift
+    JSR _PreparePPU
+    RTS
+
 _DrawMoveCounter:
+    LDA #$18
+    STA ppu_shift
     LDX #$00
 _DrawMoveCounterStep:
     DEC ppu_shift
@@ -2303,6 +2341,20 @@ _CalculateAbsoluteLevelStep:
 _CalculateAbsoluteLevelEnd:
     CLC
     ADC level_set_counter
+    RTS
+
+_EnableSound:
+    LDA #$80
+    LDX #LOW(music_music_data)
+    LDY #HIGH(music_music_data)
+    JSR FamiToneInit
+	RTS
+
+_PlaySound:
+    LDA #$00
+    LDX #LOW(music_music_data)
+    LDY #HIGH(music_music_data)
+    JSR FamiToneMusicPlay
     RTS
 
 _Snap:

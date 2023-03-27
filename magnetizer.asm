@@ -135,6 +135,7 @@ button_pressed         .rs   1
 attribute              .rs   1
 tile_attribute         .rs   1
 
+draw_counter           .rs   1
 increase_counter       .rs   1
 move_counter           .rs   4
 move_counter_limit     .rs   1
@@ -317,24 +318,10 @@ ResetScroll:
     JSR _DrawMenu
     JSR _EnableNMI
 
-    JSR EnableSound
-    JSR PlaySound
+    JSR _EnableSound
+    JSR _PlaySound
 Forever:
     JMP Forever
-
-Initialize:
-SetTilesPointer:
-    LDA #LOW(tiles)
-    STA tiles_lo
-    LDA #HIGH(tiles)
-    STA tiles_hi
-
-SetPalettePointer:
-    LDA #LOW(palettes)
-    STA palette_lo
-    LDA #HIGH(palettes)
-    STA palette_hi
-    RTS
 
 ;; NMI ;;
 NMI:
