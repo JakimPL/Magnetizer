@@ -188,6 +188,40 @@ MenuDrawEnd:
     INC speed
     JSR _ResetPPU
 
+DrawArrows:
+    LDA #$F0
+    STA SPR_ADDRESS_LARROW + $00
+    STA SPR_ADDRESS_LARROW + $04
+    STA SPR_ADDRESS_RARROW + $00
+    STA SPR_ADDRESS_RARROW + $04
+
+    LDA #$18
+    STA SPR_ADDRESS_RARROW + $01
+    STA SPR_ADDRESS_RARROW + $05
+    STA SPR_ADDRESS_LARROW + $01
+    STA SPR_ADDRESS_LARROW + $05
+
+    LDA #$03
+    STA SPR_ADDRESS_RARROW + $02
+    LDA #$83
+    STA SPR_ADDRESS_RARROW + $06
+
+    LDA #$43
+    STA SPR_ADDRESS_LARROW + $02
+    LDA #$C3
+    STA SPR_ADDRESS_LARROW + $06
+DrawLeftArrow:
+    LDA level_set
+    CMP #$01
+    BCC DrawRightArrow
+    JSR _DrawLeftArrow
+
+DrawRightArrow:
+    LDA level_set
+    CMP #LEVEL_SETS - 1
+    BEQ ReadMenuController
+    JSR _DrawRightArrow
+
 ReadMenuController:
     JSR _LatchController
     JSR _ReadController

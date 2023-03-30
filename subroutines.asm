@@ -454,6 +454,40 @@ _ClearSpritesStep:
     BNE _ClearSpritesStep
     RTS
 
+_DrawLeftArrow:
+    LDA #$63
+    STA SPR_ADDRESS_LARROW + $00
+    LDA #$6B
+    STA SPR_ADDRESS_LARROW + $04
+
+    LDA speed
+    LSR a
+    LSR a
+    AND #%00000111
+    STA temp_x
+    LDA #$08
+    SEC
+    SBC temp_x
+    STA SPR_ADDRESS_LARROW + $03
+    STA SPR_ADDRESS_LARROW + $07
+    RTS
+
+_DrawRightArrow:
+    LDA #$63
+    STA SPR_ADDRESS_RARROW + $00
+    LDA #$6B
+    STA SPR_ADDRESS_RARROW + $04
+    LDA speed
+
+    LSR a
+    LSR a
+    AND #%00000111
+    CLC
+    ADC #$F0
+    STA SPR_ADDRESS_RARROW + $03
+    STA SPR_ADDRESS_RARROW + $07
+    RTS
+
 _UpdateStopper:
     LDA screen_x
     LSR a
@@ -2466,6 +2500,13 @@ _CalculateAndSetCursorPosition:
     CLC
     ADC #$80
     STA $0230
+    RTS
+
+_CalculateArrowOffset:
+    LDA speed
+    LSR a
+    LSR a
+    AND #%00000111
     RTS
 
 _HideCursor:
