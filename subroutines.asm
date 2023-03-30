@@ -381,6 +381,7 @@ _DrawMenu:
     RTS
 
 _DrawPartialMenu:
+    JSR _DrawLogo
     JSR _DrawAllLevelTexts
     JSR _DrawScoreText
     JSR _DrawLevelsText
@@ -527,6 +528,7 @@ _EnterLevel:
     STA next_level
     JSR InitializeGame
 
+    JSR _PlaySound
     JSR _CalculateNextLevelPointer
     JSR _CalculatePalettePointer
 _EnterLevelInitialize:
@@ -2377,15 +2379,20 @@ _CalculateAbsoluteLevelEnd:
 
 _EnableSound:
     LDA #$80
-    LDX #LOW(music_music_data)
-    LDY #HIGH(music_music_data)
+    LDX #LOW(magnetizer_music_data)
+    LDY #HIGH(magnetizer_music_data)
     JSR FamiToneInit
 	RTS
 
+_PauseMusic:
+    LDA #$01
+    JSR FamiToneMusicPause
+    RTS
+
 _PlaySound:
     LDA #$00
-    LDX #LOW(music_music_data)
-    LDY #HIGH(music_music_data)
+    LDX #LOW(magnetizer_music_data)
+    LDY #HIGH(magnetizer_music_data)
     JSR FamiToneMusicPlay
     RTS
 

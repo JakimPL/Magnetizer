@@ -1,6 +1,6 @@
 GameLogic:
-    LDA #$00
-    JSR FamiToneMusicPause
+    LDA goto_menu
+    BNE JumpGoToMenu
 
     LDX level_loading
     BEQ CheckScreenMovement
@@ -11,6 +11,9 @@ CheckScreenMovement:
     BEQ CheckBlockadeToDraw
     JSR DrawTransition
     JMP GameLogicEnd
+
+JumpGoToMenu:
+    JMP GoToMenu
 
 CheckBlockadeToDraw:
     LDA blockade
@@ -220,7 +223,7 @@ CheckButton:
     CMP #$40
     BEQ RestartLevel
     CMP #$20
-    BEQ GoToMenu
+    BEQ PrepareGoToMenu
     CMP #$10
     BEQ JumpToMovement
 
@@ -230,11 +233,17 @@ CheckButton:
     JSR _CheckMovement
     JMP Movement
 
+PrepareGoToMenu:
+    LDA #01
+    STA goto_menu
+    JSR _PauseMusic
+
 JumpToMovement:
     JMP Movement
 GoToMenu:
     LDA #$00
     STA game
+    STA goto_menu
     LDA #$01
     STA screen_movement
     JSR _ClearBasicSprites
