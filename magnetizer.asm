@@ -84,6 +84,9 @@ TOTAL_DIGITS          = $02
 TEXT_LSET_Y_OFFSET    = $21
 TEXT_LSET_X_OFFSET    = $A2
 
+LOGO_Y_OFFSET         = $20
+LOGO_X_OFFSET         = $83
+
 LEVEL_SETS            = $06
 LEVELS                = $30
 LEVEL_SET_SWITCH      = $03

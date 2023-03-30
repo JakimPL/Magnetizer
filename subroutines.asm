@@ -367,6 +367,7 @@ _LoadCursorLoop:
     RTS
 
 _DrawMenu:
+    JSR _DrawLogo
     JSR _DrawLevelSetText
     JSR _DrawAllLevelTexts
     JSR _DrawScoreText
@@ -387,6 +388,37 @@ _DrawPartialMenu:
     JSR _DrawTotal
     JSR _LoadCursor
     JSR _CalculateAndSetCursorPosition
+    RTS
+
+_DrawLogo:
+    LDA #LOGO_Y_OFFSET
+    STA ppu_shift
+    LDX #LOGO_X_OFFSET
+    JSR _PreparePPU
+
+    LDX #$80
+    LDY #$00
+_DrawLogoTile:
+    STX PPUDATA
+    INX
+    TXA
+    AND #%00011111
+    CMP #$1A
+    BNE _DrawLogoTile
+_DrawLogoNewLine:
+    TXA
+    CLC
+    ADC #$06
+    STA temp_x
+
+    INY
+    CPY #$04
+
+    LDX logo_offsets, y
+    JSR _PreparePPU
+    LDX temp_x
+
+    BNE _DrawLogoTile
     RTS
 
 _DrawSingleTilePart:
