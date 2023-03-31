@@ -677,13 +677,13 @@ _NextLevelSet:
     STA level_set_counter
     INC level_set
     LDA level_set
-    CMP #LEVEL_SETS
+    CMP level_sets_unlocked
     BEQ _RollBack
     JSR _IncrementPalettePointer
     JSR _CalculateNextLevelPointer
     RTS
 _RollBack:
-    LDA #LEVEL_SETS
+    LDA level_sets_unlocked
     SEC
     SBC #$01
     STA level_set

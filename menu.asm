@@ -2,10 +2,22 @@ InitializeMenu:
     JSR _Initialize
     JSR _DisableNMI
     JSR PrecalculateCounters
+    JSR PrecalculateAvailableSets
     LDA #LOW(menu)
     STA level_lo
     LDA #HIGH(menu)
     STA level_hi
+    RTS
+
+PrecalculateAvailableSets:
+    LDX #$FF
+    STX level_sets_unlocked
+PrecalculateAvailableSetsStep:
+    INX
+    INC level_sets_unlocked
+    LDA total_levels_cleared
+    CMP levels_to_unlock, x
+    BCS PrecalculateAvailableSetsStep
     RTS
 
 PrecalculateCounters:
@@ -218,7 +230,9 @@ DrawLeftArrow:
 
 DrawRightArrow:
     LDA level_set
-    CMP #LEVEL_SETS - 1
+    CLC
+    ADC #$01
+    CMP level_sets_unlocked
     BEQ ReadMenuController
     JSR _DrawRightArrow
 
@@ -271,11 +285,13 @@ MoveCursorRight:
     LDA #$00
     STA level_set_counter
     LDA level_set
-    CMP #LEVEL_SETS
+    CMP level_sets_unlocked
     BEQ SetLevelSetToMax
     JMP SetCursor
 SetLevelSetToMax:
-    LDA #LEVEL_SETS - 1
+    LDA level_sets_unlocked
+    SEC
+    SBC #$01
     STA level_set
     JMP SetCursor
 MoveCursorDown:
