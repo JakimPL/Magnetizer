@@ -159,6 +159,7 @@ CopyClearedLevelsCountDigits:
     RTS
 
 MenuLogic:
+    JSR _CalculateLevelSetOffset
     LDX screen_movement
     BEQ CheckIfLevelSelected
 ChangePalettes:

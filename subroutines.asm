@@ -217,10 +217,20 @@ _DrawLevelLineStart:
     RTS
 
 _DrawMedal:
+    STY temp_y
     LDA #TILE_NONE
     STA PPUDATA
-    LDA #TILE_MEDAL
+
+    TYA
+    CLC
+    ADC offset
+    TAY
+
+    LDX completed, y
+    LDA medal_tiles, x
     STA PPUDATA
+
+    LDY temp_y
     RTS
 
 _DrawLevelNumber:
@@ -466,9 +476,9 @@ _ClearSpritesStep:
     RTS
 
 _DrawLeftArrow:
-    LDA #$63
+    LDA #ARROW_Y + $00
     STA SPR_ADDRESS_LARROW + $00
-    LDA #$6B
+    LDA #ARROW_Y + $08
     STA SPR_ADDRESS_LARROW + $04
 
     LDA speed
@@ -484,9 +494,9 @@ _DrawLeftArrow:
     RTS
 
 _DrawRightArrow:
-    LDA #$63
+    LDA #ARROW_Y + $00
     STA SPR_ADDRESS_RARROW + $00
-    LDA #$6B
+    LDA #ARROW_Y + $08
     STA SPR_ADDRESS_RARROW + $04
     LDA speed
 
@@ -2406,6 +2416,17 @@ _CalculateTextRange:
     STY position_y
     RTS
 
+_CalculateLevelSetOffset:
+    LDY level_set_counter
+    STY temp_y
+    LDY #$00
+    STY level_set_counter
+    JSR _CalculateAbsoluteLevel
+    STA offset
+    LDY temp_y
+    STY level_set_counter
+    RTS
+
 _CalculateAbsoluteLevel:
     LDA #$00
     LDY level_set
@@ -2509,7 +2530,7 @@ _CalculateAndSetCursorPosition:
     ASL a
     ASL a
     CLC
-    ADC #$80
+    ADC #$78
     STA SPR_ADDRESS_CURSOR
     RTS
 
