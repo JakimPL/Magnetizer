@@ -212,6 +212,17 @@ _DrawLevelLineStart:
     LDA #HIGH(text_level)
     STA text_pointer_hi
     JSR _DrawText
+    JSR _DrawLevelNumber
+    JSR _DrawMedal
+    RTS
+
+_DrawMedal:
+    LDA #TILE_NONE
+    STA PPUDATA
+    LDA #TILE_MEDAL
+    STA PPUDATA
+    RTS
+
 _DrawLevelNumber:
     TYA
     CMP #$09
@@ -362,7 +373,7 @@ _LoadCursorLoop:
     LDA cursor, x
     STA SPR_ADDRESS_CURSOR, x
     INX
-    CPX #$10
+    CPX #$04
     BNE _LoadCursorLoop
     RTS
 
@@ -2499,7 +2510,7 @@ _CalculateAndSetCursorPosition:
     ASL a
     CLC
     ADC #$80
-    STA $0230
+    STA SPR_ADDRESS_CURSOR
     RTS
 
 _CalculateArrowOffset:
@@ -2511,5 +2522,5 @@ _CalculateArrowOffset:
 
 _HideCursor:
     LDA #$F0
-    STA $0230
+    STA SPR_ADDRESS_CURSOR
     RTS

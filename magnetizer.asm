@@ -39,6 +39,7 @@ TILE_EMPTY            = $24
 TILE_BOX              = $3C
 TILE_TRAP_DOOR_ACTIVE = $64
 TILE_NONE             = $2C
+TILE_MEDAL            = $6C
 
 SPRITE_STOPPER        = $10
 SPRITE_ELECTRIC       = $0C
