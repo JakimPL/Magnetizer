@@ -744,6 +744,31 @@ _RestoreLevelPointer:
     STA level_hi
     RTS
 
+_SaveMedal:
+    LDA dividend + 1
+    BNE _SaveBronze
+    LDA dividend
+    BNE _SaveBronzeAndCheckGold
+    RTS
+_SaveBronzeAndCheckGold:
+    LDA #$01
+    LDX offset_y
+    STA completed, x
+    LDA medals, x
+    CMP dividend
+    BCS _SaveGold
+    RTS
+_SaveGold:
+    LDA #$02
+    JMP _StoreMedal
+_SaveBronze:
+    LDA #$01
+    JMP _StoreMedal
+_StoreMedal:
+    LDX offset_y
+    STA completed, x
+    RTS
+
 _Initialize:
 _SetTilesPointer:
     LDA #LOW(tiles)

@@ -51,6 +51,7 @@ CopyMedalDigits:
     INX
     LDA scores, x
     STA dividend + 1
+    JSR _SaveMedal
     JSR SetDivisor
     JSR Hex2Dec
     JSR CopyScoreDigits
@@ -61,8 +62,6 @@ CheckIfLevelCleared:
 AddClearedLevel:
     INC levels_cleared
     INC total_levels_cleared
-    LDX offset_y
-    STA completed, x
 
 IncrementLevel:
     INC total_levels
