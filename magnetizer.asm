@@ -39,7 +39,6 @@ TILE_EMPTY            = $24
 TILE_BOX              = $3C
 TILE_TRAP_DOOR_ACTIVE = $64
 TILE_NONE             = $2C
-TILE_MEDAL            = $6C
 
 SPRITE_STOPPER        = $10
 SPRITE_ELECTRIC       = $0C
@@ -64,7 +63,9 @@ COUNTER_LAST_DIGIT    = COUNTER_DIGITS - 1
 SLASH_CHARACTER       = $29
 SPACE_CHARACTER       = $2C
 
-ARROW_Y               = $5B
+ARROW_Y_OFFSET        = $5B
+MEDAL_Y_OFFSET        = $76
+MEDAL_X_OFFSET        = $6C
 
 TEXT_SCORE_Y_OFFSET   = $21
 TEXT_SCORE_X_OFFSET   = $F4
@@ -110,6 +111,7 @@ SPR_ADDRESS_STOPPER   = $02F8
 SPR_ADDRESS_ELECTRIC  = $02FC
 SPR_ADDRESS_RARROW    = $0220
 SPR_ADDRESS_LARROW    = $0228
+SPR_ADDRESS_MEDAL     = $0258
 
     .inesprg 2   ; 1x 16KB PRG code
     .ineschr 1   ; 1x  8KB CHR data
@@ -332,7 +334,7 @@ ResetScroll:
 Forever:
     JMP Forever
 
-;; NMI ;;
+
 NMI:
     LDA #$00
     STA OAMADDR

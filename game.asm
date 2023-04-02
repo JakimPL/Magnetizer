@@ -375,7 +375,6 @@ InitializeAnimation:
 VBlankLoop:
     JMP VBlankLoop
 
-;; setting pointers ;;
 InitializeGame:
     JSR _Initialize
 
@@ -423,32 +422,6 @@ LoadBoxSprites:
     STA SPR_ADDRESS_BOX + $04
     STA SPR_ADDRESS_BOX + $08
     STA SPR_ADDRESS_BOX + $0C
-
-LoadBlockadeSprites:
-    LDY #$00
-LoadBlockadeSpritesStep:
-    TYA
-    JSR _Multiply
-    TAX
-
-    LDA #$09
-    STA SPR_ADDRESS_BLOCKADE + $01, x
-    STA SPR_ADDRESS_BLOCKADE + $05, x
-    STA SPR_ADDRESS_BLOCKADE + $09, x
-    STA SPR_ADDRESS_BLOCKADE + $0D, x
-
-    LDA #$14
-    STA SPR_ADDRESS_BLOCKADE + $02, x
-    LDA #$54
-    STA SPR_ADDRESS_BLOCKADE + $06, x
-    LDA #$94
-    STA SPR_ADDRESS_BLOCKADE + $0A, x
-    LDA #$D4
-    STA SPR_ADDRESS_BLOCKADE + $0E, x
-
-    INY
-    CPY #$08
-    BNE LoadBlockadeSpritesStep
     RTS
 
 DrawTransition:

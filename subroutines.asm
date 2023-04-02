@@ -218,8 +218,6 @@ _DrawLevelLineStart:
 
 _DrawMedal:
     STY temp_y
-    LDA #TILE_NONE
-    STA PPUDATA
 
     TYA
     CLC
@@ -227,8 +225,28 @@ _DrawMedal:
     TAY
 
     LDX completed, y
-    LDA medal_tiles, x
-    STA PPUDATA
+    LDA medal_sprites, x
+    STA temp_x
+
+    LDA temp_y
+    ASL a
+    ASL a
+    TAX
+
+    LDA temp_x
+    STA SPR_ADDRESS_MEDAL + $01, x
+    LDA #$00
+    STA SPR_ADDRESS_MEDAL + $02, x
+    LDA #MEDAL_X_OFFSET
+    STA SPR_ADDRESS_MEDAL + $03, x
+
+    LDA temp_y
+    ASL a
+    ASL a
+    ASL a
+    CLC
+    ADC #MEDAL_Y_OFFSET
+    STA SPR_ADDRESS_MEDAL + $00, x
 
     LDY temp_y
     RTS
@@ -476,9 +494,9 @@ _ClearSpritesStep:
     RTS
 
 _DrawLeftArrow:
-    LDA #ARROW_Y + $00
+    LDA #ARROW_Y_OFFSET + $00
     STA SPR_ADDRESS_LARROW + $00
-    LDA #ARROW_Y + $08
+    LDA #ARROW_Y_OFFSET + $08
     STA SPR_ADDRESS_LARROW + $04
 
     LDA speed
@@ -494,9 +512,9 @@ _DrawLeftArrow:
     RTS
 
 _DrawRightArrow:
-    LDA #ARROW_Y + $00
+    LDA #ARROW_Y_OFFSET + $00
     STA SPR_ADDRESS_RARROW + $00
-    LDA #ARROW_Y + $08
+    LDA #ARROW_Y_OFFSET + $08
     STA SPR_ADDRESS_RARROW + $04
     LDA speed
 
@@ -688,7 +706,7 @@ _RollBack:
     SBC #$01
     STA level_set
     JSR _CalculateNextLevelPointer
-    JSR GoToMenu
+    JSR PrepareGoToMenu
     RTS
 
 _CalculateNextLevelPointer:
