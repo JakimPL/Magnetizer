@@ -2357,7 +2357,6 @@ _AssignDirectionReturn:
     RTS
 
 _SetDirection:
-    JSR _HideStopper
     LDY #$01
     STY grounded
     STY increase_counter

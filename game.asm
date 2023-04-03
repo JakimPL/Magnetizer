@@ -317,6 +317,7 @@ IncrementCounterCheck:
     JSR _IncreaseMoveCounter
     LDA #$00
     STA increase_counter
+    JSR _HideStopper
 
 GameLogicEnd:
     INC screen_x
@@ -366,7 +367,7 @@ InitializePosition:
     STA SPR_ADDRESS_START + $08
     STA SPR_ADDRESS_START + $0C
     STA position_y
-    DEC position_y
+    INC position_y
 
 InitializeAnimation:
     LDA #$01
