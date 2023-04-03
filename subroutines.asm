@@ -1480,6 +1480,7 @@ _IncreaseSpeedStep:
     RTS
 
 _Stop:
+    STX temp_x
     JSR _HideElectric
     JSR _PlaySoundHit
     LDA #$00
@@ -1489,6 +1490,7 @@ _Stop:
     STA speed
     LDA #$01
     STA real_speed
+    LDX temp_x
     RTS
 
 ;; collision routine ;;
@@ -1529,6 +1531,7 @@ _PortalATeleport:
     STA position_x
     LDA portals_b_y, x
     STA position_y
+    JSR _PlaySoundTeleport
     JMP _CheckIfNextPositionIsFree
 _PortalBCheck:
     JSR _GetTile
@@ -1541,6 +1544,7 @@ _PortalBTeleport:
     STA position_x
     LDA portals_a_y, x
     STA position_y
+    JSR _PlaySoundTeleport
     JMP _CheckIfNextPositionIsFree
 
 _ArrowUpCheck:
@@ -2526,20 +2530,26 @@ _PlayMusic:
     RTS
 
 _PlaySoundMovement:
-	LDA #$01
-	LDX #FT_SFX_CH1
+	LDA #SOUND_MOVEMENT
+	LDX #FT_SFX_CH2
 	JSR FamiToneSfxPlay
     RTS
 
 _PlaySoundBox:
-	LDA #$00
+	LDA #SOUND_BOX
 	LDX #FT_SFX_CH1
 	JSR FamiToneSfxPlay
     RTS
 
 _PlaySoundHit:
-	LDA #$02
-	LDX #FT_SFX_CH1
+	LDA #SOUND_HIT
+	LDX #FT_SFX_CH2
+	JSR FamiToneSfxPlay
+    RTS
+
+_PlaySoundTeleport:
+	LDA #SOUND_TELEPORT
+	LDX #FT_SFX_CH3
 	JSR FamiToneSfxPlay
     RTS
 

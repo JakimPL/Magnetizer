@@ -25,7 +25,7 @@ MACRO       0   5  -1  -1   0 : 9 3 2 1 1 0
 MACRO       0   6  -1  -1   0 : 4 4 3 3 2 2 1
 MACRO       0   7  -1  -1   0 : 1 1 2 2
 MACRO       0   8  -1  -1   0 : 1 1 1 2 2 2 3 3 3 4
-MACRO       0   9  -1  -1   0 : 11 10 10 9 9 8 8 7 7 6 6 5 5 5 4 4 3 3 3 3 3 3 2 2 2 2 2 2 1 1 1 0
+MACRO       0   9  -1  -1   0 : 10 10 9 8 8 7 6 6 5 5 4 3 3 2 1
 MACRO       1   0  -1  -1   0 : 7 2 0 -7 -10 -12
 MACRO       1   1  -1  -1   0 : 0 -12
 MACRO       1   2  -1  -1   0 : 12 7 7 0
@@ -34,8 +34,9 @@ MACRO       2   0  -1  -1   0 : 0 1 0 -1
 MACRO       2   1   8  -1   0 : 0 0 0 0 0 0 0 0 0 -2 0 2
 MACRO       2   2   0  -1   0 : 0 2 -2
 MACRO       2   3   0  -1   0 : 1 2 1
+MACRO       2   4  -1  -1   0 : 0
 MACRO       4   0  -1  -1   0 : 3
-MACRO       4   1  -1  -1   0 : 3
+MACRO       4   1  -1  -1   0 : 1
 MACRO       4   2  -1  -1   0 : 0 0 2
 MACRO       4   3  -1  -1   0 : 0 0 1 2 3
 MACRO       4   4  -1  -1   0 : 1
@@ -45,17 +46,17 @@ MACRO       4   4  -1  -1   0 : 1
 # Instruments
 INST2A03   0     0  -1   0  -1   0 "Main"
 INST2A03   1     0  -1   2  -1   0 "Main"
-INST2A03   2     1  -1   0  -1   1 "Second"
-INST2A03   3     3   0  -1  -1  -1 "Kick"
-INST2A03   4     4   1  -1  -1  -1 "Duo"
+INST2A03   2     1  -1   0  -1   0 "Second"
+INST2A03   3     3   0   4  -1  -1 "Kick"
+INST2A03   4     4   1   4  -1   1 "Duo"
 INST2A03   5     2  -1   1  -1   2 "Pulse"
-INST2A03   6     5  -1  -1   0   3 "Hihat"
+INST2A03   6     5  -1   4   0   3 "Hihat"
 INST2A03   7     6  -1   0  -1   1 "Second (1/4)"
 INST2A03   8     7  -1   1  -1   2 "Pulse (1/4)"
-INST2A03   9     3   0  -1  -1  -1 "Kickbass"
-INST2A03  10     5  -1  -1   0   4 "Hihat (noise)"
+INST2A03   9     3   0   4  -1  -1 "Kickbass"
+INST2A03  10     5  -1   4   0   4 "Hihat (noise)"
 INST2A03  11     3   3  -1  -1  -1 "Snare"
-INST2A03  12     9  -1   3  -1  -1 "Noise"
+INST2A03  12     9  -1   3  -1   4 "Noise"
 
 # Tracks
 

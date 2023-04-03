@@ -40,7 +40,7 @@ magnetizer_music_data:
 	.db $30 ;instrument $0b
 	.dw .env4,.env12,.env0
 	.db $00
-	.db $30 ;instrument $0c
+	.db $f0 ;instrument $0c
 	.dw .env9,.env0,.env15
 	.db $00
 
@@ -64,8 +64,8 @@ magnetizer_music_data:
 .env8:
 	.db $c1,$c1,$c2,$c2,$00,$03
 .env9:
-	.db $cb,$ca,$ca,$c9,$c9,$c8,$c8,$c7,$c7,$c6,$c6,$c5,$02,$c4,$c4,$c3
-	.db $05,$c2,$05,$c1,$02,$c0,$00,$15
+	.db $ca,$ca,$c9,$c8,$c8,$c7,$c6,$c6,$c5,$c5,$c4,$c3,$c3,$c2,$c1,$00
+	.db $0e
 .env10:
 	.db $c7,$c2,$c0,$b9,$b6,$b4,$00,$05
 .env11:
