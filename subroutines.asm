@@ -221,6 +221,7 @@ _SetFakeLine1:
     STA text_pointer_hi
 _DrawLevelLineDrawText:
     JSR _DrawText
+    JSR _DrawMedal
     RTS
 _DrawLevelLineStart:
     LDA #LOW(text_level)

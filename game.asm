@@ -260,6 +260,7 @@ EndLevel:
     LDA #$01
     STA next_level
     JSR _NextLevel
+    JSR _Stop
 EndLevelReset:
     JSR _ResetMoveCounter
     JSR _StartScreenMovement
@@ -357,7 +358,7 @@ InitializePosition:
 
     LDA starting_position_y
     SEC
-    SBC #$00
+    SBC #$01
     STA SPR_ADDRESS_START + $00
     STA SPR_ADDRESS_START + $04
     CLC
@@ -365,6 +366,7 @@ InitializePosition:
     STA SPR_ADDRESS_START + $08
     STA SPR_ADDRESS_START + $0C
     STA position_y
+    DEC position_y
 
 InitializeAnimation:
     LDA #$01
