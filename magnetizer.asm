@@ -113,6 +113,11 @@ SPR_ADDRESS_RARROW    = $0220
 SPR_ADDRESS_LARROW    = $0228
 SPR_ADDRESS_MEDAL     = $0238
 
+SOUND_BOX             = $00
+SOUND_MOVEMENT        = $01
+SOUND_TELEPORT        = $02
+SOUND_HIT             = $03
+
     .inesprg 2   ; 1x 16KB PRG code
     .ineschr 1   ; 1x  8KB CHR data
     .inesmap 3   ; mapper 0 = NROM, no bank swapping

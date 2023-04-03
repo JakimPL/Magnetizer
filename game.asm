@@ -234,6 +234,7 @@ CheckButton:
     JMP Movement
 
 PrepareGoToMenu:
+    JSR _PlaySoundHit
     LDA #01
     STA goto_menu
     JSR _PauseMusic
