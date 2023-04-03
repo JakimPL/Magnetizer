@@ -115,6 +115,22 @@ _SetDigitTargetCounters:
     STA digit_target_hi
     RTS
 
+_ClearMedalSprites:
+    LDA #$F0
+    STA SPR_ADDRESS_MEDAL + $00, x
+    STA SPR_ADDRESS_MEDAL + $04, x
+    STA SPR_ADDRESS_MEDAL + $08, x
+    STA SPR_ADDRESS_MEDAL + $0C, x
+    STA SPR_ADDRESS_MEDAL + $10, x
+    STA SPR_ADDRESS_MEDAL + $14, x
+    STA SPR_ADDRESS_MEDAL + $18, x
+    STA SPR_ADDRESS_MEDAL + $1C, x
+    STA SPR_ADDRESS_MEDAL + $20, x
+    STA SPR_ADDRESS_MEDAL + $24, x
+    STA SPR_ADDRESS_MEDAL + $28, x
+    STA SPR_ADDRESS_MEDAL + $2C, x
+    RTS
+
 _ClearBasicSprites:
     JSR _HideStopper
     JSR _HideElectric

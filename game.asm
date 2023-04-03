@@ -392,6 +392,7 @@ SetTrapDoor:
     RTS
 
 InitializeSprites:
+    JSR _ClearMedalSprites
 LoadSprites:
     LDX #$00
 LoadSpritesLoop:
