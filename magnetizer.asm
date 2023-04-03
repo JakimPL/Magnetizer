@@ -361,6 +361,7 @@ MainLoopEnd:
     .include "levels.asm"
     .include "famitone2.asm"
     .include "music.asm"
+    .include "sounds.asm"
     .include "constants.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

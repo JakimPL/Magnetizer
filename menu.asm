@@ -270,6 +270,7 @@ MoveCursorLeft:
     INC button_pressed
     DEC level_set
     LDA #$00
+    STA screen_offset
     STA level_set_counter
     LDA level_set
     BMI SetLevelSetToZero
@@ -283,6 +284,7 @@ MoveCursorRight:
     INC button_pressed
     INC level_set
     LDA #$00
+    STA screen_offset
     STA level_set_counter
     LDA level_set
     CMP level_sets_unlocked

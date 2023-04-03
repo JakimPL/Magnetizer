@@ -212,7 +212,7 @@ PreRead:
     LDA box_direction
     CMP #$00
     BEQ ReadController
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
 ReadController:
     JSR _ReadController
@@ -284,40 +284,42 @@ Move:
     BEQ MoveLeft
     CPX #RIGHT
     BEQ MoveRight
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
 MoveUp:
     DEC position_y
     JSR _AfterStep
     BNE Move
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
 MoveDown:
     INC position_y
     JSR _AfterStep
     BNE Move
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
 MoveLeft:
     DEC position_x
     JSR _AfterStep
     BNE Move
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
 MoveRight:
     INC position_x
     JSR _AfterStep
     BNE Move
-    JMP IncrementCounterCheck
+    JMP CounterIncrementCheck
 
-IncrementCounterCheck:
+CounterIncrementCheck:
     LDA increase_counter
     CMP #$01
     BNE GameLogicEnd
     JSR _IncreaseMoveCounter
     LDA #$00
     STA increase_counter
+CounterPostIncrement:
     JSR _HideStopper
+    JSR _PlaySoundMovement
 
 GameLogicEnd:
     INC screen_x

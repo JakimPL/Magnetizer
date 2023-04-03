@@ -618,7 +618,7 @@ _EnterLevel:
     STA next_level
     JSR InitializeGame
 
-    JSR _PlaySound
+    JSR _PlayMusic
     JSR _CalculateNextLevelPointer
     JSR _CalculatePalettePointer
 _EnterLevelInitialize:
@@ -1481,6 +1481,7 @@ _IncreaseSpeedStep:
 
 _Stop:
     JSR _HideElectric
+    JSR _PlaySoundHit
     LDA #$00
     STA grounded
     STA increase_counter
@@ -1857,6 +1858,8 @@ _MoveBox:
     LDA target
     JSR _Divide
     STA box_y, y
+
+    JSR _PlaySoundBox
 
 _MarkBoxesForSwap:
     LDX index
@@ -2505,6 +2508,9 @@ _EnableSound:
     LDX #LOW(magnetizer_music_data)
     LDY #HIGH(magnetizer_music_data)
     JSR FamiToneInit
+    LDX #LOW(sounds)
+	LDY #HIGH(sounds)
+	JSR FamiToneSfxInit
 	RTS
 
 _PauseMusic:
@@ -2512,11 +2518,29 @@ _PauseMusic:
     JSR FamiToneMusicPause
     RTS
 
-_PlaySound:
+_PlayMusic:
     LDA #$00
     LDX #LOW(magnetizer_music_data)
     LDY #HIGH(magnetizer_music_data)
     JSR FamiToneMusicPlay
+    RTS
+
+_PlaySoundMovement:
+	LDA #$01
+	LDX #FT_SFX_CH1
+	JSR FamiToneSfxPlay
+    RTS
+
+_PlaySoundBox:
+	LDA #$00
+	LDX #FT_SFX_CH1
+	JSR FamiToneSfxPlay
+    RTS
+
+_PlaySoundHit:
+	LDA #$02
+	LDX #FT_SFX_CH1
+	JSR FamiToneSfxPlay
     RTS
 
 _Snap:
