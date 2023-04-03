@@ -2523,7 +2523,8 @@ _PauseMusic:
     RTS
 
 _PlayMusic:
-    LDA #$00
+    LDX level_set
+    LDA songs, x
     LDX #LOW(magnetizer_music_data)
     LDY #HIGH(magnetizer_music_data)
     JSR FamiToneMusicPlay

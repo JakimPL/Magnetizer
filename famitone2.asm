@@ -1,7 +1,7 @@
 ;FamiTone2 v1.12
 
     .bank 3
-    .org $F000
+    .org $E000
 
 ;settings, uncomment or put them into your main program; the latter makes possible updates easier
 
