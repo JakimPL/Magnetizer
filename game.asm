@@ -372,6 +372,8 @@ InitializeAnimation:
     LDA #$00
     STA animation_cycle
 
+InitializeUpdateFamiTone:
+    JSR FamiToneUpdate
 VBlankLoop:
     JMP VBlankLoop
 

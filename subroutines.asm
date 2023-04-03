@@ -1614,11 +1614,9 @@ _EndCheck:
 _StartLevel:
     JSR _ResetPPU
     JSR InitializeSprites
-    JSR _DisableNMI
     JSR _Stop
     JSR _ResetMoveCounter
     JSR _LoadLevel
-    JSR _EnableNMI
     JMP InitializePosition
 
 _CheckIfNextPositionIsFree:
