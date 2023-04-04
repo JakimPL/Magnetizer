@@ -22,6 +22,7 @@ Game controls:
 * _SELECT_: return to menu
 
 ### Authors
+* **idea**: Wackyjackie
 * **code**: Jakim, Wackyjackie (original code)
 * **graphics**: Wackyjackie
 * **music/sound effects**: Jakim
