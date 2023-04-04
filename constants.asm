@@ -91,6 +91,18 @@ text_levels:
 text_total:
     .db $06, $1D, $18, $1D, $0A, $15, $2A
 
+text_music:
+    .db $06, $16, $1E, $1C, $12, $0C, $2A
+
+text_sound:
+    .db $06, $1C, $18, $1E, $17, $0D, $2A
+
+text_on:
+    .db $03, $18, $17, $24
+
+text_off:
+    .db $03, $18, $0F, $0F
+
 text_fake_1:
     .db $0C, $26, $27, $26, $27, $26, $27, $26, $27, $26, $27, $26, $27
 

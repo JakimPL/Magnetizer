@@ -437,6 +437,7 @@ _LoadCursorLoop:
     RTS
 
 _DrawMenu:
+    JSR _DrawSoundOptions
     JSR _DrawLogo
     JSR _DrawLevelSetText
     JSR _DrawAllLevelTexts
@@ -451,6 +452,7 @@ _DrawMenu:
     RTS
 
 _DrawPartialMenu:
+    JSR _DrawSoundOptions
     JSR _DrawLogo
     JSR _DrawAllLevelTexts
     JSR _DrawScoreText
@@ -459,6 +461,37 @@ _DrawPartialMenu:
     JSR _DrawTotal
     JSR _LoadCursor
     JSR _CalculateAndSetCursorPosition
+    RTS
+
+_DrawSoundOptions:
+    JSR _DrawMusicOption
+    JSR _DrawSoundOption
+    RTS
+
+_DrawMusicOption:
+    LDA #TEXT_MUSIC_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_MUSIC_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LOW(text_music)
+    STA text_pointer_lo
+    LDA #HIGH(text_music)
+    STA text_pointer_hi
+    JSR _DrawText
+    RTS
+
+_DrawSoundOption:
+    LDA #TEXT_SOUND_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_SOUND_X_OFFSET
+    JSR _PreparePPU
+
+    LDA #LOW(text_sound)
+    STA text_pointer_lo
+    LDA #HIGH(text_sound)
+    STA text_pointer_hi
+    JSR _DrawText
     RTS
 
 _DrawLogo:
