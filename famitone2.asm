@@ -1,7 +1,7 @@
 ;FamiTone2 v1.12
 
-    .bank 3
-    .org $E000
+    .bank 2
+    .org $D400
 
 ;settings, uncomment or put them into your main program; the latter makes possible updates easier
 
@@ -1190,3 +1190,6 @@ _FT2NoteTableMSB:
     .db $01, $01, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .db $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00
     .endif
+
+test_label:
+	.db $00

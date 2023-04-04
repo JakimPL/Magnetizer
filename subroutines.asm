@@ -241,6 +241,9 @@ _DrawMedal:
     ADC offset
     TAY
 
+    CPY #LEVELS
+    BCS _DrawMedalExit
+
     LDX completed, y
     LDA medal_sprites, x
     STA temp_x
@@ -266,6 +269,7 @@ _DrawMedal:
     STA SPR_ADDRESS_MEDAL + $00, x
 
     LDY temp_y
+_DrawMedalExit:
     RTS
 
 _DrawLevelNumber:
