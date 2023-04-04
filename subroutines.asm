@@ -247,21 +247,18 @@ _ClearMedal:
     RTS
 
 _DrawMedal:
-    STY temp_y
+    STY starting_position_y
 
     TYA
     CLC
     ADC offset
     TAY
 
-    CPY #LEVELS
-    BCS _DrawMedalExit
-
     LDX completed, y
     LDA medal_sprites, x
     STA temp_x
 
-    LDA temp_y
+    LDA starting_position_y
     ASL a
     ASL a
     TAX
@@ -273,7 +270,7 @@ _DrawMedal:
     LDA #MEDAL_X_OFFSET
     STA SPR_ADDRESS_MEDAL + $03, x
 
-    LDA temp_y
+    LDA starting_position_y
     ASL a
     ASL a
     ASL a
@@ -281,7 +278,7 @@ _DrawMedal:
     ADC #MEDAL_Y_OFFSET
     STA SPR_ADDRESS_MEDAL + $00, x
 
-    LDY temp_y
+    LDY starting_position_y
 _DrawMedalExit:
     RTS
 
@@ -2490,11 +2487,12 @@ _CalculateTextRange:
     LSR a
     AND #%00000011
     TAX
-    LDY text_ranges, x
-    STY position_x
+
+    LDA text_ranges, x
+    STA position_x
     INX
-    LDY text_ranges, x
-    STY position_y
+    LDA text_ranges, x
+    STA position_y
     RTS
 
 _CalculateLevelSetOffset:
