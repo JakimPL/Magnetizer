@@ -26,6 +26,6 @@ Game controls:
 * **graphics**: Wackyjackie
 * **music/sound effects**: Jakim
 * **level design**: Jakim, Wackyjackie, klapekboy
-* **sound engine**: FamiTone2 by Shiru​
+* **sound engine**: [FamiTone2 by Shiru](http://shiru.untergrund.net/code.shtml)
 
 Original game site: http://magnetizer.xn.pl/.
