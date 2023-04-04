@@ -286,9 +286,13 @@ JumpToToggleMusic:
 JumpToEnterLevel:
     JMP EnterLevel
 MoveCursorLeft:
-    JSR _PlaySoundChangeSet
     INC screen_movement
     INC button_pressed
+    LDA level_set
+    BNE ChangeLevelSetLeft
+    JMP SetCursor
+ChangeLevelSetLeft:
+    JSR _PlaySoundChangeSet
     DEC level_set
     LDA #$00
     STA screen_offset
@@ -302,9 +306,16 @@ SetLevelSetToZero:
     STA level_set
     JMP SetCursor
 MoveCursorRight:
-    JSR _PlaySoundChangeSet
     INC screen_movement
     INC button_pressed
+    LDA level_set
+    CLC
+    ADC #$01
+    CMP level_sets_unlocked
+    BNE ChangeLevelSetRight
+    JMP SetCursor
+ChangeLevelSetRight:
+    JSR _PlaySoundChangeSet
     INC level_set
     LDA #$00
     STA screen_offset
@@ -321,8 +332,17 @@ SetLevelSetToMax:
     STA level_set
     JMP SetCursor
 MoveCursorDown:
-    JSR _PlaySoundScroll
     INC button_pressed
+    LDA level_set_counter
+    LDX level_set
+    LDA level_set_count, x
+    SEC
+    SBC #$01
+    CMP level_set_counter
+    BNE ScrollDown
+    JMP SetCursor
+ScrollDown
+    JSR _PlaySoundScroll
     INC level_set_counter
     LDX level_set
     LDA level_set_count, x
@@ -332,8 +352,12 @@ MoveCursorDown:
     BCC SetLevelToMax
     JMP SetCursor
 MoveCursorUp:
-    JSR _PlaySoundScroll
     INC button_pressed
+    LDA level_set_counter
+    BNE ScrollUp
+    JMP SetCursor
+ScrollUp:
+    JSR _PlaySoundScroll
     DEC level_set_counter
     LDA level_set_counter
     BMI SetLevelToZero
