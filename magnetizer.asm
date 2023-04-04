@@ -123,9 +123,8 @@ SOUND_BOX             = $00
 SOUND_MOVEMENT        = $01
 SOUND_TELEPORT        = $02
 SOUND_HIT             = $03
-SOUND_ENTER_LEVEL     = $04
-SOUND_SCROLL          = $05
-SOUND_CHANGE_SET      = $06
+SOUND_SCROLL          = $04
+SOUND_CHANGE_SET      = $05
 
     .inesprg 2   ; 1x 16KB PRG code
     .ineschr 1   ; 1x  8KB CHR data

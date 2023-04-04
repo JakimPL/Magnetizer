@@ -257,23 +257,31 @@ JumpToReleaseController:
 CheckInput:
     LDA input
     CMP #$01
-    BEQ MoveCursorRight
+    BEQ JumpToMoveCursorRight
     CMP #$02
-    BEQ MoveCursorLeft
+    BEQ JumpToMoveCursorLeft
     CMP #$04
-    BEQ MoveCursorDown
+    BEQ JumpToMoveCursorDown
     CMP #$08
-    BEQ MoveCursorUp
+    BEQ JumpToMoveCursorUp
     CMP #$10
     BEQ JumpToEnterLevel
     CMP #$40
-    BEQ GoToToggleSound
+    BEQ JumpToToggleSound
     CMP #$80
-    BEQ GoToToggleMusic
+    BEQ JumpToToggleMusic
     JMP ReleaseController
-GoToToggleSound:
+JumpToMoveCursorRight:
+    JMP MoveCursorRight
+JumpToMoveCursorLeft:
+    JMP MoveCursorLeft
+JumpToMoveCursorUp:
+    JMP MoveCursorUp
+JumpToMoveCursorDown:
+    JMP MoveCursorDown
+JumpToToggleSound:
     JMP ToggleSound
-GoToToggleMusic:
+JumpToToggleMusic:
     JMP ToggleMusic
 JumpToEnterLevel:
     JMP EnterLevel
@@ -331,7 +339,6 @@ MoveCursorUp:
     BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
-    JSR _PlaySoundEnterLevel
     INC screen_offset
     JSR _HideCursor
     JSR _CalculateNextLevelPointer

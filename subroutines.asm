@@ -2639,12 +2639,6 @@ _PlaySoundTeleport:
 	JSR _PlaySound
     RTS
 
-_PlaySoundEnterLevel:
-	LDA #SOUND_ENTER_LEVEL
-	LDX #FT_SFX_CH3
-	JSR _PlaySound
-    RTS
-
 _PlaySoundScroll:
     LDA #SOUND_SCROLL
     LDX #FT_SFX_CH3
