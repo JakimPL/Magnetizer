@@ -35,6 +35,11 @@ _DisableNMI:
     STA PPUCTRL
     RTS
 
+_WaitForVBlank:
+    BIT PPUSTATUS
+    BPL _WaitForVBlank
+    RTS
+
 _PreparePPU:
     LDA PPUSTATUS
     LDA ppu_shift
@@ -452,15 +457,28 @@ _DrawMenu:
     RTS
 
 _DrawPartialMenu:
+    JSR _WaitForVBlank
     JSR _DrawSoundOptions
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _DrawLogo
-    JSR _DrawAllLevelTexts
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _DrawScoreText
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _DrawLevelsText
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _DrawTotalText
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _DrawTotal
+    JSR _ResetPPU
+    JSR _WaitForVBlank
     JSR _LoadCursor
     JSR _CalculateAndSetCursorPosition
+    JSR _EnableNMI
     RTS
 
 _DrawSoundOptions:

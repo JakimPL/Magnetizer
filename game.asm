@@ -317,15 +317,6 @@ GameLogicEnd:
     INC screen_x
     RTS
 
-VBlank:
-    BIT PPUSTATUS
-    BPL VBlank
-
-AfterVBLank:
-    JSR _LoadPalettes
-    JSR _LoadBackgroundsAndAttributes
-    JSR _EnableNMI
-
 InitializePosition:
     LDA starting_position_x
     SEC
@@ -507,12 +498,9 @@ DrawMenuScreenEnd:
     LDA #$00
     STA level_loading
     STA screen_offset
-    STA game
     STA goto_menu
-    JSR _ResetPPU
+    STA game
     JSR _DisableNMI
     JSR InitializeMenu
     JSR _DrawPartialMenu
-    JSR _EnableNMI
-DrawMenuScreenLoop:
-    JMP DrawMenuScreenLoop
+    RTS

@@ -318,8 +318,7 @@ Reset:
     STX DMC_FREQ
 
 InitialVBlank:
-    BIT PPUSTATUS
-    BPL InitialVBlank
+    JSR _WaitForVBlank
 
 ClearMemory:
     LDA #$00
