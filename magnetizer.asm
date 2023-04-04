@@ -365,11 +365,11 @@ MainLoopEnd:
     .include "game.asm"
     .include "subroutines.asm"
     .include "hex2dec.asm"
+    .include "constants.asm"
+    .include "sounds.asm"
     .include "levels.asm"
     .include "famitone2.asm"
     .include "music.asm"
-    .include "sounds.asm"
-    .include "constants.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
