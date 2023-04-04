@@ -196,6 +196,8 @@ DrawStatistics:
     JSR _DrawScores
     JSR _DrawLevels
     JSR _DrawLevelSetText
+    JSR _DrawSoundOptionChoice
+    JSR _DrawMusicOptionChoice
 MenuDrawEnd:
     INC speed
     JSR _ResetPPU
@@ -263,8 +265,18 @@ CheckInput:
     CMP #$08
     BEQ MoveCursorUp
     CMP #$10
-    BEQ EnterLevel
+    BEQ JumpToEnterLevel
+    CMP #$40
+    BEQ GoToToggleSound
+    CMP #$80
+    BEQ GoToToggleMusic
     JMP ReleaseController
+GoToToggleSound:
+    JMP ToggleSound
+GoToToggleMusic:
+    JMP ToggleMusic
+JumpToEnterLevel:
+    JMP EnterLevel
 MoveCursorLeft:
     INC screen_movement
     INC button_pressed
@@ -329,6 +341,18 @@ SetLevelToMax:
     DEC level_set_counter
 SetCursor:
     JSR _CalculateAndSetCursorPosition
+    JMP MenuLogicEnd
+ToggleSound:
+    INC button_pressed
+    LDA sound_off
+    JSR _Toggle
+    STA sound_off
+    JMP MenuLogicEnd
+ToggleMusic:
+    INC button_pressed
+    LDA music_off
+    JSR _Toggle
+    STA music_off
     JMP MenuLogicEnd
 
 ReleaseController:

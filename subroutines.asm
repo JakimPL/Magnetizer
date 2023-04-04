@@ -479,6 +479,16 @@ _DrawMusicOption:
     LDA #HIGH(text_music)
     STA text_pointer_hi
     JSR _DrawText
+
+_DrawMusicOptionChoice:
+    LDA #TEXT_MUSIC_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_MUSIC_X_OFFSET + $06
+    JSR _PreparePPU
+
+    LDA music_off
+    JSR _SetOnOrOffText
+    JSR _DrawText
     RTS
 
 _DrawSoundOption:
@@ -492,6 +502,30 @@ _DrawSoundOption:
     LDA #HIGH(text_sound)
     STA text_pointer_hi
     JSR _DrawText
+
+_DrawSoundOptionChoice
+    LDA #TEXT_SOUND_Y_OFFSET
+    STA ppu_shift
+    LDX #TEXT_SOUND_X_OFFSET + $06
+    JSR _PreparePPU
+
+    LDA sound_off
+    JSR _SetOnOrOffText
+    JSR _DrawText
+    RTS
+
+_SetOnOrOffText:
+    BEQ _SetOnTextPointer
+    LDA #LOW(text_off)
+    STA text_pointer_lo
+    LDA #HIGH(text_off)
+    STA text_pointer_hi
+    RTS
+_SetOnTextPointer:
+    LDA #LOW(text_on)
+    STA text_pointer_lo
+    LDA #HIGH(text_on)
+    STA text_pointer_hi
     RTS
 
 _DrawLogo:
@@ -2618,6 +2652,10 @@ _Divide:
     LSR a
     LSR a
     LSR a
+    RTS
+
+_Toggle:
+    EOR #%00000001
     RTS
 
 _TransformA:

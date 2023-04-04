@@ -71,7 +71,7 @@ MEDAL_X_OFFSET        = $6C
 TEXT_MUSIC_Y_OFFSET   = $23
 TEXT_MUSIC_X_OFFSET   = $62
 TEXT_SOUND_Y_OFFSET   = $23
-TEXT_SOUND_X_OFFSET   = $76
+TEXT_SOUND_X_OFFSET   = $74
 
 TEXT_SCORE_Y_OFFSET   = $21
 TEXT_SCORE_X_OFFSET   = $F4
@@ -270,6 +270,9 @@ screen_movement        .rs   1
 screen_offset          .rs   1
 screen_mode            .rs   1
 screen_x               .rs   1
+
+music_off              .rs   1
+sound_off              .rs   1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
