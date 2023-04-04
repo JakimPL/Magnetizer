@@ -2605,36 +2605,65 @@ _PauseMusic:
     RTS
 
 _PlayMusic:
+    LDY music_off
+    BNE _ExitPlayMusic
     LDX level_set
     LDA songs, x
     LDX #LOW(magnetizer_music_data)
     LDY #HIGH(magnetizer_music_data)
     JSR FamiToneMusicPlay
+_ExitPlayMusic:
     RTS
 
 _PlaySoundMovement:
 	LDA #SOUND_MOVEMENT
 	LDX #FT_SFX_CH2
-	JSR FamiToneSfxPlay
+	JSR _PlaySound
     RTS
 
 _PlaySoundBox:
 	LDA #SOUND_BOX
 	LDX #FT_SFX_CH1
-	JSR FamiToneSfxPlay
+	JSR _PlaySound
     RTS
 
 _PlaySoundHit:
 	LDA #SOUND_HIT
 	LDX #FT_SFX_CH2
-	JSR FamiToneSfxPlay
+	JSR _PlaySound
     RTS
 
 _PlaySoundTeleport:
 	LDA #SOUND_TELEPORT
 	LDX #FT_SFX_CH3
-	JSR FamiToneSfxPlay
+	JSR _PlaySound
     RTS
+
+_PlaySoundEnterLevel:
+	LDA #SOUND_ENTER_LEVEL
+	LDX #FT_SFX_CH3
+	JSR _PlaySound
+    RTS
+
+_PlaySoundScroll:
+    LDA #SOUND_SCROLL
+    LDX #FT_SFX_CH3
+    JSR _PlaySound
+    RTS
+
+_PlaySoundChangeSet:
+	LDA #SOUND_CHANGE_SET
+	LDX #FT_SFX_CH3
+	JSR _PlaySound
+    RTS
+
+_PlaySound:
+    LDY sound_off
+    BNE _ExitPlaySound
+	JSR FamiToneSfxPlay
+_ExitPlaySound:
+    RTS
+
 
 _Snap:
     AND #%11110000
