@@ -16,6 +16,7 @@ DMC_LEN               = $4013
 OAMDMA                = $4014
 SND_CHN               = $4015
 JOY1                  = $4016
+APU_CTRL              = $4017
 
 BLOCK                 = $00
 FREE                  = $01
@@ -298,13 +299,13 @@ Reset:
     SEI          ; disable IRQs
     CLD          ; disable decimal mode
     LDX #$40
-    STX $4017    ; disable APU frame IRQ
+    STX APU_CTRL
     LDX #$FF
-    TXS          ; Set up stack
-    INX          ; now X = 0
-    STX PPUCTRL    ; disable NMI
-    STX PPUMASK    ; disable rendering
-    STX DMC_FREQ    ; disable DMC IRQs
+    TXS
+    INX
+    STX PPUCTRL
+    STX PPUMASK
+    STX DMC_FREQ
 
 InitialVBlank:
     BIT PPUSTATUS
@@ -358,7 +359,8 @@ MainLoopEnd:
     JSR FamiToneUpdate
     RTI
 
-;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
     .include "menu.asm"
     .include "game.asm"
     .include "subroutines.asm"
@@ -375,7 +377,7 @@ MainLoopEnd:
     .org $FFFA
     .dw NMI
     .dw Reset
-    .dw 0
+    .dw $00
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -221,7 +221,7 @@ _SetFakeLine1:
     STA text_pointer_hi
 _DrawLevelLineDrawText:
     JSR _DrawText
-    JSR _DrawMedal
+    JSR _ClearMedal
     RTS
 _DrawLevelLineStart:
     LDA #LOW(text_level)
@@ -231,6 +231,19 @@ _DrawLevelLineStart:
     JSR _DrawText
     JSR _DrawLevelNumber
     JSR _DrawMedal
+    RTS
+
+_ClearMedal:
+    LDA temp_y
+    ASL a
+    ASL a
+    TAX
+
+    LDA medal_sprites
+    STA SPR_ADDRESS_MEDAL + $01, x
+    LDA #$F0
+    ADC #MEDAL_Y_OFFSET
+    STA SPR_ADDRESS_MEDAL + $00, x
     RTS
 
 _DrawMedal:

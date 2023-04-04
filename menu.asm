@@ -271,6 +271,7 @@ MoveCursorLeft:
     DEC level_set
     LDA #$00
     STA screen_offset
+    STA speed
     STA level_set_counter
     LDA level_set
     BMI SetLevelSetToZero
@@ -285,6 +286,7 @@ MoveCursorRight:
     INC level_set
     LDA #$00
     STA screen_offset
+    STA speed
     STA level_set_counter
     LDA level_set
     CMP level_sets_unlocked

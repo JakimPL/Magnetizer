@@ -73,7 +73,7 @@ medal_sprites:
 
 
 text_ranges:
-    .db $00, $04, $08, $0A, $0B
+    .db $00, $03, $06, $08, $0A
 
 text_levels_y_offsets:
     .db $21, $22, $22, $22, $22, $22, $22, $22, $22, $23
