@@ -235,7 +235,7 @@ CheckButton:
     JMP Movement
 
 PrepareGoToMenu:
-    JSR _ClearBasicSprites
+    JSR _Stop
     JSR _PlaySoundHit
     LDA #SOUND_HIT
     LDA #$01
@@ -245,18 +245,6 @@ PrepareGoToMenu:
 
 JumpToMovement:
     JMP Movement
-GoToMenu:
-    LDA #$00
-    STA game
-    STA goto_menu
-    LDA #$01
-    STA screen_movement
-    JSR _ResetPPU
-    LDX #$00
-    STX PPUMASK
-    JSR _DisableNMI
-    JSR InitializeMenu
-    JMP GoToMenuVBlank
 RestartLevel:
     JSR _StartScreenRedraw
     JMP GameLogicEnd
@@ -328,19 +316,6 @@ CounterPostIncrement:
 GameLogicEnd:
     INC screen_x
     RTS
-
-GoToMenuVBlank:
-    BIT PPUSTATUS
-    BPL GoToMenuVBlank
-    LDA #$20
-    STA ppu_shift
-    JSR _LoadBackgroundAndAttribute
-    JSR _DrawPartialMenu
-    JSR _ResetPPU
-    JSR _EnableNMI
-
-GoToMenuVBlankLoop:
-    JMP GoToMenuVBlankLoop
 
 VBlank:
     BIT PPUSTATUS
@@ -534,8 +509,10 @@ DrawMenuScreenEnd:
     STA screen_offset
     STA game
     STA goto_menu
+    JSR _ResetPPU
     JSR _DisableNMI
     JSR InitializeMenu
-    JMP GoToMenuVBlank
-;DrawMenuScreenLoop:
-;    JMP DrawMenuScreenLoop
+    JSR _DrawPartialMenu
+    JSR _EnableNMI
+DrawMenuScreenLoop:
+    JMP DrawMenuScreenLoop
