@@ -1,6 +1,6 @@
 GameLogic:
     LDA goto_menu
-    BNE JumpGoToMenu
+    BNE JumpToDrawMenuScreen
 
     LDX level_loading
     BEQ CheckScreenMovement
@@ -12,8 +12,9 @@ CheckScreenMovement:
     JSR DrawTransition
     JMP GameLogicEnd
 
-JumpGoToMenu:
-    JMP GoToMenu
+JumpToDrawMenuScreen:
+    JSR DrawMenuScreen
+    JMP GameLogicEnd
 
 CheckBlockadeToDraw:
     LDA blockade
@@ -234,10 +235,13 @@ CheckButton:
     JMP Movement
 
 PrepareGoToMenu:
+    JSR _ClearBasicSprites
     JSR _PlaySoundHit
-    LDA #01
+    LDA #SOUND_HIT
+    LDA #$01
     STA goto_menu
     JSR _PauseMusic
+    JSR _StartScreenRedraw
 
 JumpToMovement:
     JMP Movement
@@ -247,7 +251,6 @@ GoToMenu:
     STA goto_menu
     LDA #$01
     STA screen_movement
-    JSR _ClearBasicSprites
     JSR _ResetPPU
     LDX #$00
     STX PPUMASK
@@ -516,3 +519,23 @@ DrawNextLevelEnd:
 DrawNextLevelFinish:
     JSR _ResetPPU
     RTS
+
+DrawMenuScreen:
+    LDA #$20
+    STA ppu_address
+    JSR _SetMenuPointer
+    JSR _RedrawLevelStep
+    BNE DrawMenuScreenEnd
+    JSR _ResetPPU
+    RTS
+DrawMenuScreenEnd:
+    LDA #$00
+    STA level_loading
+    STA screen_offset
+    STA game
+    STA goto_menu
+    JSR _DisableNMI
+    JSR InitializeMenu
+    JMP GoToMenuVBlank
+;DrawMenuScreenLoop:
+;    JMP DrawMenuScreenLoop

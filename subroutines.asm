@@ -795,6 +795,7 @@ _NextLevelSet:
     LDA level_set
     CMP level_sets_unlocked
     BEQ _RollBack
+    CMP #LEVEL_SETS
     JSR _IncrementPalettePointer
     JSR _CalculateNextLevelPointer
     RTS
@@ -833,6 +834,15 @@ _EnterLevelIncreasePointer:
     INX
     CPX level_set
     BNE _EnterLevelIncreasePointer
+    RTS
+
+_SetMenuPointer:
+    LDA #LOW(menu)
+    STA level_lo
+    STA pointer_lo
+    LDA #HIGH(menu)
+    STA level_hi
+    STA pointer_hi
     RTS
 
 _SetLevelPointer:
@@ -2213,7 +2223,6 @@ _ResetBoxSwap:
     STA target_box
     RTS
 
-;; y as argument ;;
 _IsBlockadeOnIndex:
     LDA index
     AND #%00001111
@@ -2252,7 +2261,6 @@ _IsBoxOnIndexReturnFalse:
     LDA #$00
     RTS
 
-;; collision logic ;;
 _GetTile:
     LDY index
     LDA [level_lo], y
@@ -2451,7 +2459,6 @@ _SetDirection:
     STY draw_counter
     RTS
 
-;; move counter ;;
 _ResetMoveCounter:
     LDA #$00
     STA move_counter_limit

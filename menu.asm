@@ -3,10 +3,7 @@ InitializeMenu:
     JSR _DisableNMI
     JSR PrecalculateCounters
     JSR PrecalculateAvailableSets
-    LDA #LOW(menu)
-    STA level_lo
-    LDA #HIGH(menu)
-    STA level_hi
+    JSR _SetMenuPointer
     RTS
 
 PrecalculateAvailableSets:
@@ -306,6 +303,10 @@ MoveCursorRight:
     CLC
     ADC #$01
     CMP level_sets_unlocked
+    BNE CheckIfLastLevelSet
+    JMP SetCursor
+CheckIfLastLevelSet:
+    CMP #LEVEL_SETS
     BNE ChangeLevelSetRight
     JMP SetCursor
 ChangeLevelSetRight:

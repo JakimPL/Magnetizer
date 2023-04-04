@@ -345,7 +345,6 @@ ResetScroll:
     JSR _LoadBackgroundsAndAttributes
     JSR _DrawMenu
     JSR _EnableNMI
-
     JSR _EnableSound
 Forever:
     JMP Forever
