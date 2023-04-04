@@ -298,12 +298,6 @@ ChangeLevelSetLeft:
     STA screen_offset
     STA speed
     STA level_set_counter
-    LDA level_set
-    BMI SetLevelSetToZero
-    JMP SetCursor
-SetLevelSetToZero:
-    LDA #$00
-    STA level_set
     JMP SetCursor
 MoveCursorRight:
     INC screen_movement
@@ -321,15 +315,6 @@ ChangeLevelSetRight:
     STA screen_offset
     STA speed
     STA level_set_counter
-    LDA level_set
-    CMP level_sets_unlocked
-    BEQ SetLevelSetToMax
-    JMP SetCursor
-SetLevelSetToMax:
-    LDA level_sets_unlocked
-    SEC
-    SBC #$01
-    STA level_set
     JMP SetCursor
 MoveCursorDown:
     INC button_pressed
@@ -344,12 +329,6 @@ MoveCursorDown:
 ScrollDown
     JSR _PlaySoundScroll
     INC level_set_counter
-    LDX level_set
-    LDA level_set_count, x
-    SEC
-    SBC #$01
-    CMP level_set_counter
-    BCC SetLevelToMax
     JMP SetCursor
 MoveCursorUp:
     INC button_pressed
@@ -359,22 +338,12 @@ MoveCursorUp:
 ScrollUp:
     JSR _PlaySoundScroll
     DEC level_set_counter
-    LDA level_set_counter
-    BMI SetLevelToZero
     JMP SetCursor
 EnterLevel:
     INC screen_offset
     JSR _HideCursor
     JSR _CalculateNextLevelPointer
     JMP MenuLogicEnd
-SetLevelToZero:
-    LDA #$00
-    STA level_set_counter
-    JMP SetCursor
-SetLevelToMax:
-    LDA level_set_count, x
-    STA level_set_counter
-    DEC level_set_counter
 SetCursor:
     JSR _CalculateAndSetCursorPosition
     JMP MenuLogicEnd
