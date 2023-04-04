@@ -11,6 +11,8 @@ Menu controls:
 * _up_/_down_ arrows: level change
 * _left_/_right_ arrows: level set change
 * _START_: choose a level
+* _A_: toggle music _ON_/_OFF_
+* _B_: toggle sound _ON_/_OFF_
 
 Game controls:
 
@@ -22,7 +24,7 @@ Game controls:
 ### Authors
 * **code**: Jakim, Wackyjackie (original code)
 * **graphics**: Wackyjackie
-* **music**: Jakim (not present yet)
+* **music/sound effects**: Jakim
 * **level design**: Jakim, Wackyjackie, klapekboy
 * **sound engine**: FamiTone2 by Shiru​
 

@@ -376,10 +376,10 @@ MainLoopEnd:
     .include "subroutines.asm"
     .include "hex2dec.asm"
     .include "constants.asm"
-    .include "sounds.asm"
+    .include "sound/sounds.asm"
     .include "levels.asm"
-    .include "famitone2.asm"
-    .include "music.asm"
+    .include "sound/famitone2.asm"
+    .include "sound/music.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
