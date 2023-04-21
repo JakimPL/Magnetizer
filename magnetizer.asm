@@ -97,8 +97,8 @@ TEXT_LSET_X_OFFSET    = $82
 LOGO_Y_OFFSET         = $20
 LOGO_X_OFFSET         = $83
 
-LEVEL_SETS            = $06
-LEVELS                = $36
+LEVEL_SETS            = $07
+LEVELS                = $3C
 LEVEL_SET_SWITCH      = $03
 LEVEL_POINTER_OFFSET  = $02
 SWITCH_POINTER_VALUE  = $BE
