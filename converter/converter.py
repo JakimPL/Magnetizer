@@ -37,36 +37,37 @@ DICTIONARY = {
 }
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("input", nargs='+', help="location of .arr file")
-args = parser.parse_args()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('input', nargs='+', help='location of .arr file')
+    args = parser.parse_args()
 
-filenames = args.input
-print(filenames)
+    filenames = args.input
+    print(filenames)
 
-for filename in filenames:
-    with open(filename, 'rb') as file:
-        index = 0
-        while byte := file.read(2):
-            index += 1
-            if index == BYTE_WIDTH:
-                ROWS = int.from_bytes(byte, byteorder='little')
-            elif index == BYTE_HEIGHT:
-                COLUMNS = int.from_bytes(byte, byteorder='little')
-                array = np.zeros((ROWS, COLUMNS), dtype=int)
-            elif index >= OFFSET and not index % 2:
-                real_index = (index - OFFSET) // 2
-                column = real_index % ROWS
-                row = real_index // ROWS
-                value = int.from_bytes(byte, byteorder='little')
-                if row < ROWS and column < COLUMNS:
-                    array[row, column] = DICTIONARY.get(value, -1)
+    for filename in filenames:
+        with open(filename, 'rb') as file:
+            index = 0
+            while byte := file.read(2):
+                index += 1
+                if index == BYTE_WIDTH:
+                    ROWS = int.from_bytes(byte, byteorder='little')
+                elif index == BYTE_HEIGHT:
+                    COLUMNS = int.from_bytes(byte, byteorder='little')
+                    array = np.zeros((ROWS, COLUMNS), dtype=int)
+                elif index >= OFFSET and not index % 2:
+                    real_index = (index - OFFSET) // 2
+                    column = real_index % ROWS
+                    row = real_index // ROWS
+                    value = int.from_bytes(byte, byteorder='little')
+                    if row < ROWS and column < COLUMNS:
+                        array[row, column] = DICTIONARY.get(value, -1)
 
-    target_array = np.zeros((PADDED_TARGET_ROWS, PADDED_TARGET_COLUMNS), dtype=int)
-    target_array[:TARGET_ROWS, :TARGET_COLUMNS] = array[:TARGET_ROWS, :TARGET_COLUMNS]
-    output = ''
-    for line in target_array:
-        line_start = '    .db $'
-        output += line_start + ", $".join(list(map(to_hex, line))) + '\n'
+        target_array = np.zeros((PADDED_TARGET_ROWS, PADDED_TARGET_COLUMNS), dtype=int)
+        target_array[:TARGET_ROWS, :TARGET_COLUMNS] = array[:TARGET_ROWS, :TARGET_COLUMNS]
+        output = ''
+        for line in target_array:
+            line_start = '    .db $'
+            output += line_start + ", $".join(list(map(to_hex, line))) + '\n'
 
-    print(output)
+        print(output)
