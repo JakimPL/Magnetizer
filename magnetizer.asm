@@ -98,7 +98,7 @@ LOGO_Y_OFFSET         = $20
 LOGO_X_OFFSET         = $83
 
 LEVEL_SETS            = $06
-LEVELS                = $30
+LEVELS                = $36
 LEVEL_SET_SWITCH      = $03
 LEVEL_POINTER_OFFSET  = $02
 SWITCH_POINTER_VALUE  = $BE
