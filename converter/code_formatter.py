@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     with open(input_path, 'r') as file:
         code = file.read()
-        lines = code.splitlines()[1:]
+        lines = code.splitlines()
         formatted_code = ''.join(format_code(lines))
         print(formatted_code)
 
