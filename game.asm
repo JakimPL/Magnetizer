@@ -246,6 +246,7 @@ PrepareGoToMenu:
 JumpToMovement:
     JMP Movement
 RestartLevel:
+    JSR _Stop
     JSR _StartScreenRedraw
     JMP GameLogicEnd
 EndLevel:

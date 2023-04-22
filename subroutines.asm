@@ -1732,6 +1732,7 @@ _StartLevel:
     JSR _Stop
     JSR _ResetMoveCounter
     JSR _LoadLevel
+    JSR _ReplayMusicIfChanged
     JMP InitializePosition
 
 _CheckIfNextPositionIsFree:
@@ -2637,8 +2638,16 @@ _PlayMusic:
     LDA songs, x
     LDX #LOW(magnetizer_music_data)
     LDY #HIGH(magnetizer_music_data)
+    STA current_song
     JSR FamiToneMusicPlay
 _ExitPlayMusic:
+    RTS
+
+_ReplayMusicIfChanged:
+    LDX level_set
+    LDA songs, x
+    CMP current_song
+    BNE _PlayMusic
     RTS
 
 _PlaySoundMovement:

@@ -276,6 +276,8 @@ screen_x               .rs   1
 music_off              .rs   1
 sound_off              .rs   1
 
+current_song           .rs   1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     .rsset $6000
