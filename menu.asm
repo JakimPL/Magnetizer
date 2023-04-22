@@ -4,6 +4,7 @@ InitializeMenu:
     JSR PrecalculateCounters
     JSR PrecalculateAvailableSets
     JSR _SetMenuPointer
+    JSR _WaitForVBlank
     RTS
 
 PrecalculateAvailableSets:

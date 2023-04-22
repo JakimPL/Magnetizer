@@ -1896,7 +1896,6 @@ _SaveBlockadeToRemove:
     RTS
 
 _BlockadeRemoverCheckLoop:
-    LDA #$00
     LDY blockade_removers
     CPY #$00
     BNE _BlockadeRemoverCheckStep
@@ -1948,7 +1947,7 @@ _BoxCheck:
     JSR _IsBoxOnIndex
     CMP #$01
     BEQ _BoxAction
-    RTS
+    JMP _BoxCheckEnd
 _BoxAction:
     LDX direction
     LDA movement, x
@@ -1963,7 +1962,7 @@ _BoxAction:
     JSR _CheckBoxCollision
     CMP #$00
     BEQ _MoveBox
-    RTS
+    JMP _BoxCheckEnd
 _MoveBox:
     LDY temp_y
     LDA target
@@ -2022,6 +2021,7 @@ _MarkBoxesForSwap:
     STA box_animation_y
 
 _BoxCheckEnd:
+    LDY temp_y
     RTS
 
 _RemoveSourceBox:
