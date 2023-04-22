@@ -296,7 +296,7 @@ trap_doors_y           .rs  48
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $6400
+    .rsset $0600
 scores                 .rs   2 * LEVELS
 completed              .rs   1 * LEVELS
 counters               .rs   2 * (LEVELS_DIGITS + 1) * (LEVEL_SETS + 1)

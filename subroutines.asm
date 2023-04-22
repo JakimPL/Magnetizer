@@ -1895,6 +1895,7 @@ _SaveBlockadeToRemove:
     RTS
 
 _BlockadeRemoverCheckLoop:
+    LDA #$00
     LDY blockade_removers
     CPY #$00
     BNE _BlockadeRemoverCheckStep
