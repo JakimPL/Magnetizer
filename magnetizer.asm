@@ -290,13 +290,13 @@ portals_a_x            .rs  40
 portals_a_y            .rs  40
 portals_b_x            .rs  40
 portals_b_y            .rs  40
-trap_doors_on          .rs  16
-trap_doors_x           .rs  16
-trap_doors_y           .rs  16
+trap_doors_on          .rs  48
+trap_doors_x           .rs  48
+trap_doors_y           .rs  48
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    .rsset $6200
+    .rsset $6400
 scores                 .rs   2 * LEVELS
 completed              .rs   1 * LEVELS
 counters               .rs   2 * (LEVELS_DIGITS + 1) * (LEVEL_SETS + 1)
