@@ -1899,6 +1899,7 @@ _BlockadeRemoverCheckLoop:
     LDY blockade_removers
     CPY #$00
     BNE _BlockadeRemoverCheckStep
+    LDA #$00
     RTS
 _BlockadeRemoverCheckStep:
     DEY
