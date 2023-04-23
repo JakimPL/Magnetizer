@@ -1,3 +1,6 @@
+;MAGNETIZER_UNLOCKED ; uncomment to unlock all sets and levels
+
+
 ;;;;;;;   constants   ;;;;;;;
 
 PPUCTRL               = $2000
